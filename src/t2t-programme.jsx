@@ -1,5 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 
+// ─── MOBILE HOOK ──────────────────────────────────────────────────────────────
+const useMobile = () => {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return isMobile;
+};
+
 const GlobalStyles = () => (
   <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
@@ -161,10 +172,14 @@ const PasswordGate = ({ title, subtitle, password, buttonLabel, onUnlock }) => {
 const Nav = ({ page, setPage, onLogoClick }) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 30);
-    window.addEventListener("scroll", fn); return () => window.removeEventListener("scroll", fn);
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("scroll", onScroll);
+    window.addEventListener("resize", onResize);
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onResize); };
   }, []);
 
   const navLinks = [
@@ -176,8 +191,8 @@ const Nav = ({ page, setPage, onLogoClick }) => {
 
   return (
     <>
-      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:1000, height:68, background:scrolled||menuOpen?"rgba(255,254,249,0.97)":"transparent", backdropFilter:scrolled||menuOpen?"blur(16px)":"none", borderBottom:scrolled||menuOpen?"1px solid var(--border)":"none", transition:"all 0.3s ease", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 24px 0 24px" }}>
-        
+      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:1000, height:68, background:scrolled||menuOpen?"rgba(255,254,249,0.97)":"transparent", backdropFilter:scrolled||menuOpen?"blur(16px)":"none", borderBottom:scrolled||menuOpen?"1px solid var(--border)":"none", transition:"all 0.3s ease", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 24px" }}>
+
         {/* Logo */}
         <div onClick={()=>{onLogoClick();setMenuOpen(false);}} style={{ cursor:"pointer", display:"flex", alignItems:"center", gap:12 }}>
           <div style={{ width:34, height:34, background:"var(--forest)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
@@ -190,28 +205,32 @@ const Nav = ({ page, setPage, onLogoClick }) => {
         </div>
 
         {/* Desktop links */}
-        <div className="nav-desktop" style={{ display:"flex", gap:4, alignItems:"center" }}>
-          {[{key:"landing",label:"Home"},{key:"newsroom",label:"Newsroom"}].map(({key,label})=>(
-            <button key={key} onClick={()=>setPage(key)} style={{ background:page===key?"var(--mint2)":"transparent", border:"none", color:page===key?"var(--forest)":"var(--text3)", padding:"7px 18px", borderRadius:6, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}>{label}</button>
-          ))}
-          <div style={{ width:1, height:20, background:"var(--border)", margin:"0 8px" }} />
-          <button onClick={()=>setPage("press-gate")} style={{ background:"transparent", border:"1.5px solid var(--forest)", color:"var(--forest)", padding:"7px 18px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", marginRight:6 }}>Press Portal</button>
-          <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", border:"none", color:"white", padding:"9px 22px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>Apply Now</button>
-        </div>
+        {!isMobile && (
+          <div style={{ display:"flex", gap:4, alignItems:"center" }}>
+            {[{key:"landing",label:"Home"},{key:"newsroom",label:"Newsroom"}].map(({key,label})=>(
+              <button key={key} onClick={()=>setPage(key)} style={{ background:page===key?"var(--mint2)":"transparent", border:"none", color:page===key?"var(--forest)":"var(--text3)", padding:"7px 18px", borderRadius:6, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}>{label}</button>
+            ))}
+            <div style={{ width:1, height:20, background:"var(--border)", margin:"0 8px" }} />
+            <button onClick={()=>setPage("press-gate")} style={{ background:"transparent", border:"1.5px solid var(--forest)", color:"var(--forest)", padding:"7px 18px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", marginRight:6 }}>Press Portal</button>
+            <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", border:"none", color:"white", padding:"9px 22px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>Apply Now</button>
+          </div>
+        )}
 
         {/* Mobile hamburger */}
-        <button className="nav-hamburger" onClick={()=>setMenuOpen(o=>!o)} style={{ display:"none", background:"transparent", border:"1.5px solid var(--border)", borderRadius:8, padding:"7px 10px", cursor:"pointer", flexDirection:"column", gap:5, alignItems:"center", justifyContent:"center" }}>
-          <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.2s", transform:menuOpen?"rotate(45deg) translate(5px,5px)":"none" }} />
-          <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.2s", opacity:menuOpen?0:1 }} />
-          <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.2s", transform:menuOpen?"rotate(-45deg) translate(5px,-5px)":"none" }} />
-        </button>
+        {isMobile && (
+          <button onClick={()=>setMenuOpen(o=>!o)} style={{ background:"transparent", border:"1.5px solid var(--border)", borderRadius:8, padding:"8px 10px", cursor:"pointer", display:"flex", flexDirection:"column", gap:5, alignItems:"center", justifyContent:"center" }}>
+            <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.25s", transform:menuOpen?"rotate(45deg) translate(5px,5px)":"none" }} />
+            <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.25s", opacity:menuOpen?0:1 }} />
+            <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.25s", transform:menuOpen?"rotate(-45deg) translate(5px,-5px)":"none" }} />
+          </button>
+        )}
       </nav>
 
-      {/* Mobile dropdown menu */}
-      {menuOpen && (
-        <div className="nav-mobile-menu" style={{ display:"none", position:"fixed", top:68, left:0, right:0, zIndex:999, background:"rgba(255,254,249,0.98)", backdropFilter:"blur(16px)", borderBottom:"1px solid var(--border)", padding:"16px 24px 24px", flexDirection:"column", gap:8 }}>
+      {/* Mobile dropdown */}
+      {isMobile && menuOpen && (
+        <div style={{ position:"fixed", top:68, left:0, right:0, zIndex:999, background:"rgba(255,254,249,0.98)", backdropFilter:"blur(16px)", borderBottom:"1px solid var(--border)", padding:"16px 24px 24px", display:"flex", flexDirection:"column", gap:8 }}>
           {navLinks.map(({key,label,primary})=>(
-            <button key={key} onClick={()=>{setPage(key);setMenuOpen(false);}} style={{ background:primary?"var(--forest)":page===key?"var(--mint2)":"transparent", border:primary?"none":"1px solid var(--border)", color:primary?"white":page===key?"var(--forest)":"var(--text2)", padding:"13px 20px", borderRadius:8, fontSize:"0.95rem", fontWeight:primary?600:500, cursor:"pointer", textAlign:"left", width:"100%" }}>
+            <button key={key} onClick={()=>{setPage(key);setMenuOpen(false);}} style={{ background:primary?"var(--forest)":page===key?"var(--mint2)":"transparent", border:primary?"none":"1.5px solid var(--border)", color:primary?"white":page===key?"var(--forest)":"var(--text2)", padding:"13px 20px", borderRadius:8, fontSize:"0.95rem", fontWeight:primary?600:500, cursor:"pointer", textAlign:"left", width:"100%" }}>
               {label}
             </button>
           ))}
@@ -222,37 +241,42 @@ const Nav = ({ page, setPage, onLogoClick }) => {
 };
 
 // ─── LANDING ─────────────────────────────────────────────────────────────────
-const Landing = ({ setPage }) => (
+const Landing = ({ setPage }) => {
+  const m = useMobile();
+  return (
   <div>
-    <section className="hero-section" style={{ minHeight:"100vh", background:`radial-gradient(ellipse at 70% 30%, rgba(200,230,218,0.4) 0%, transparent 55%), radial-gradient(ellipse at 10% 80%, rgba(200,230,218,0.2) 0%, transparent 45%), var(--sand2)`, display:"flex", flexDirection:"column", justifyContent:"center", padding:"140px 80px 80px", position:"relative", overflow:"hidden" }}>
+    {/* HERO */}
+    <section style={{ minHeight: m?"auto":"100vh", background:`radial-gradient(ellipse at 70% 30%, rgba(200,230,218,0.4) 0%, transparent 55%), radial-gradient(ellipse at 10% 80%, rgba(200,230,218,0.2) 0%, transparent 45%), var(--sand2)`, display:"flex", flexDirection:"column", justifyContent:"center", padding: m?"100px 24px 48px":"140px 80px 80px", position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", inset:0, opacity:0.4, backgroundImage:"radial-gradient(circle, rgba(27,61,47,0.06) 1px, transparent 1px)", backgroundSize:"36px 36px" }} />
-      <div style={{ position:"absolute", right:-120, top:"10%", width:600, height:600, borderRadius:"50%", border:"1px solid rgba(27,61,47,0.08)", pointerEvents:"none" }} />
-      <div style={{ position:"absolute", right:-60, top:"5%", width:480, height:480, borderRadius:"50%", background:"radial-gradient(circle, rgba(200,230,218,0.35) 0%, transparent 70%)", pointerEvents:"none" }} />
+      {!m && <>
+        <div style={{ position:"absolute", right:-120, top:"10%", width:600, height:600, borderRadius:"50%", border:"1px solid rgba(27,61,47,0.08)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", right:-60, top:"5%", width:480, height:480, borderRadius:"50%", background:"radial-gradient(circle, rgba(200,230,218,0.35) 0%, transparent 70%)", pointerEvents:"none" }} />
+      </>}
 
-      <div className="fade-up" style={{ maxWidth:760, position:"relative" }}>
+      <div className="fade-up" style={{ maxWidth: m?"100%":760, position:"relative" }}>
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"var(--forest)", color:"white", borderRadius:100, padding:"5px 14px 5px 10px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:32 }}>
           <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
         </div>
-        <h1 style={{ fontSize:"clamp(3rem,6vw,6rem)", fontWeight:700, lineHeight:1.0, color:"var(--forest)", marginBottom:28, letterSpacing:"-0.02em" }}>
+        <h1 style={{ fontSize: m?"2.8rem":"clamp(3rem,6vw,6rem)", fontWeight:700, lineHeight:1.05, color:"var(--forest)", marginBottom:24, letterSpacing:"-0.02em" }}>
           Training to<br /><span style={{ fontStyle:"italic", fontWeight:400, color:"var(--sage)" }}>Transaction.</span>
         </h1>
-        <p style={{ fontSize:"1.15rem", color:"var(--text2)", lineHeight:1.75, maxWidth:560, marginBottom:12, fontWeight:300 }}>
+        <p style={{ fontSize: m?"1rem":"1.15rem", color:"var(--text2)", lineHeight:1.75, maxWidth:560, marginBottom:12, fontWeight:300 }}>
           A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
         </p>
-        <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.1rem", color:"var(--sage)", marginBottom:48 }}>Lagos and Abuja · Commencing April 13, 2026</p>
-        <div className="hero-buttons" style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
-          <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", boxShadow:"0 8px 32px rgba(27,61,47,0.28)", transition:"all 0.2s" }}
-            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";}}
-            onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";}}
-          >Apply to the Programme</button>
-          <button onClick={()=>setPage("newsroom")} style={{ background:"transparent", border:"1.5px solid var(--forest)", color:"var(--forest)", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}
+        <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.1rem", color:"var(--sage)", marginBottom: m?32:48 }}>Lagos and Abuja · Commencing April 13, 2026</p>
+        <div style={{ display:"flex", flexDirection: m?"column":"row", gap:12 }}>
+          <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", boxShadow:"0 8px 32px rgba(27,61,47,0.28)" }}>
+            Apply to the Programme
+          </button>
+          <button onClick={()=>setPage("newsroom")} style={{ background:"transparent", border:"1.5px solid var(--forest)", color:"var(--forest)", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer" }}
             onMouseEnter={e=>{e.currentTarget.style.background="var(--forest)";e.currentTarget.style.color="white";}}
             onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="var(--forest)";}}
           >Press and Media</button>
         </div>
       </div>
 
-      <div className="overview-card" style={{ position:"absolute", right:80, bottom:80, background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"28px 32px", boxShadow:"0 20px 60px rgba(27,61,47,0.1)", minWidth:260 }}>
+      {/* Overview card — absolute on desktop, stacked on mobile */}
+      <div style={{ position: m?"relative":"absolute", right: m?"auto":80, bottom: m?"auto":80, marginTop: m?40:0, background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"28px 32px", boxShadow: m?"none":"0 20px 60px rgba(27,61,47,0.1)", width: m?"100%":"auto", minWidth: m?"unset":260 }}>
         <p style={{ fontSize:"0.68rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.1em", marginBottom:16 }}>PROGRAMME OVERVIEW</p>
         {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"March 31, 2026"},{label:"Commencement",val:"April 13, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val})=>(
           <div key={label} style={{ marginBottom:12, paddingBottom:12, borderBottom:"1px solid var(--border2)" }}>
@@ -263,24 +287,26 @@ const Landing = ({ setPage }) => (
       </div>
     </section>
 
-    <section style={{ background:"var(--forest)", padding:"60px 80px" }}>
-      <p style={{ fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.12em", color:"rgba(200,230,218,0.55)", marginBottom:40, textAlign:"center" }}>IN PARTNERSHIP WITH</p>
-      <div className="partners-grid" style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:16, maxWidth:960, margin:"0 auto" }}>
+    {/* PARTNERS */}
+    <section style={{ background:"var(--forest)", padding: m?"40px 24px":"60px 80px" }}>
+      <p style={{ fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.12em", color:"rgba(200,230,218,0.55)", marginBottom:32, textAlign:"center" }}>IN PARTNERSHIP WITH</p>
+      <div style={{ display:"grid", gridTemplateColumns: m?"repeat(2,1fr)":"repeat(5, 1fr)", gap:12, maxWidth:960, margin:"0 auto" }}>
         {[{name:"Providus Bank",role:"Lead Sponsor",abbr:"PB"},{name:"ECOWAS Parliament",role:"Institutional Backer",abbr:"EP"},{name:"Global African Business Association",role:"GABA",abbr:"GABA"},{name:"Duchess Natural Limited",role:"Implementing Partner",abbr:"DNL"},{name:"Borderless Trade and Investments",role:"Implementing Partner",abbr:"BTI"}].map(({name,role,abbr})=>(
-          <div key={name} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(200,230,218,0.15)", borderRadius:12, padding:"20px 16px", textAlign:"center", transition:"all 0.2s" }}
+          <div key={name} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(200,230,218,0.15)", borderRadius:12, padding:"16px 12px", textAlign:"center", transition:"all 0.2s" }}
             onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
             onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)";}}
           >
-            <div style={{ width:44, height:44, background:"rgba(200,230,218,0.15)", borderRadius:10, margin:"0 auto 12px", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Cormorant Garamond", fontWeight:700, color:"var(--mint)", fontSize:"0.9rem" }}>{abbr}</div>
-            <p style={{ fontWeight:600, color:"white", fontSize:"0.8rem", marginBottom:4, lineHeight:1.3 }}>{name}</p>
-            <p style={{ fontSize:"0.7rem", color:"rgba(200,230,218,0.55)" }}>{role}</p>
+            <div style={{ width:40, height:40, background:"rgba(200,230,218,0.15)", borderRadius:10, margin:"0 auto 10px", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Cormorant Garamond", fontWeight:700, color:"var(--mint)", fontSize:"0.85rem" }}>{abbr}</div>
+            <p style={{ fontWeight:600, color:"white", fontSize: m?"0.72rem":"0.8rem", marginBottom:3, lineHeight:1.3 }}>{name}</p>
+            <p style={{ fontSize:"0.65rem", color:"rgba(200,230,218,0.55)" }}>{role}</p>
           </div>
         ))}
       </div>
     </section>
 
-    <section className="section-pad" style={{ padding:"100px 80px", background:"var(--cream)" }}>
-      <div className="stages-grid" style={{ maxWidth:1100, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1.4fr", gap:80, alignItems:"start" }}>
+    {/* STAGES */}
+    <section style={{ padding: m?"60px 24px":"100px 80px", background:"var(--cream)" }}>
+      <div style={{ maxWidth:1100, margin:"0 auto", display:"grid", gridTemplateColumns: m?"1fr":"1fr 1.4fr", gap: m?40:80, alignItems:"start" }}>
         <div>
           <span style={{ display:"inline-block", background:"var(--mint2)", color:"var(--forest)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:20 }}>THE PROGRAMME</span>
           <h2 style={{ fontSize:"clamp(2rem,3.5vw,3rem)", fontWeight:600, lineHeight:1.15, color:"var(--forest)", marginBottom:24 }}>From readiness<br />to real deals.</h2>
@@ -290,14 +316,11 @@ const Landing = ({ setPage }) => (
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
           {[{num:"01",stage:"Stage One",title:"Business and Export Readiness",desc:"Compliance documentation, NAFDAC and product standards, KYC completion, operational assessment",dur:"Lagos: 4 days · Abuja: 2 days"},{num:"02",stage:"Stage Two",title:"Market Access and Buyer Linkage",desc:"Buyer connections, ECOWAS region and US–Canada market access, trade documentation",dur:"Lagos: 4 days · Abuja: 2 days"},{num:"03",stage:"Stage Three",title:"Transaction Execution",desc:"Trade finance solutions, FX access via Providus Bank, pilot transaction guidance, first deal closed",dur:"Lagos: 4 days · Abuja: 2 days"}].map(({num,stage,title,desc,dur})=>(
-            <div key={num} style={{ background:"white", border:"1px solid var(--border2)", borderRadius:12, padding:"28px 28px 28px 24px", display:"grid", gridTemplateColumns:"48px 1fr", gap:20, alignItems:"start", transition:"all 0.2s" }}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor="var(--sage-light)";e.currentTarget.style.boxShadow="0 8px 32px rgba(27,61,47,0.08)";}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor="var(--border2)";e.currentTarget.style.boxShadow="none";}}
-            >
-              <div style={{ width:48, height:48, background:"var(--forest)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Cormorant Garamond", fontWeight:700, color:"var(--mint)", fontSize:"1rem", flexShrink:0 }}>{num}</div>
+            <div key={num} style={{ background:"white", border:"1px solid var(--border2)", borderRadius:12, padding:"24px 20px", display:"grid", gridTemplateColumns:"44px 1fr", gap:16, alignItems:"start", transition:"all 0.2s" }}>
+              <div style={{ width:44, height:44, background:"var(--forest)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Cormorant Garamond", fontWeight:700, color:"var(--mint)", fontSize:"1rem", flexShrink:0 }}>{num}</div>
               <div>
                 <p style={{ fontSize:"0.7rem", color:"var(--sage)", fontWeight:600, letterSpacing:"0.08em", marginBottom:4 }}>{stage.toUpperCase()}</p>
-                <p style={{ fontFamily:"Cormorant Garamond", fontWeight:600, fontSize:"1.2rem", color:"var(--forest)", marginBottom:6 }}>{title}</p>
+                <p style={{ fontFamily:"Cormorant Garamond", fontWeight:600, fontSize:"1.15rem", color:"var(--forest)", marginBottom:6 }}>{title}</p>
                 <p style={{ fontSize:"0.85rem", color:"var(--text2)", lineHeight:1.6, marginBottom:10 }}>{desc}</p>
                 <span style={{ background:"var(--mint2)", color:"var(--forest3)", padding:"3px 10px", borderRadius:100, fontSize:"0.72rem", fontWeight:500 }}>{dur}</span>
               </div>
@@ -307,47 +330,52 @@ const Landing = ({ setPage }) => (
       </div>
     </section>
 
-    <section className="section-pad" style={{ padding:"80px 80px", background:"var(--sand2)" }}>
+    {/* ELIGIBILITY */}
+    <section style={{ padding: m?"60px 24px":"80px 80px", background:"var(--sand2)" }}>
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
-        <div style={{ textAlign:"center", marginBottom:56 }}>
+        <div style={{ textAlign:"center", marginBottom:48 }}>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:16, display:"inline-block" }}>WHO IT IS FOR</span>
-          <h2 style={{ fontSize:"2.5rem", fontWeight:600, color:"var(--forest)", marginTop:12 }}>Built for Market-Ready African SMEs</h2>
+          <h2 style={{ fontSize: m?"2rem":"2.5rem", fontWeight:600, color:"var(--forest)", marginTop:12 }}>Built for Market-Ready African SMEs</h2>
         </div>
-        <div className="eligibility-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20 }}>
+        <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3, 1fr)", gap:16 }}>
           {[{icon:"🌾",title:"Agriculture and Agro-Processing",desc:"Grains, spices, legumes, functional powders, nuts, seeds and related processed goods."},{icon:"📋",title:"Verifiable Business Operations",desc:"Registered business with stable operations, production capacity and demonstrable business stability."},{icon:"🤝",title:"Transaction Readiness",desc:"Businesses ready for structured international trade engagement and committed to programme activities."}].map(({icon,title,desc})=>(
-            <div key={title} className="card-hover" style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"36px 28px" }}>
-              <div style={{ fontSize:"2rem", marginBottom:16 }}>{icon}</div>
-              <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:10 }}>{title}</h3>
+            <div key={title} style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"28px 24px" }}>
+              <div style={{ fontSize:"2rem", marginBottom:14 }}>{icon}</div>
+              <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.25rem", fontWeight:600, color:"var(--forest)", marginBottom:10 }}>{title}</h3>
               <p style={{ fontSize:"0.875rem", color:"var(--text2)", lineHeight:1.7 }}>{desc}</p>
             </div>
           ))}
         </div>
-        <p style={{ textAlign:"center", marginTop:32, fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1rem", color:"var(--text3)" }}>Prior export experience is considered an advantage but is not mandatory.</p>
+        <p style={{ textAlign:"center", marginTop:28, fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1rem", color:"var(--text3)" }}>Prior export experience is considered an advantage but is not mandatory.</p>
       </div>
     </section>
 
-    <section className="cta-section" style={{ background:"var(--forest)", padding:"100px 80px", textAlign:"center", position:"relative", overflow:"hidden" }}>
-      <div style={{ position:"absolute", left:"50%", top:"50%", transform:"translate(-50%,-50%)", width:700, height:700, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.06)", pointerEvents:"none" }} />
+    {/* CTA */}
+    <section style={{ background:"var(--forest)", padding: m?"60px 24px":"100px 80px", textAlign:"center", position:"relative", overflow:"hidden" }}>
+      {!m && <div style={{ position:"absolute", left:"50%", top:"50%", transform:"translate(-50%,-50%)", width:700, height:700, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.06)", pointerEvents:"none" }} />}
       <div style={{ position:"relative" }}>
-        <h2 style={{ fontSize:"clamp(2.2rem,5vw,4rem)", fontWeight:600, color:"white", lineHeight:1.1, marginBottom:16 }}>
+        <h2 style={{ fontSize: m?"2rem":"clamp(2.2rem,5vw,4rem)", fontWeight:600, color:"white", lineHeight:1.1, marginBottom:16 }}>
           Applications Close<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:400 }}>March 31, 2026</span>
         </h2>
-        <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:44, fontSize:"1.05rem", fontWeight:300 }}>Programme commences April 13 in Lagos and Abuja.</p>
+        <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:40, fontSize:"1.05rem", fontWeight:300 }}>Programme commences April 13 in Lagos and Abuja.</p>
         <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"16px 44px", borderRadius:10, fontSize:"1rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.2)" }}>Begin Your Application</button>
       </div>
     </section>
 
-    <footer style={{ background:"var(--text)", padding:"40px 80px" }}><div className="footer-inner" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:20 }}>
-      <div>
-        <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.1rem", color:"white", marginBottom:4 }}>T2T Programme</p>
-        <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>Training to Transaction · 2026</p>
+    {/* FOOTER */}
+    <footer style={{ background:"var(--text)", padding: m?"32px 24px":"40px 80px" }}>
+      <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap: m?16:20 }}>
+        <div>
+          <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.1rem", color:"white", marginBottom:4 }}>T2T Programme</p>
+          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>Training to Transaction · 2026</p>
+        </div>
+        {!m && <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.35)", maxWidth:420, textAlign:"center" }}>Implemented by Duchess NL and Borderless Trade and Investments. Sponsored by Providus Bank.</p>}
+        <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.35)" }}>media@t2tprogramme.org</p>
       </div>
-      <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.35)", maxWidth:420, textAlign:"center" }}>Implemented by Duchess NL and Borderless Trade and Investments. Sponsored by Providus Bank. All implementation subject to Providus Bank approval structures.</p>
-      <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.35)" }}>media@t2tprogramme.org</p>
-    </div></footer>
+    </footer>
   </div>
-);
-
+  );
+};
 // ─── FORM PRIMITIVES ──────────────────────────────────────────────────────────
 const FF = ({num,label,hint,children}) => (
   <div>
@@ -578,6 +606,7 @@ const PressPortal = ({ addSubmission, onExit }) => {
 
 // ─── NEWSROOM ─────────────────────────────────────────────────────────────────
 const Newsroom = ({ setPage, approvedSubmissions }) => {
+  const m = useMobile();
   const [art, setArt] = useState(null);
 
   // Merge static + approved journalist submissions
@@ -594,7 +623,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
   const rest = allArticles.filter(n=>n.id!==feat.id);
 
   if (art) return (
-    <div style={{ minHeight:"100vh", background:"var(--cream)", padding:"100px 80px 80px", maxWidth:900, margin:"0 auto" }}>
+    <div style={{ minHeight:"100vh", background:"var(--cream)", padding:m?"80px 20px 60px":"100px 80px 80px", maxWidth:900, margin:"0 auto" }}>
       <button onClick={()=>setArt(null)} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"8px 18px", borderRadius:8, fontSize:"0.8rem", fontWeight:500, cursor:"pointer", marginBottom:40 }}>Back to Newsroom</button>
       <div className="fade-up">
         <span style={{ background:"var(--forest)", color:"var(--mint)", padding:"3px 12px", borderRadius:4, fontSize:"0.68rem", fontWeight:600, letterSpacing:"0.1em" }}>{art.cat}</span>
@@ -627,8 +656,8 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
   );
 
   return (
-    <div style={{ minHeight:"100vh", background:"var(--cream)", padding:"100px 80px 80px" }}>
-      <div className="newsroom-header" style={{ maxWidth:1100, margin:"0 auto 60px", display:"flex", justifyContent:"space-between", alignItems:"flex-end", paddingBottom:32, borderBottom:"1px solid var(--border)", flexWrap:"wrap", gap:24 }}>
+    <div style={{ minHeight:"100vh", background:"var(--cream)", padding:m?"80px 20px 60px":"100px 80px 80px" }}>
+      <div style={{ maxWidth:1100, margin:"0 auto 60px", display:"flex", flexDirection:m?"column":"row", justifyContent:"space-between", alignItems:m?"flex-start":"flex-end", paddingBottom:32, borderBottom:"1px solid var(--border)", gap:20 }}>
         <div>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:12, display:"inline-block" }}>DIGITAL NEWSROOM</span>
           <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3.2rem", fontWeight:600, color:"var(--forest)", lineHeight:1 }}>Press and Media</h1>
@@ -646,8 +675,8 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
       </div>
 
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
-        <div onClick={()=>setArt(feat)} className="card-hover newsroom-featured" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", background:"white", borderRadius:16, border:"1px solid var(--border)", overflow:"hidden", marginBottom:40, cursor:"pointer" }}>
-          <div className="newsroom-featured-img" style={{ height:380, overflow:"hidden" }}>
+        <div onClick={()=>setArt(feat)} className="card-hover" style={{ display:"grid", gridTemplateColumns:m?"1fr":"1fr 1fr", background:"white", borderRadius:16, border:"1px solid var(--border)", overflow:"hidden", marginBottom:40, cursor:"pointer" }}>
+          <div style={{ height:m?220:380, overflow:"hidden" }}>
             <img src={feat.img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.5s ease" }} onMouseEnter={e=>e.target.style.transform="scale(1.04)"} onMouseLeave={e=>e.target.style.transform="scale(1)"} />
           </div>
           <div style={{ padding:"44px 40px", display:"flex", flexDirection:"column", justifyContent:"center" }}>
@@ -662,7 +691,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
         </div>
 
         {rest.length > 0 && (
-          <div className="newsroom-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20, marginBottom:72 }}>
+          <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:16, marginBottom:60 }}>
             {rest.map(a=>(
               <div key={a.id} onClick={()=>setArt(a)} className="card-hover" style={{ background:"white", borderRadius:14, border:"1px solid var(--border)", overflow:"hidden", cursor:"pointer" }}>
                 <div style={{ height:200, overflow:"hidden" }}>
@@ -682,10 +711,10 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
           </div>
         )}
 
-        <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:20, padding:"48px" }}>
+        <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:20, padding:m?"28px 20px":"48px" }}>
           <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.8rem", fontWeight:600, color:"var(--forest)", marginBottom:6 }}>Media Resources</h2>
           <p style={{ color:"var(--text3)", marginBottom:32, fontSize:"0.875rem" }}>Official assets for press use</p>
-          <div className="media-resources-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16, marginBottom:40 }}>
+          <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:12, marginBottom:32 }}>
             {[{icon:"📄",title:"Programme Fact Sheet",type:"PDF · 2 pages"},{icon:"🎨",title:"Partner Logos Pack",type:"ZIP · Brand assets"},{icon:"📑",title:"Programme Overview",type:"PDF · 8 pages"}].map(({icon,title,type})=>(
               <div key={title} style={{ background:"white", border:"1px solid var(--border)", borderRadius:12, padding:"20px", display:"flex", alignItems:"center", gap:14, cursor:"pointer", transition:"all 0.2s" }} onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 16px rgba(27,61,47,0.08)"} onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
                 <div style={{ fontSize:"1.5rem" }}>{icon}</div>
@@ -695,7 +724,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
           </div>
           <div style={{ paddingTop:32, borderTop:"1px solid var(--border)" }}>
             <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:16 }}>Press Contacts</h3>
-            <div className="press-contacts-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16 }}>
+            <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:12 }}>
               {[{name:"Media Enquiries",email:"media@t2tprogramme.org",org:"T2T Programme Office"},{name:"Providus Bank Comms",email:"comms@providusbank.com",org:"Providus Bank"},{name:"Programme Updates",email:"updates@duchessnl.com",org:"Duchess NL and BTI"}].map(c=>(
                 <div key={c.email} style={{ background:"white", border:"1px solid var(--border)", borderRadius:10, padding:"16px 18px" }}>
                   <p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:3 }}>{c.name}</p>
