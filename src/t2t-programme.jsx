@@ -29,6 +29,28 @@ const GlobalStyles = () => (
     input,select,textarea { font-family:'Outfit',sans-serif; }
     input:focus,select:focus,textarea:focus { outline:none;border-color:var(--forest) !important;box-shadow:0 0 0 3px rgba(27,61,47,0.08); }
     button { font-family:'Outfit',sans-serif; }
+    /* ── MOBILE RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .hero-section { padding:100px 24px 48px !important; min-height:auto !important; }
+      .hero-buttons { flex-direction:column !important; }
+      .hero-buttons button { width:100% !important; }
+      .overview-card { position:relative !important; right:auto !important; bottom:auto !important; width:100% !important; min-width:unset !important; margin-top:36px !important; box-shadow:none !important; }
+      .partners-grid { grid-template-columns:repeat(2,1fr) !important; }
+      .stages-grid { grid-template-columns:1fr !important; gap:40px !important; }
+      .eligibility-grid { grid-template-columns:1fr !important; }
+      .section-pad { padding:60px 24px !important; }
+      .newsroom-featured { grid-template-columns:1fr !important; }
+      .newsroom-featured-img { height:220px !important; }
+      .newsroom-grid { grid-template-columns:1fr !important; }
+      .newsroom-header { flex-direction:column !important; align-items:flex-start !important; }
+      .media-resources-grid { grid-template-columns:1fr !important; }
+      .press-contacts-grid { grid-template-columns:1fr !important; }
+      .press-form-two-col { grid-template-columns:1fr !important; }
+      .dash-stats { grid-template-columns:repeat(2,1fr) !important; }
+      .dash-detail-grid { grid-template-columns:repeat(2,1fr) !important; }
+      .footer-inner { flex-direction:column !important; align-items:flex-start !important; gap:16px !important; }
+      .cta-section { padding:60px 24px !important; }
+    }
   `}</style>
 );
 
@@ -138,40 +160,71 @@ const PasswordGate = ({ title, subtitle, password, buttonLabel, onUnlock }) => {
 // ─── NAV ─────────────────────────────────────────────────────────────────────
 const Nav = ({ page, setPage, onLogoClick }) => {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", fn); return () => window.removeEventListener("scroll", fn);
   }, []);
 
+  const navLinks = [
+    {key:"landing", label:"Home"},
+    {key:"newsroom", label:"Newsroom"},
+    {key:"press-gate", label:"Press Portal"},
+    {key:"register", label:"Apply Now", primary:true},
+  ];
+
   return (
-    <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:1000, height:68, background:scrolled?"rgba(255,254,249,0.97)":"transparent", backdropFilter:scrolled?"blur(16px)":"none", borderBottom:scrolled?"1px solid var(--border)":"none", transition:"all 0.3s ease", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 48px" }}>
-      <div onClick={onLogoClick} style={{ cursor:"pointer", display:"flex", alignItems:"center", gap:12 }}>
-        <div style={{ width:34, height:34, background:"var(--forest)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 1L14 4.5V11.5L8 15L2 11.5V4.5L8 1Z" stroke="white" strokeWidth="1.5" fill="none"/>
-            <path d="M8 5L11 7V11L8 13L5 11V7L8 5Z" fill="white"/>
-          </svg>
+    <>
+      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:1000, height:68, background:scrolled||menuOpen?"rgba(255,254,249,0.97)":"transparent", backdropFilter:scrolled||menuOpen?"blur(16px)":"none", borderBottom:scrolled||menuOpen?"1px solid var(--border)":"none", transition:"all 0.3s ease", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 24px 0 24px" }}>
+        
+        {/* Logo */}
+        <div onClick={()=>{onLogoClick();setMenuOpen(false);}} style={{ cursor:"pointer", display:"flex", alignItems:"center", gap:12 }}>
+          <div style={{ width:34, height:34, background:"var(--forest)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1L14 4.5V11.5L8 15L2 11.5V4.5L8 1Z" stroke="white" strokeWidth="1.5" fill="none"/>
+              <path d="M8 5L11 7V11L8 13L5 11V7L8 5Z" fill="white"/>
+            </svg>
+          </div>
+          <span style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.05rem", color:"var(--forest)" }}>T2T Programme</span>
         </div>
-        <span style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.05rem", color:"var(--forest)" }}>T2T Programme</span>
-      </div>
-      <div style={{ display:"flex", gap:4, alignItems:"center" }}>
-        {[{key:"landing",label:"Home"},{key:"newsroom",label:"Newsroom"}].map(({key,label})=>(
-          <button key={key} onClick={()=>setPage(key)} style={{ background:page===key?"var(--mint2)":"transparent", border:"none", color:page===key?"var(--forest)":"var(--text3)", padding:"7px 18px", borderRadius:6, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}>{label}</button>
-        ))}
-        <div style={{ width:1, height:20, background:"var(--border)", margin:"0 8px" }} />
-        <button onClick={()=>setPage("press-gate")} style={{ background:"transparent", border:"1.5px solid var(--forest)", color:"var(--forest)", padding:"7px 18px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", marginRight:6 }}>
-          Press Portal
+
+        {/* Desktop links */}
+        <div className="nav-desktop" style={{ display:"flex", gap:4, alignItems:"center" }}>
+          {[{key:"landing",label:"Home"},{key:"newsroom",label:"Newsroom"}].map(({key,label})=>(
+            <button key={key} onClick={()=>setPage(key)} style={{ background:page===key?"var(--mint2)":"transparent", border:"none", color:page===key?"var(--forest)":"var(--text3)", padding:"7px 18px", borderRadius:6, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}>{label}</button>
+          ))}
+          <div style={{ width:1, height:20, background:"var(--border)", margin:"0 8px" }} />
+          <button onClick={()=>setPage("press-gate")} style={{ background:"transparent", border:"1.5px solid var(--forest)", color:"var(--forest)", padding:"7px 18px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", marginRight:6 }}>Press Portal</button>
+          <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", border:"none", color:"white", padding:"9px 22px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>Apply Now</button>
+        </div>
+
+        {/* Mobile hamburger */}
+        <button className="nav-hamburger" onClick={()=>setMenuOpen(o=>!o)} style={{ display:"none", background:"transparent", border:"1.5px solid var(--border)", borderRadius:8, padding:"7px 10px", cursor:"pointer", flexDirection:"column", gap:5, alignItems:"center", justifyContent:"center" }}>
+          <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.2s", transform:menuOpen?"rotate(45deg) translate(5px,5px)":"none" }} />
+          <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.2s", opacity:menuOpen?0:1 }} />
+          <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.2s", transform:menuOpen?"rotate(-45deg) translate(5px,-5px)":"none" }} />
         </button>
-        <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", border:"none", color:"white", padding:"9px 22px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>Apply Now</button>
-      </div>
-    </nav>
+      </nav>
+
+      {/* Mobile dropdown menu */}
+      {menuOpen && (
+        <div className="nav-mobile-menu" style={{ display:"none", position:"fixed", top:68, left:0, right:0, zIndex:999, background:"rgba(255,254,249,0.98)", backdropFilter:"blur(16px)", borderBottom:"1px solid var(--border)", padding:"16px 24px 24px", flexDirection:"column", gap:8 }}>
+          {navLinks.map(({key,label,primary})=>(
+            <button key={key} onClick={()=>{setPage(key);setMenuOpen(false);}} style={{ background:primary?"var(--forest)":page===key?"var(--mint2)":"transparent", border:primary?"none":"1px solid var(--border)", color:primary?"white":page===key?"var(--forest)":"var(--text2)", padding:"13px 20px", borderRadius:8, fontSize:"0.95rem", fontWeight:primary?600:500, cursor:"pointer", textAlign:"left", width:"100%" }}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+    </>
   );
 };
 
 // ─── LANDING ─────────────────────────────────────────────────────────────────
 const Landing = ({ setPage }) => (
   <div>
-    <section style={{ minHeight:"100vh", background:`radial-gradient(ellipse at 70% 30%, rgba(200,230,218,0.4) 0%, transparent 55%), radial-gradient(ellipse at 10% 80%, rgba(200,230,218,0.2) 0%, transparent 45%), var(--sand2)`, display:"flex", flexDirection:"column", justifyContent:"center", padding:"140px 80px 80px", position:"relative", overflow:"hidden" }}>
+    <section className="hero-section" style={{ minHeight:"100vh", background:`radial-gradient(ellipse at 70% 30%, rgba(200,230,218,0.4) 0%, transparent 55%), radial-gradient(ellipse at 10% 80%, rgba(200,230,218,0.2) 0%, transparent 45%), var(--sand2)`, display:"flex", flexDirection:"column", justifyContent:"center", padding:"140px 80px 80px", position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", inset:0, opacity:0.4, backgroundImage:"radial-gradient(circle, rgba(27,61,47,0.06) 1px, transparent 1px)", backgroundSize:"36px 36px" }} />
       <div style={{ position:"absolute", right:-120, top:"10%", width:600, height:600, borderRadius:"50%", border:"1px solid rgba(27,61,47,0.08)", pointerEvents:"none" }} />
       <div style={{ position:"absolute", right:-60, top:"5%", width:480, height:480, borderRadius:"50%", background:"radial-gradient(circle, rgba(200,230,218,0.35) 0%, transparent 70%)", pointerEvents:"none" }} />
@@ -187,7 +240,7 @@ const Landing = ({ setPage }) => (
           A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
         </p>
         <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.1rem", color:"var(--sage)", marginBottom:48 }}>Lagos and Abuja · Commencing April 13, 2026</p>
-        <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+        <div className="hero-buttons" style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
           <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", boxShadow:"0 8px 32px rgba(27,61,47,0.28)", transition:"all 0.2s" }}
             onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";}}
             onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";}}
@@ -199,7 +252,7 @@ const Landing = ({ setPage }) => (
         </div>
       </div>
 
-      <div style={{ position:"absolute", right:80, bottom:80, background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"28px 32px", boxShadow:"0 20px 60px rgba(27,61,47,0.1)", minWidth:260 }}>
+      <div className="overview-card" style={{ position:"absolute", right:80, bottom:80, background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"28px 32px", boxShadow:"0 20px 60px rgba(27,61,47,0.1)", minWidth:260 }}>
         <p style={{ fontSize:"0.68rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.1em", marginBottom:16 }}>PROGRAMME OVERVIEW</p>
         {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"March 31, 2026"},{label:"Commencement",val:"April 13, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val})=>(
           <div key={label} style={{ marginBottom:12, paddingBottom:12, borderBottom:"1px solid var(--border2)" }}>
@@ -212,7 +265,7 @@ const Landing = ({ setPage }) => (
 
     <section style={{ background:"var(--forest)", padding:"60px 80px" }}>
       <p style={{ fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.12em", color:"rgba(200,230,218,0.55)", marginBottom:40, textAlign:"center" }}>IN PARTNERSHIP WITH</p>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:16, maxWidth:960, margin:"0 auto" }}>
+      <div className="partners-grid" style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:16, maxWidth:960, margin:"0 auto" }}>
         {[{name:"Providus Bank",role:"Lead Sponsor",abbr:"PB"},{name:"ECOWAS Parliament",role:"Institutional Backer",abbr:"EP"},{name:"Global African Business Association",role:"GABA",abbr:"GABA"},{name:"Duchess Natural Limited",role:"Implementing Partner",abbr:"DNL"},{name:"Borderless Trade and Investments",role:"Implementing Partner",abbr:"BTI"}].map(({name,role,abbr})=>(
           <div key={name} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(200,230,218,0.15)", borderRadius:12, padding:"20px 16px", textAlign:"center", transition:"all 0.2s" }}
             onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
@@ -226,8 +279,8 @@ const Landing = ({ setPage }) => (
       </div>
     </section>
 
-    <section style={{ padding:"100px 80px", background:"var(--cream)" }}>
-      <div style={{ maxWidth:1100, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1.4fr", gap:80, alignItems:"start" }}>
+    <section className="section-pad" style={{ padding:"100px 80px", background:"var(--cream)" }}>
+      <div className="stages-grid" style={{ maxWidth:1100, margin:"0 auto", display:"grid", gridTemplateColumns:"1fr 1.4fr", gap:80, alignItems:"start" }}>
         <div>
           <span style={{ display:"inline-block", background:"var(--mint2)", color:"var(--forest)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:20 }}>THE PROGRAMME</span>
           <h2 style={{ fontSize:"clamp(2rem,3.5vw,3rem)", fontWeight:600, lineHeight:1.15, color:"var(--forest)", marginBottom:24 }}>From readiness<br />to real deals.</h2>
@@ -254,13 +307,13 @@ const Landing = ({ setPage }) => (
       </div>
     </section>
 
-    <section style={{ padding:"80px 80px", background:"var(--sand2)" }}>
+    <section className="section-pad" style={{ padding:"80px 80px", background:"var(--sand2)" }}>
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
         <div style={{ textAlign:"center", marginBottom:56 }}>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:16, display:"inline-block" }}>WHO IT IS FOR</span>
           <h2 style={{ fontSize:"2.5rem", fontWeight:600, color:"var(--forest)", marginTop:12 }}>Built for Market-Ready African SMEs</h2>
         </div>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20 }}>
+        <div className="eligibility-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20 }}>
           {[{icon:"🌾",title:"Agriculture and Agro-Processing",desc:"Grains, spices, legumes, functional powders, nuts, seeds and related processed goods."},{icon:"📋",title:"Verifiable Business Operations",desc:"Registered business with stable operations, production capacity and demonstrable business stability."},{icon:"🤝",title:"Transaction Readiness",desc:"Businesses ready for structured international trade engagement and committed to programme activities."}].map(({icon,title,desc})=>(
             <div key={title} className="card-hover" style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"36px 28px" }}>
               <div style={{ fontSize:"2rem", marginBottom:16 }}>{icon}</div>
@@ -273,7 +326,7 @@ const Landing = ({ setPage }) => (
       </div>
     </section>
 
-    <section style={{ background:"var(--forest)", padding:"100px 80px", textAlign:"center", position:"relative", overflow:"hidden" }}>
+    <section className="cta-section" style={{ background:"var(--forest)", padding:"100px 80px", textAlign:"center", position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", left:"50%", top:"50%", transform:"translate(-50%,-50%)", width:700, height:700, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.06)", pointerEvents:"none" }} />
       <div style={{ position:"relative" }}>
         <h2 style={{ fontSize:"clamp(2.2rem,5vw,4rem)", fontWeight:600, color:"white", lineHeight:1.1, marginBottom:16 }}>
@@ -284,14 +337,14 @@ const Landing = ({ setPage }) => (
       </div>
     </section>
 
-    <footer style={{ background:"var(--text)", padding:"40px 80px", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:20 }}>
+    <footer style={{ background:"var(--text)", padding:"40px 80px" }}><div className="footer-inner" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:20 }}>
       <div>
         <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.1rem", color:"white", marginBottom:4 }}>T2T Programme</p>
         <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>Training to Transaction · 2026</p>
       </div>
       <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.35)", maxWidth:420, textAlign:"center" }}>Implemented by Duchess NL and Borderless Trade and Investments. Sponsored by Providus Bank. All implementation subject to Providus Bank approval structures.</p>
       <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.35)" }}>media@t2tprogramme.org</p>
-    </footer>
+    </div></footer>
   </div>
 );
 
@@ -438,7 +491,7 @@ const PressPortal = ({ addSubmission, onExit }) => {
           <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:14, padding:"32px 28px" }}>
             <p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--forest)", letterSpacing:"0.1em", marginBottom:24, paddingBottom:12, borderBottom:"1px solid var(--border2)" }}>YOUR DETAILS</p>
             <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+              <div className="press-form-two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
                 <div>
                   <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Full Name</label>
                   <TI value={d.name} onChange={v=>set("name",v)} placeholder="Your full name" />
@@ -448,7 +501,7 @@ const PressPortal = ({ addSubmission, onExit }) => {
                   <TI value={d.outlet} onChange={v=>set("outlet",v)} placeholder="Publication or outlet name" />
                 </div>
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+              <div className="press-form-two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
                 <div>
                   <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Email Address</label>
                   <TI value={d.email} onChange={v=>set("email",v)} placeholder="Your work email" />
@@ -575,7 +628,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
 
   return (
     <div style={{ minHeight:"100vh", background:"var(--cream)", padding:"100px 80px 80px" }}>
-      <div style={{ maxWidth:1100, margin:"0 auto 60px", display:"flex", justifyContent:"space-between", alignItems:"flex-end", paddingBottom:32, borderBottom:"1px solid var(--border)", flexWrap:"wrap", gap:24 }}>
+      <div className="newsroom-header" style={{ maxWidth:1100, margin:"0 auto 60px", display:"flex", justifyContent:"space-between", alignItems:"flex-end", paddingBottom:32, borderBottom:"1px solid var(--border)", flexWrap:"wrap", gap:24 }}>
         <div>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:12, display:"inline-block" }}>DIGITAL NEWSROOM</span>
           <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3.2rem", fontWeight:600, color:"var(--forest)", lineHeight:1 }}>Press and Media</h1>
@@ -593,8 +646,8 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
       </div>
 
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
-        <div onClick={()=>setArt(feat)} className="card-hover" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", background:"white", borderRadius:16, border:"1px solid var(--border)", overflow:"hidden", marginBottom:40, cursor:"pointer" }}>
-          <div style={{ height:380, overflow:"hidden" }}>
+        <div onClick={()=>setArt(feat)} className="card-hover newsroom-featured" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", background:"white", borderRadius:16, border:"1px solid var(--border)", overflow:"hidden", marginBottom:40, cursor:"pointer" }}>
+          <div className="newsroom-featured-img" style={{ height:380, overflow:"hidden" }}>
             <img src={feat.img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.5s ease" }} onMouseEnter={e=>e.target.style.transform="scale(1.04)"} onMouseLeave={e=>e.target.style.transform="scale(1)"} />
           </div>
           <div style={{ padding:"44px 40px", display:"flex", flexDirection:"column", justifyContent:"center" }}>
@@ -609,7 +662,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
         </div>
 
         {rest.length > 0 && (
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20, marginBottom:72 }}>
+          <div className="newsroom-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20, marginBottom:72 }}>
             {rest.map(a=>(
               <div key={a.id} onClick={()=>setArt(a)} className="card-hover" style={{ background:"white", borderRadius:14, border:"1px solid var(--border)", overflow:"hidden", cursor:"pointer" }}>
                 <div style={{ height:200, overflow:"hidden" }}>
@@ -632,7 +685,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:20, padding:"48px" }}>
           <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.8rem", fontWeight:600, color:"var(--forest)", marginBottom:6 }}>Media Resources</h2>
           <p style={{ color:"var(--text3)", marginBottom:32, fontSize:"0.875rem" }}>Official assets for press use</p>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16, marginBottom:40 }}>
+          <div className="media-resources-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16, marginBottom:40 }}>
             {[{icon:"📄",title:"Programme Fact Sheet",type:"PDF · 2 pages"},{icon:"🎨",title:"Partner Logos Pack",type:"ZIP · Brand assets"},{icon:"📑",title:"Programme Overview",type:"PDF · 8 pages"}].map(({icon,title,type})=>(
               <div key={title} style={{ background:"white", border:"1px solid var(--border)", borderRadius:12, padding:"20px", display:"flex", alignItems:"center", gap:14, cursor:"pointer", transition:"all 0.2s" }} onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 16px rgba(27,61,47,0.08)"} onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
                 <div style={{ fontSize:"1.5rem" }}>{icon}</div>
@@ -642,7 +695,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
           </div>
           <div style={{ paddingTop:32, borderTop:"1px solid var(--border)" }}>
             <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:16 }}>Press Contacts</h3>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16 }}>
+            <div className="press-contacts-grid" style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:16 }}>
               {[{name:"Media Enquiries",email:"media@t2tprogramme.org",org:"T2T Programme Office"},{name:"Providus Bank Comms",email:"comms@providusbank.com",org:"Providus Bank"},{name:"Programme Updates",email:"updates@duchessnl.com",org:"Duchess NL and BTI"}].map(c=>(
                 <div key={c.email} style={{ background:"white", border:"1px solid var(--border)", borderRadius:10, padding:"16px 18px" }}>
                   <p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:3 }}>{c.name}</p>
@@ -713,7 +766,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
         {/* ── SME TAB ── */}
         {tab==="sme" && (
           <>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:14, marginBottom:28 }}>
+            <div className="dash-stats" style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:14, marginBottom:28 }}>
               {[{label:"Total Received",val:counts.total,acc:"var(--forest)"},{label:"Pending Review",val:counts.pending,acc:"#B8943F"},{label:"Approved",val:counts.approved,acc:"#1B7A4A"},{label:"Rejected",val:counts.rejected,acc:"#C0392B"},{label:"Average Score",val:`${counts.avg}/100`,acc:"var(--forest)"}].map(({label,val,acc})=>(
                 <div key={label} style={{ background:"white", border:"1px solid var(--border)", borderRadius:12, padding:"20px", borderTop:`3px solid ${acc}` }}>
                   <p style={{ fontSize:"0.72rem", color:"var(--text3)", fontWeight:500, marginBottom:8 }}>{label}</p>
@@ -768,7 +821,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
         {/* ── PRESS TAB ── */}
         {tab==="press" && (
           <>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:14, marginBottom:28 }}>
+            <div className="dash-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:14, marginBottom:28 }}>
               {[{label:"Total Submissions",val:pCounts.total,acc:"var(--forest)"},{label:"Awaiting Review",val:pCounts.pending,acc:"#B8943F"},{label:"Published",val:pCounts.approved,acc:"#1B7A4A"},{label:"Declined",val:pCounts.rejected,acc:"#C0392B"}].map(({label,val,acc})=>(
                 <div key={label} style={{ background:"white", border:"1px solid var(--border)", borderRadius:12, padding:"20px", borderTop:`3px solid ${acc}` }}>
                   <p style={{ fontSize:"0.72rem", color:"var(--text3)", fontWeight:500, marginBottom:8 }}>{label}</p>
