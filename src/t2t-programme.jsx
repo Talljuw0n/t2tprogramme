@@ -26,7 +26,7 @@ const GlobalStyles = () => (
       --amber:#B8943F; --amber-bg:#FDF5E0;
       --max-w:1440px;
     }
-    .wrap { max-width:var(--max-w); margin:0 auto; width:100%; }
+    .wrap { max-width:var(--max-w); margin:0 auto; width:100%; padding:0 80px; box-sizing:border-box; }
     html { scroll-behavior:smooth; }
     body { font-family:'Outfit',sans-serif; background:var(--cream); color:var(--text); overflow-x:hidden; }
     h1,h2,h3,h4 { font-family:'Cormorant Garamond',serif; }
@@ -44,14 +44,15 @@ const GlobalStyles = () => (
     button { font-family:'Outfit',sans-serif; }
     /* ── MOBILE RESPONSIVE ── */
     @media (max-width: 768px) {
-      .hero-section { padding:100px 24px 48px !important; min-height:auto !important; }
+      .wrap { padding:0 24px !important; }
+      .hero-section { padding:100px 0 48px !important; min-height:auto !important; }
       .hero-buttons { flex-direction:column !important; }
       .hero-buttons button { width:100% !important; }
       .overview-card { position:relative !important; right:auto !important; bottom:auto !important; width:100% !important; min-width:unset !important; margin-top:36px !important; box-shadow:none !important; }
       .partners-grid { grid-template-columns:repeat(2,1fr) !important; }
       .stages-grid { grid-template-columns:1fr !important; gap:40px !important; }
       .eligibility-grid { grid-template-columns:1fr !important; }
-      .section-pad { padding:60px 24px !important; }
+      .section-pad { padding:60px 0 !important; }
       .newsroom-featured { grid-template-columns:1fr !important; }
       .newsroom-featured-img { height:220px !important; }
       .newsroom-grid { grid-template-columns:1fr !important; }
@@ -62,7 +63,7 @@ const GlobalStyles = () => (
       .dash-stats { grid-template-columns:repeat(2,1fr) !important; }
       .dash-detail-grid { grid-template-columns:repeat(2,1fr) !important; }
       .footer-inner { flex-direction:column !important; align-items:flex-start !important; gap:16px !important; }
-      .cta-section { padding:60px 24px !important; }
+      .cta-section { padding:60px 0 !important; }
     }
   `}</style>
 );
@@ -171,9 +172,7 @@ const PasswordGate = ({ title, subtitle, password, buttonLabel, onUnlock }) => {
 };
 
 // ─── NAV ─────────────────────────────────────────────────────────────────────
-// LOGO SETUP: Replace the <img> src below with your actual T2T logo file.
-// Also add <link rel="icon" href="/favicon.ico"> in your index.html for the favicon.
-const T2T_LOGO = "/logo.png"; // e.g. "/logo.png" — set this once you have the file
+const T2T_LOGO = "/logo.png";
 
 const Nav = ({ page, setPage, onLogoClick }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -193,28 +192,26 @@ const Nav = ({ page, setPage, onLogoClick }) => {
   return (
     <>
       <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:1000, height:72, background:bg, backdropFilter:scrolled||menuOpen?"blur(20px)":"none", borderBottom:scrolled||menuOpen?"1px solid var(--border)":"none", transition:"all 0.3s ease" }}>
-        <div className="wrap" style={{ height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px" }}>
+        <div className="wrap" style={{ height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
 
           {/* ── LOGO AREA ── */}
           <div onClick={()=>{onLogoClick();setMenuOpen(false);}} style={{ cursor:"pointer", display:"flex", alignItems:"center", gap:12 }}>
             {T2T_LOGO
-              ? <img src={T2T_LOGO} alt="T2T Programme" style={{ height:40, width:"auto", objectFit:"contain",display:"block" }} onError={e=>console.log("logo failed to load:", e )} />
-              : (
-                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                  {/* Placeholder shown until logo is uploaded */}
-                  <div style={{ width:38, height:38, background:"var(--forest)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, border:"2px dashed rgba(200,230,218,0.4)" }}>
-                    <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
-                      <path d="M8 1L14 4.5V11.5L8 15L2 11.5V4.5L8 1Z" stroke="white" strokeWidth="1.5" fill="none"/>
-                      <path d="M8 5L11 7V11L8 13L5 11V7L8 5Z" fill="white"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.1rem", color:"var(--forest)", lineHeight:1 }}>T2T Programme</p>
-                    <p style={{ fontSize:"0.6rem", color:"var(--text3)", letterSpacing:"0.08em", fontWeight:500 }}>TRAINING TO TRANSACTION</p>
-                  </div>
-                </div>
-              )
+              ? <img src={T2T_LOGO} alt="T2T Programme" style={{ height:40, width:"auto", objectFit:"contain", display:"block" }} onError={e=>{ e.currentTarget.style.display="none"; e.currentTarget.nextSibling.style.display="flex"; }} />
+              : null
             }
+            <div style={{ display: T2T_LOGO ? "none" : "flex", alignItems:"center", gap:10 }}>
+              <div style={{ width:38, height:38, background:"var(--forest)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, border:"2px dashed rgba(200,230,218,0.4)" }}>
+                <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 1L14 4.5V11.5L8 15L2 11.5V4.5L8 1Z" stroke="white" strokeWidth="1.5" fill="none"/>
+                  <path d="M8 5L11 7V11L8 13L5 11V7L8 5Z" fill="white"/>
+                </svg>
+              </div>
+              <div>
+                <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.1rem", color:"var(--forest)", lineHeight:1 }}>T2T Programme</p>
+                <p style={{ fontSize:"0.6rem", color:"var(--text3)", letterSpacing:"0.08em", fontWeight:500 }}>TRAINING TO TRANSACTION</p>
+              </div>
+            </div>
           </div>
 
           {/* Desktop links */}
@@ -255,8 +252,6 @@ const Nav = ({ page, setPage, onLogoClick }) => {
 };
 
 // ─── LANDING ─────────────────────────────────────────────────────────────────
-// PARTNER LOGOS: Replace the logo URLs below with actual uploaded partner logo files.
-// e.g. providusLogo: "/logos/providus.png"
 const PARTNER_LOGOS = {
   providus:   "/logos/providus.png",
   ecowas:     "/logos/ecowas.png",
@@ -281,13 +276,11 @@ const Landing = ({ setPage }) => {
 
     {/* ── HERO ── */}
     <section style={{ position:"relative", minHeight:"100vh", display:"flex", alignItems:"center", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 60%, #2E6249 100%)" }}>
-      {/* Subtle dot pattern */}
       <div style={{ position:"absolute", inset:0, opacity:0.15, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.4) 1px, transparent 1px)", backgroundSize:"32px 32px" }} />
       <div style={{ position:"absolute", right:"-10%", top:"10%", width:"50vw", height:"50vw", maxWidth:700, maxHeight:700, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.07)", pointerEvents:"none" }} />
       <div style={{ position:"absolute", right:"5%", top:"20%", width:"30vw", height:"30vw", maxWidth:400, maxHeight:400, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.05)", pointerEvents:"none" }} />
-      {/* TO ADD HERO BG IMAGE: add a div with background url('/images/hero-bg.jpg') here, and another div with a dark green overlay */}
 
-      <div className="wrap" style={{ position:"relative", zIndex:2, padding: m?"100px 24px 60px":"130px 80px 100px", display:"flex", flexDirection: m?"column":"row", alignItems:"center", gap: m?40:60, width:"100%" }}>
+      <div className="wrap" style={{ position:"relative", zIndex:2, paddingTop: m?100:130, paddingBottom: m?60:100, display:"flex", flexDirection: m?"column":"row", alignItems:"center", gap: m?40:60 }}>
         {/* Left — headline */}
         <div className="fade-up" style={{ flex:1 }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
@@ -330,7 +323,7 @@ const Landing = ({ setPage }) => {
 
       {/* Mobile overview — below hero */}
       {m && (
-        <div className="wrap" style={{ position:"relative", zIndex:2, padding:"0 24px 48px" }}>
+        <div className="wrap" style={{ position:"relative", zIndex:2, paddingBottom:48 }}>
           <div style={{ background:"rgba(255,255,255,0.1)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:16, padding:"24px" }}>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
               {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"3 Months"},{label:"Deadline",val:"March 31, 2026"},{label:"Starts",val:"April 13, 2026"}].map(({label,val})=>(
@@ -342,14 +335,13 @@ const Landing = ({ setPage }) => {
       )}
     </section>
 
-    {/* ── PARTNERS — logo grid like ASF ── */}
-    <section style={{ background:"white", padding: m?"40px 24px":"56px 0", borderBottom:"1px solid var(--border)" }}>
-      <div className="wrap" style={{ padding: m?"0":"0 80px" }}>
+    {/* ── PARTNERS ── */}
+    <section style={{ background:"white", padding: m?"40px 0":"56px 0", borderBottom:"1px solid var(--border)" }}>
+      <div className="wrap">
         <p style={{ fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.14em", color:"var(--text3)", marginBottom:36, textAlign:"center" }}>IN PARTNERSHIP WITH</p>
         <div style={{ display:"grid", gridTemplateColumns: m?"repeat(2,1fr)":"repeat(5,1fr)", gap: m?24:40, alignItems:"center", maxWidth:1000, margin:"0 auto" }}>
           {partners.map(({key,name,role,abbr})=>(
             <div key={key} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:12 }}>
-              {/* Logo box — replace src once logos are provided */}
               <div style={{ width:"100%", maxWidth:140, height:72, background:"var(--sand2)", border:"1.5px dashed var(--border)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
                 {PARTNER_LOGOS[key]
                   ? <img src={PARTNER_LOGOS[key]} alt={name} style={{ width:"100%", height:"100%", objectFit:"contain", padding:8 }} />
@@ -370,12 +362,9 @@ const Landing = ({ setPage }) => {
     </section>
 
     {/* ── ABOUT / IMPACT ── */}
-    {/* TO ADD ABOUT IMAGE: wrap the inner div in a 2-col grid and add an img div with src="/images/about-image.jpg" */}
-    <section style={{ padding: m?"60px 24px":"100px 0", background:"var(--cream)" }}>
-      <div className="wrap" style={{ padding: m?"0":"0 80px", maxWidth:1200, margin:"0 auto" }}>
+    <section style={{ padding: m?"60px 0":"100px 0", background:"var(--cream)" }}>
+      <div className="wrap">
         <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"1fr 1fr", gap: m?32:80, alignItems:"start" }}>
-
-          {/* Left — text */}
           <div>
             <span style={{ display:"inline-block", background:"var(--mint2)", color:"var(--forest)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:20 }}>THE PROGRAMME</span>
             <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"clamp(2.2rem,3.5vw,3.2rem)", fontWeight:600, lineHeight:1.1, color:"var(--forest)", marginBottom:24 }}>
@@ -389,8 +378,6 @@ const Landing = ({ setPage }) => {
             </p>
             <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"13px 32px", borderRadius:9, fontSize:"0.9rem", fontWeight:600, cursor:"pointer", boxShadow:"0 4px 20px rgba(27,61,47,0.25)" }}>Apply to the Programme</button>
           </div>
-
-          {/* Right — impact numbers */}
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
             {[{num:"3",label:"Month intensive programme"},{num:"2",label:"Delivery cities"},{num:"3",label:"Target global markets"},{num:"50+",label:"SMEs to be selected"}].map(({num,label})=>(
               <div key={label} style={{ background:"var(--sand2)", border:"1px solid var(--border)", borderRadius:12, padding:"24px 20px" }}>
@@ -399,56 +386,51 @@ const Landing = ({ setPage }) => {
               </div>
             ))}
           </div>
-
         </div>
       </div>
     </section>
 
     {/* ── STAGES ── */}
-    <section style={{ padding: m?"60px 24px":"100px 0", background:"var(--forest)", position:"relative", overflow:"hidden" }}>
-      {/* Subtle dot overlay */}
+    <section style={{ padding: m?"60px 0":"100px 0", background:"var(--forest)", position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", inset:0, opacity:0.08, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.5) 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
-      {/* TO ADD STAGES BG IMAGE: add a div with background url('/images/stages-bg.jpg') and opacity 0.08 here */}
-      <div className="wrap" style={{ position:"relative", zIndex:1, padding: m?"0":"0 80px" }}>
+      <div className="wrap" style={{ position:"relative", zIndex:1 }}>
         <div style={{ textAlign:"center", marginBottom: m?40:64 }}>
           <span style={{ background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", display:"inline-block", marginBottom:16 }}>HOW IT WORKS</span>
           <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"3rem", fontWeight:600, color:"white", lineHeight:1.1 }}>Three stages. Real outcomes.</h2>
         </div>
         <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3,1fr)", gap: m?20:24 }}>
           {[
-            {num:"01",title:"Business and Export Readiness",desc:"Compliance documentation, NAFDAC and product standards, KYC completion, and operational assessment.",dur:"Lagos: 4 days · Abuja: 2 days",img:"https://images.unsplash.com/photo-1589156215461-7c73de0ab923?w=600&q=80"},
-            {num:"02",title:"Market Access and Buyer Linkage",desc:"Buyer connections, ECOWAS region and US-Canada market access, and full trade documentation.",dur:"Lagos: 4 days · Abuja: 2 days",img:"https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80"},
-            {num:"03",title:"Transaction Execution",desc:"Trade finance solutions, FX access via Providus Bank, pilot transaction guidance, and first deal closed.",dur:"Lagos: 4 days · Abuja: 2 days",img:"https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80"},
-          ].map(({num,title,desc,dur,img})=>(
+            {num:"01",title:"Business and Export Readiness",desc:"Compliance documentation, NAFDAC and product standards, KYC completion, and operational assessment.",dur:"Lagos: 4 days · Abuja: 2 days"},
+            {num:"02",title:"Market Access and Buyer Linkage",desc:"Buyer connections, ECOWAS region and US-Canada market access, and full trade documentation.",dur:"Lagos: 4 days · Abuja: 2 days"},
+            {num:"03",title:"Transaction Execution",desc:"Trade finance solutions, FX access via Providus Bank, pilot transaction guidance, and first deal closed.",dur:"Lagos: 4 days · Abuja: 2 days"},
+          ].map(({num,title,desc,dur})=>(
             <div key={num} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(200,230,218,0.12)", borderRadius:16, overflow:"hidden" }}>
-              {/* TO ADD STAGE IMAGE: add an img div here with src={'/images/stage-' + num + '.jpg'} then remove the number badge div below */}
               <div style={{ padding:"28px 24px" }}>
                 <div style={{ width:44, height:44, background:"rgba(200,230,218,0.12)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Cormorant Garamond", fontWeight:700, color:"var(--mint)", fontSize:"1.1rem", marginBottom:16 }}>{num}</div>
                 <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"white", marginBottom:10, lineHeight:1.2 }}>{title}</h3>
                 <p style={{ fontSize:"0.85rem", color:"rgba(200,230,218,0.7)", lineHeight:1.7, marginBottom:16 }}>{desc}</p>
                 <span style={{ background:"rgba(200,230,218,0.1)", border:"1px solid rgba(200,230,218,0.2)", color:"var(--mint)", padding:"4px 12px", borderRadius:100, fontSize:"0.7rem", fontWeight:500 }}>{dur}</span>
-            </div>
+              </div>
             </div>
           ))}
         </div>
       </div>
     </section>
 
-    {/* ── WHO IT'S FOR — image cards like ASF programmes ── */}
-    <section style={{ padding: m?"60px 24px":"100px 0", background:"var(--sand2)" }}>
-      <div className="wrap" style={{ padding: m?"0":"0 80px" }}>
+    {/* ── WHO IT'S FOR ── */}
+    <section style={{ padding: m?"60px 0":"100px 0", background:"var(--sand2)" }}>
+      <div className="wrap">
         <div style={{ textAlign:"center", marginBottom: m?40:60 }}>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", display:"inline-block", marginBottom:16 }}>WHO IT IS FOR</span>
           <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"3rem", fontWeight:600, color:"var(--forest)", lineHeight:1.1 }}>Built for market-ready<br />African SMEs</h2>
         </div>
         <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3,1fr)", gap: m?20:28 }}>
           {[
-            {icon:"🌾", title:"Agriculture and Agro-Processing", desc:"Grains, spices, legumes, functional powders, nuts, seeds and related processed goods ready for export.", img:"/images/who-agriculture.jpg"},
-            {icon:"📋", title:"Verifiable Business Operations", desc:"Registered businesses with stable operations, production capacity and demonstrable business stability.", img:"/images/who-operations.jpg"},
-            {icon:"🤝", title:"Transaction Readiness", desc:"Businesses ready for structured international trade engagement and committed to programme activities.", img:"/images/who-readiness.jpg"},
-          ].map(({icon,title,desc,img})=>(
+            {icon:"🌾", title:"Agriculture and Agro-Processing", desc:"Grains, spices, legumes, functional powders, nuts, seeds and related processed goods ready for export."},
+            {icon:"📋", title:"Verifiable Business Operations", desc:"Registered businesses with stable operations, production capacity and demonstrable business stability."},
+            {icon:"🤝", title:"Transaction Readiness", desc:"Businesses ready for structured international trade engagement and committed to programme activities."},
+          ].map(({icon,title,desc})=>(
             <div key={title} style={{ borderRadius:16, overflow:"hidden", background:"white", border:"1px solid var(--border)", boxShadow:"0 2px 20px rgba(27,61,47,0.06)" }}>
-              {/* TO ADD CARD IMAGE: add an img div here with src={img} — img paths are already set in the data array above */}
               <div style={{ padding:"28px 24px" }}>
                 <div style={{ width:52, height:52, background:"var(--mint2)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.6rem", marginBottom:16 }}>{icon}</div>
                 <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:10 }}>{title}</h3>
@@ -464,8 +446,7 @@ const Landing = ({ setPage }) => {
     {/* ── CTA BANNER ── */}
     <section style={{ position:"relative", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #1a3d2e 100%)" }}>
       <div style={{ position:"absolute", inset:0, opacity:0.1, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.5) 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
-      {/* TO ADD CTA BG IMAGE: add a div with background url('/images/cta-bg.jpg') and a dark overlay div after it */}
-      <div className="wrap" style={{ position:"relative", zIndex:1, padding: m?"60px 24px":"100px 80px", textAlign:"center" }}>
+      <div className="wrap" style={{ position:"relative", zIndex:1, paddingTop: m?60:100, paddingBottom: m?60:100, textAlign:"center" }}>
         <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"clamp(2.5rem,5vw,4.5rem)", fontWeight:600, color:"white", lineHeight:1.05, marginBottom:16 }}>
           Applications Close<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:300 }}>March 31, 2026</span>
         </h2>
@@ -478,11 +459,10 @@ const Landing = ({ setPage }) => {
     </section>
 
     {/* ── FOOTER ── */}
-    <footer style={{ background:"var(--text)", padding: m?"32px 24px":"48px 0" }}>
-      <div className="wrap" style={{ padding: m?"0":"0 80px" }}>
+    <footer style={{ background:"var(--text)", padding: m?"32px 0":"48px 0" }}>
+      <div className="wrap">
         <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap: m?20:40, paddingBottom: m?20:32, borderBottom:"1px solid rgba(255,255,255,0.08)", marginBottom: m?20:28 }}>
           <div>
-            {/* Footer logo */}
             {T2T_LOGO
               ? <img src={T2T_LOGO} alt="T2T Programme" style={{ height:36, width:"auto", objectFit:"contain", marginBottom:8, filter:"brightness(0) invert(1)" }} />
               : <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.3rem", color:"white", marginBottom:4 }}>T2T Programme</p>
@@ -504,6 +484,7 @@ const Landing = ({ setPage }) => {
   </div>
   );
 };
+
 // ─── FORM PRIMITIVES ──────────────────────────────────────────────────────────
 const FF = ({num,label,hint,children}) => (
   <div>
@@ -620,8 +601,6 @@ const PressPortal = ({ addSubmission, onExit }) => {
   return (
     <div style={{ minHeight:"100vh", background:"var(--sand2)", padding:"100px 24px 80px" }}>
       <div style={{ maxWidth:680, margin:"0 auto" }}>
-
-        {/* Header */}
         <div style={{ marginBottom:48 }}>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>
             PRESS PORTAL · ACCREDITED JOURNALISTS
@@ -639,94 +618,41 @@ const PressPortal = ({ addSubmission, onExit }) => {
             </p>
           </div>
         </div>
-
-        {/* Form */}
         <div style={{ display:"flex", flexDirection:"column", gap:28 }}>
-
-          {/* Journalist Info */}
           <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:14, padding:"32px 28px" }}>
             <p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--forest)", letterSpacing:"0.1em", marginBottom:24, paddingBottom:12, borderBottom:"1px solid var(--border2)" }}>YOUR DETAILS</p>
             <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
               <div className="press-form-two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-                <div>
-                  <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Full Name</label>
-                  <TI value={d.name} onChange={v=>set("name",v)} placeholder="Your full name" />
-                </div>
-                <div>
-                  <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Media Outlet</label>
-                  <TI value={d.outlet} onChange={v=>set("outlet",v)} placeholder="Publication or outlet name" />
-                </div>
+                <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Full Name</label><TI value={d.name} onChange={v=>set("name",v)} placeholder="Your full name" /></div>
+                <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Media Outlet</label><TI value={d.outlet} onChange={v=>set("outlet",v)} placeholder="Publication or outlet name" /></div>
               </div>
               <div className="press-form-two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-                <div>
-                  <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Email Address</label>
-                  <TI value={d.email} onChange={v=>set("email",v)} placeholder="Your work email" />
-                </div>
-                <div>
-                  <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Phone Number</label>
-                  <TI value={d.phone} onChange={v=>set("phone",v)} placeholder="Contact number" />
-                </div>
+                <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Email Address</label><TI value={d.email} onChange={v=>set("email",v)} placeholder="Your work email" /></div>
+                <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Phone Number</label><TI value={d.phone} onChange={v=>set("phone",v)} placeholder="Contact number" /></div>
               </div>
-              <div>
-                <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Country</label>
-                <SI value={d.country} onChange={v=>set("country",v)} options={["Nigeria","Ghana","Senegal","Côte d'Ivoire","Kenya","South Africa","United Kingdom","United States","Canada","Other"]} />
-              </div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Country</label><SI value={d.country} onChange={v=>set("country",v)} options={["Nigeria","Ghana","Senegal","Côte d'Ivoire","Kenya","South Africa","United Kingdom","United States","Canada","Other"]} /></div>
             </div>
           </div>
-
-          {/* Story Details */}
           <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:14, padding:"32px 28px" }}>
             <p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--forest)", letterSpacing:"0.1em", marginBottom:24, paddingBottom:12, borderBottom:"1px solid var(--border2)" }}>SUBMISSION DETAILS</p>
             <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
-              <div>
-                <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Submission Type</label>
-                <Rad value={d.storyType} onChange={v=>set("storyType",v)} options={["Press Release","News Story","Feature Article","Opinion / Commentary","Interview Request","Event Coverage"]} />
-              </div>
-              <div>
-                <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Headline / Title</label>
-                <TI value={d.headline} onChange={v=>set("headline",v)} placeholder="Proposed headline for your submission" />
-              </div>
-              <div>
-                <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Summary</label>
-                <p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:8 }}>A brief 1 to 2 sentence summary of your story or pitch.</p>
-                <TA value={d.summary} onChange={v=>set("summary",v)} placeholder="Briefly describe your story..." rows={2} />
-              </div>
-              <div>
-                <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Full Content</label>
-                <p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:8 }}>Paste your full press release, article, or story pitch below.</p>
-                <TA value={d.content} onChange={v=>set("content",v)} placeholder="Full content of your submission..." rows={10} />
-              </div>
-              <div>
-                <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Image URL (Optional)</label>
-                <p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:8 }}>Link to a high-resolution image to accompany the story (must be publicly accessible).</p>
-                <TI value={d.imageUrl} onChange={v=>set("imageUrl",v)} placeholder="https://..." />
-              </div>
-              <div>
-                <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Category</label>
-                <SI value={d.category} onChange={v=>set("category",v)} options={["PRESS RELEASE","NEWS STORY","PARTNER SPOTLIGHT","PROGRAMME UPDATE","OPINION","MEDIA RESOURCE","EVENT COVERAGE"]} />
-              </div>
-              <div>
-                <label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Any additional notes for the editorial team? (Optional)</label>
-                <TA value={d.notes} onChange={v=>set("notes",v)} placeholder="Embargo dates, corrections, context, special requests..." rows={3} />
-              </div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Submission Type</label><Rad value={d.storyType} onChange={v=>set("storyType",v)} options={["Press Release","News Story","Feature Article","Opinion / Commentary","Interview Request","Event Coverage"]} /></div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Headline / Title</label><TI value={d.headline} onChange={v=>set("headline",v)} placeholder="Proposed headline for your submission" /></div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Summary</label><p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:8 }}>A brief 1 to 2 sentence summary of your story or pitch.</p><TA value={d.summary} onChange={v=>set("summary",v)} placeholder="Briefly describe your story..." rows={2} /></div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Full Content</label><p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:8 }}>Paste your full press release, article, or story pitch below.</p><TA value={d.content} onChange={v=>set("content",v)} placeholder="Full content of your submission..." rows={10} /></div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Image URL (Optional)</label><p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:8 }}>Link to a high-resolution image to accompany the story (must be publicly accessible).</p><TI value={d.imageUrl} onChange={v=>set("imageUrl",v)} placeholder="https://..." /></div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Category</label><SI value={d.category} onChange={v=>set("category",v)} options={["PRESS RELEASE","NEWS STORY","PARTNER SPOTLIGHT","PROGRAMME UPDATE","OPINION","MEDIA RESOURCE","EVENT COVERAGE"]} /></div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Any additional notes for the editorial team? (Optional)</label><TA value={d.notes} onChange={v=>set("notes",v)} placeholder="Embargo dates, corrections, context, special requests..." rows={3} /></div>
             </div>
           </div>
-
-          {/* Declaration */}
           <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:12, padding:"20px 24px" }}>
             <Chk value={d.declaration||[]} onChange={v=>set("declaration",v)} options={["I confirm this content is accurate and original","I authorise the T2T Programme to publish and edit this submission","I understand this does not guarantee publication"]} />
           </div>
-
         </div>
-
-        {/* Submit */}
         <div style={{ marginTop:40, paddingTop:28, borderTop:"1px solid var(--border)", display:"flex", justifyContent:"flex-end", gap:12 }}>
           <button onClick={onExit} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Cancel</button>
-          <button onClick={submit} style={{ background:"var(--forest)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>
-            Submit for Review
-          </button>
+          <button onClick={submit} style={{ background:"var(--forest)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>Submit for Review</button>
         </div>
-
       </div>
     </div>
   );
@@ -737,7 +663,6 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
   const m = useMobile();
   const [art, setArt] = useState(null);
 
-  // Merge static + approved journalist submissions
   const approvedAsArticles = approvedSubmissions.map(s => ({
     id: s.id, cat: s.category || "PRESS RELEASE",
     date: new Date(s.submittedAt).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}),
@@ -773,7 +698,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
         }
         <div style={{ marginTop:56, background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:16, padding:"36px 40px" }}>
           <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.4rem", color:"var(--forest)", marginBottom:20 }}>Media Contacts</h3>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20 }}>
+          <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3, 1fr)", gap:20 }}>
             {[{name:"Media Enquiries",email:"media@t2tprogramme.org",org:"T2T Programme Office"},{name:"Providus Bank Comms",email:"comms@providusbank.com",org:"Providus Bank"},{name:"Programme Updates",email:"updates@duchessnl.com",org:"Duchess NL and BTI"}].map(c=>(
               <div key={c.email}><p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:3 }}>{c.name}</p><p style={{ color:"var(--forest)", fontSize:"0.83rem", marginBottom:2 }}>{c.email}</p><p style={{ color:"var(--text3)", fontSize:"0.78rem" }}>{c.org}</p></div>
             ))}
@@ -784,25 +709,23 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
   );
 
   return (
-    <div style={{ minHeight:"100vh", background:"var(--cream)", padding:m?"80px 20px 60px":"100px 80px 80px" }}>
-      <div style={{ maxWidth:1100, margin:"0 auto 60px", display:"flex", flexDirection:m?"column":"row", justifyContent:"space-between", alignItems:m?"flex-start":"flex-end", paddingBottom:32, borderBottom:"1px solid var(--border)", gap:20 }}>
-        <div>
-          <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:12, display:"inline-block" }}>DIGITAL NEWSROOM</span>
-          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3.2rem", fontWeight:600, color:"var(--forest)", lineHeight:1 }}>Press and Media</h1>
-          <p style={{ color:"var(--text3)", marginTop:8 }}>Official communications for media professionals, journalists, and stakeholders.</p>
-        </div>
-        <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems:"flex-end" }}>
-          <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:12, padding:"16px 20px" }}>
-            <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:4 }}>PRESS CONTACT</p>
-            <p style={{ color:"var(--forest)", fontWeight:600, fontSize:"0.875rem" }}>media@t2tprogramme.org</p>
+    <div style={{ minHeight:"100vh", background:"var(--cream)", paddingTop: m?80:100, paddingBottom: m?60:80 }}>
+      <div className="wrap">
+        <div style={{ marginBottom:60, display:"flex", flexDirection:m?"column":"row", justifyContent:"space-between", alignItems:m?"flex-start":"flex-end", paddingBottom:32, borderBottom:"1px solid var(--border)", gap:20 }}>
+          <div>
+            <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:12, display:"inline-block" }}>DIGITAL NEWSROOM</span>
+            <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3.2rem", fontWeight:600, color:"var(--forest)", lineHeight:1 }}>Press and Media</h1>
+            <p style={{ color:"var(--text3)", marginTop:8 }}>Official communications for media professionals, journalists, and stakeholders.</p>
           </div>
-          <button onClick={()=>setPage("press-gate")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"10px 20px", borderRadius:8, fontSize:"0.82rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em" }}>
-            Submit a Story
-          </button>
+          <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems: m?"flex-start":"flex-end" }}>
+            <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:12, padding:"16px 20px" }}>
+              <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:4 }}>PRESS CONTACT</p>
+              <p style={{ color:"var(--forest)", fontWeight:600, fontSize:"0.875rem" }}>media@t2tprogramme.org</p>
+            </div>
+            <button onClick={()=>setPage("press-gate")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"10px 20px", borderRadius:8, fontSize:"0.82rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em" }}>Submit a Story</button>
+          </div>
         </div>
-      </div>
 
-      <div style={{ maxWidth:1100, margin:"0 auto" }}>
         <div onClick={()=>setArt(feat)} className="card-hover" style={{ display:"grid", gridTemplateColumns:m?"1fr":"1fr 1fr", background:"white", borderRadius:16, border:"1px solid var(--border)", overflow:"hidden", marginBottom:40, cursor:"pointer" }}>
           <div style={{ height:m?220:380, overflow:"hidden" }}>
             <img src={feat.img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.5s ease" }} onMouseEnter={e=>e.target.style.transform="scale(1.04)"} onMouseLeave={e=>e.target.style.transform="scale(1)"} />
@@ -889,8 +812,6 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
   return (
     <div style={{ minHeight:"100vh", background:"var(--sand2)", padding:"40px 48px 80px" }}>
       <div style={{ maxWidth:1200, margin:"0 auto" }}>
-
-        {/* Admin Header */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:36, flexWrap:"wrap", gap:16 }}>
           <div style={{ display:"flex", alignItems:"center", gap:16 }}>
             <div style={{ width:40, height:40, background:"var(--forest)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center" }}>
@@ -907,12 +828,8 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div style={{ display:"flex", gap:4, marginBottom:28, borderBottom:"1px solid var(--border)", paddingBottom:0 }}>
-          {[
-            {key:"sme", label:`SME Applications`, badge:pCounts.pending===0?null:null},
-            {key:"press", label:`Press Submissions`, badge:pCounts.pending},
-          ].map(({key,label,badge})=>(
+        <div style={{ display:"flex", gap:4, marginBottom:28, borderBottom:"1px solid var(--border)" }}>
+          {[{key:"sme",label:"SME Applications"},{key:"press",label:"Press Submissions",badge:pCounts.pending}].map(({key,label,badge})=>(
             <button key={key} onClick={()=>setTab(key)} style={{ background:"transparent", border:"none", borderBottom:`2.5px solid ${tab===key?"var(--forest)":"transparent"}`, color:tab===key?"var(--forest)":"var(--text3)", padding:"10px 20px 12px", fontSize:"0.9rem", fontWeight:tab===key?600:400, cursor:"pointer", display:"flex", alignItems:"center", gap:8, transition:"all 0.15s" }}>
               {label}
               {badge>0 && <span style={{ background:"var(--red)", color:"white", borderRadius:100, padding:"1px 8px", fontSize:"0.7rem", fontWeight:700 }}>{badge}</span>}
@@ -920,7 +837,6 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
           ))}
         </div>
 
-        {/* ── SME TAB ── */}
         {tab==="sme" && (
           <>
             <div className="dash-stats" style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:14, marginBottom:28 }}>
@@ -975,7 +891,6 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
           </>
         )}
 
-        {/* ── PRESS TAB ── */}
         {tab==="press" && (
           <>
             <div className="dash-stats" style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:14, marginBottom:28 }}>
@@ -986,7 +901,6 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                 </div>
               ))}
             </div>
-
             <div style={{ display:"flex", gap:8, marginBottom:20 }}>
               {["all","pending","approved","rejected"].map(f=>(
                 <button key={f} onClick={()=>setPressFilter(f)} style={{ background:pressFilter===f?"var(--forest)":"white", border:`1.5px solid ${pressFilter===f?"var(--forest)":"var(--border)"}`, color:pressFilter===f?"white":"var(--text2)", padding:"7px 18px", borderRadius:8, fontSize:"0.82rem", fontWeight:500, cursor:"pointer", textTransform:"capitalize" }}>
@@ -994,7 +908,6 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                 </button>
               ))}
             </div>
-
             {submissions.length===0
               ? <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"80px 40px", textAlign:"center" }}><p style={{ fontSize:"3rem", marginBottom:16 }}>📰</p><h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.6rem", color:"var(--forest)", marginBottom:8 }}>No press submissions yet</h3><p style={{ color:"var(--text3)" }}>Journalist submissions will appear here for review.</p></div>
               : <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
@@ -1015,8 +928,8 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                         <span style={{ background:"var(--mint2)", color:"var(--forest3)", padding:"3px 8px", borderRadius:4, fontSize:"0.68rem", fontWeight:600 }}>{s.storyType||"Submission"}</span>
                         <StPill st={s.status} />
                         <div style={{ display:"flex", gap:6 }} onClick={e=>e.stopPropagation()}>
-                          <button onClick={()=>upSubStatus(s.id,"approved")} title="Publish" style={{ background:"#E8F5EF", border:"1px solid #1B7A4A40", color:"#1B7A4A", padding:"6px 10px", borderRadius:6, fontSize:"0.75rem", cursor:"pointer", fontWeight:700 }}>Publish</button>
-                          <button onClick={()=>upSubStatus(s.id,"rejected")} title="Decline" style={{ background:"#FDECEA", border:"1px solid #C0392B40", color:"#C0392B", padding:"6px 10px", borderRadius:6, fontSize:"0.75rem", cursor:"pointer", fontWeight:700 }}>Decline</button>
+                          <button onClick={()=>upSubStatus(s.id,"approved")} style={{ background:"#E8F5EF", border:"1px solid #1B7A4A40", color:"#1B7A4A", padding:"6px 10px", borderRadius:6, fontSize:"0.75rem", cursor:"pointer", fontWeight:700 }}>Publish</button>
+                          <button onClick={()=>upSubStatus(s.id,"rejected")} style={{ background:"#FDECEA", border:"1px solid #C0392B40", color:"#C0392B", padding:"6px 10px", borderRadius:6, fontSize:"0.75rem", cursor:"pointer", fontWeight:700 }}>Decline</button>
                         </div>
                       </div>
                       {pressExp===s.id && (
@@ -1038,7 +951,6 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
             }
           </>
         )}
-
       </div>
     </div>
   );
@@ -1071,7 +983,7 @@ export default function App() {
   const showNav = !["admin-gate","dashboard"].includes(page);
 
   return (
-    <>
+    <div style={{ overflowX:"hidden", width:"100%" }}>
       <GlobalStyles />
       {showNav && <Nav page={page} setPage={setPage} onLogoClick={handleLogoClick} />}
 
@@ -1079,7 +991,6 @@ export default function App() {
       {page==="register" && <Registration addApp={addApp} />}
       {page==="newsroom" && <Newsroom setPage={setPage} approvedSubmissions={approvedSubmissions} />}
 
-      {/* Press portal gate */}
       {page==="press-gate" && !pressUnlocked && (
         <PasswordGate
           title="Press Portal"
@@ -1093,7 +1004,6 @@ export default function App() {
         <PressPortal addSubmission={addSubmission} onExit={() => { setPressUnlocked(false); setPage("newsroom"); }} />
       )}
 
-      {/* Admin gate */}
       {page==="admin-gate" && !adminUnlocked && (
         <PasswordGate
           title="Admin Access"
@@ -1106,6 +1016,6 @@ export default function App() {
       {page==="dashboard" && adminUnlocked && (
         <Dashboard apps={apps} upAppStatus={upAppStatus} submissions={submissions} upSubStatus={upSubStatus} onExit={() => { setAdminUnlocked(false); setPage("landing"); }} />
       )}
-    </>
+    </div>
   );
 }
