@@ -13,7 +13,7 @@ const useMobile = () => {
 
 const GlobalStyles = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root {
       --forest:#1B3D2F; --forest2:#234D3B; --forest3:#2E6249;
@@ -24,7 +24,9 @@ const GlobalStyles = () => (
       --border:#D8E8E0; --border2:#EAF2EC;
       --white:#FFFFFF; --red:#C0392B; --green-ok:#1B7A4A;
       --amber:#B8943F; --amber-bg:#FDF5E0;
+      --max-w:1440px;
     }
+    .wrap { max-width:var(--max-w); margin:0 auto; width:100%; }
     html { scroll-behavior:smooth; }
     body { font-family:'Outfit',sans-serif; background:var(--cream); color:var(--text); overflow-x:hidden; }
     h1,h2,h3,h4 { font-family:'Cormorant Garamond',serif; }
@@ -169,6 +171,10 @@ const PasswordGate = ({ title, subtitle, password, buttonLabel, onUnlock }) => {
 };
 
 // ─── NAV ─────────────────────────────────────────────────────────────────────
+// LOGO SETUP: Replace the <img> src below with your actual T2T logo file.
+// Also add <link rel="icon" href="/favicon.ico"> in your index.html for the favicon.
+const T2T_LOGO = "/logo.png"; // e.g. "/logo.png" — set this once you have the file
+
 const Nav = ({ page, setPage, onLogoClick }) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -182,54 +188,62 @@ const Nav = ({ page, setPage, onLogoClick }) => {
     return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onResize); };
   }, []);
 
-  const navLinks = [
-    {key:"landing", label:"Home"},
-    {key:"newsroom", label:"Newsroom"},
-    {key:"press-gate", label:"Press Portal"},
-    {key:"register", label:"Apply Now", primary:true},
-  ];
+  const bg = scrolled || menuOpen ? "rgba(255,254,249,0.97)" : "rgba(255,254,249,0)";
 
   return (
     <>
-      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:1000, height:68, background:scrolled||menuOpen?"rgba(255,254,249,0.97)":"transparent", backdropFilter:scrolled||menuOpen?"blur(16px)":"none", borderBottom:scrolled||menuOpen?"1px solid var(--border)":"none", transition:"all 0.3s ease", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 24px" }}>
+      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:1000, height:72, background:bg, backdropFilter:scrolled||menuOpen?"blur(20px)":"none", borderBottom:scrolled||menuOpen?"1px solid var(--border)":"none", transition:"all 0.3s ease" }}>
+        <div className="wrap" style={{ height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px" }}>
 
-        {/* Logo */}
-        <div onClick={()=>{onLogoClick();setMenuOpen(false);}} style={{ cursor:"pointer", display:"flex", alignItems:"center", gap:12 }}>
-          <div style={{ width:34, height:34, background:"var(--forest)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1L14 4.5V11.5L8 15L2 11.5V4.5L8 1Z" stroke="white" strokeWidth="1.5" fill="none"/>
-              <path d="M8 5L11 7V11L8 13L5 11V7L8 5Z" fill="white"/>
-            </svg>
+          {/* ── LOGO AREA ── */}
+          <div onClick={()=>{onLogoClick();setMenuOpen(false);}} style={{ cursor:"pointer", display:"flex", alignItems:"center", gap:12 }}>
+            {T2T_LOGO
+              ? <img src={T2T_LOGO} alt="T2T Programme" style={{ height:40, width:"auto", objectFit:"contain",display:"block" }} onError={e=>console.log("logo failed to load:", e )} />
+              : (
+                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                  {/* Placeholder shown until logo is uploaded */}
+                  <div style={{ width:38, height:38, background:"var(--forest)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, border:"2px dashed rgba(200,230,218,0.4)" }}>
+                    <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
+                      <path d="M8 1L14 4.5V11.5L8 15L2 11.5V4.5L8 1Z" stroke="white" strokeWidth="1.5" fill="none"/>
+                      <path d="M8 5L11 7V11L8 13L5 11V7L8 5Z" fill="white"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.1rem", color:"var(--forest)", lineHeight:1 }}>T2T Programme</p>
+                    <p style={{ fontSize:"0.6rem", color:"var(--text3)", letterSpacing:"0.08em", fontWeight:500 }}>TRAINING TO TRANSACTION</p>
+                  </div>
+                </div>
+              )
+            }
           </div>
-          <span style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.05rem", color:"var(--forest)" }}>T2T Programme</span>
+
+          {/* Desktop links */}
+          {!isMobile && (
+            <div style={{ display:"flex", gap:4, alignItems:"center" }}>
+              {[{key:"landing",label:"Home"},{key:"newsroom",label:"Newsroom"}].map(({key,label})=>(
+                <button key={key} onClick={()=>setPage(key)} style={{ background:page===key?"var(--mint2)":"transparent", border:"none", color:page===key?"var(--forest)":"var(--text3)", padding:"7px 18px", borderRadius:6, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}>{label}</button>
+              ))}
+              <div style={{ width:1, height:20, background:"var(--border)", margin:"0 8px" }} />
+              <button onClick={()=>setPage("press-gate")} style={{ background:"transparent", border:"1.5px solid var(--forest)", color:"var(--forest)", padding:"7px 18px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", marginRight:6 }}>Press Portal</button>
+              <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", border:"none", color:"white", padding:"9px 22px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>Apply Now</button>
+            </div>
+          )}
+
+          {/* Mobile hamburger */}
+          {isMobile && (
+            <button onClick={()=>setMenuOpen(o=>!o)} style={{ background:"transparent", border:"1.5px solid var(--border)", borderRadius:8, padding:"8px 10px", cursor:"pointer", display:"flex", flexDirection:"column", gap:5, alignItems:"center", justifyContent:"center" }}>
+              <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.25s", transform:menuOpen?"rotate(45deg) translate(5px,5px)":"none" }} />
+              <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.25s", opacity:menuOpen?0:1 }} />
+              <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.25s", transform:menuOpen?"rotate(-45deg) translate(5px,-5px)":"none" }} />
+            </button>
+          )}
         </div>
-
-        {/* Desktop links */}
-        {!isMobile && (
-          <div style={{ display:"flex", gap:4, alignItems:"center" }}>
-            {[{key:"landing",label:"Home"},{key:"newsroom",label:"Newsroom"}].map(({key,label})=>(
-              <button key={key} onClick={()=>setPage(key)} style={{ background:page===key?"var(--mint2)":"transparent", border:"none", color:page===key?"var(--forest)":"var(--text3)", padding:"7px 18px", borderRadius:6, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}>{label}</button>
-            ))}
-            <div style={{ width:1, height:20, background:"var(--border)", margin:"0 8px" }} />
-            <button onClick={()=>setPage("press-gate")} style={{ background:"transparent", border:"1.5px solid var(--forest)", color:"var(--forest)", padding:"7px 18px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", marginRight:6 }}>Press Portal</button>
-            <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", border:"none", color:"white", padding:"9px 22px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>Apply Now</button>
-          </div>
-        )}
-
-        {/* Mobile hamburger */}
-        {isMobile && (
-          <button onClick={()=>setMenuOpen(o=>!o)} style={{ background:"transparent", border:"1.5px solid var(--border)", borderRadius:8, padding:"8px 10px", cursor:"pointer", display:"flex", flexDirection:"column", gap:5, alignItems:"center", justifyContent:"center" }}>
-            <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.25s", transform:menuOpen?"rotate(45deg) translate(5px,5px)":"none" }} />
-            <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.25s", opacity:menuOpen?0:1 }} />
-            <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.25s", transform:menuOpen?"rotate(-45deg) translate(5px,-5px)":"none" }} />
-          </button>
-        )}
       </nav>
 
       {/* Mobile dropdown */}
       {isMobile && menuOpen && (
-        <div style={{ position:"fixed", top:68, left:0, right:0, zIndex:999, background:"rgba(255,254,249,0.98)", backdropFilter:"blur(16px)", borderBottom:"1px solid var(--border)", padding:"16px 24px 24px", display:"flex", flexDirection:"column", gap:8 }}>
-          {navLinks.map(({key,label,primary})=>(
+        <div style={{ position:"fixed", top:72, left:0, right:0, zIndex:999, background:"rgba(255,254,249,0.98)", backdropFilter:"blur(20px)", borderBottom:"1px solid var(--border)", padding:"16px 24px 24px", display:"flex", flexDirection:"column", gap:8 }}>
+          {[{key:"landing",label:"Home"},{key:"newsroom",label:"Newsroom"},{key:"press-gate",label:"Press Portal"},{key:"register",label:"Apply Now",primary:true}].map(({key,label,primary})=>(
             <button key={key} onClick={()=>{setPage(key);setMenuOpen(false);}} style={{ background:primary?"var(--forest)":page===key?"var(--mint2)":"transparent", border:primary?"none":"1.5px solid var(--border)", color:primary?"white":page===key?"var(--forest)":"var(--text2)", padding:"13px 20px", borderRadius:8, fontSize:"0.95rem", fontWeight:primary?600:500, cursor:"pointer", textAlign:"left", width:"100%" }}>
               {label}
             </button>
@@ -241,88 +255,113 @@ const Nav = ({ page, setPage, onLogoClick }) => {
 };
 
 // ─── LANDING ─────────────────────────────────────────────────────────────────
+// PARTNER LOGOS: Replace the logo URLs below with actual uploaded partner logo files.
+// e.g. providusLogo: "/logos/providus.png"
+const PARTNER_LOGOS = {
+  providus:   "/logos/providus.png",
+  ecowas:     "/logos/ecowas.png",
+  gaba:       "/logos/gaba.png",
+  duchess:    "/logos/duchess.png",
+  borderless: "/logos/borderless.png",
+};
+
 const Landing = ({ setPage }) => {
   const m = useMobile();
+
+  const partners = [
+    { key:"providus",   name:"Providus Bank",                    role:"Lead Sponsor",         abbr:"PB"   },
+    { key:"ecowas",     name:"ECOWAS Parliament",                role:"Institutional Backer", abbr:"EP"   },
+    { key:"gaba",       name:"Global African Business Assoc.",   role:"GABA",                 abbr:"GABA" },
+    { key:"duchess",    name:"Duchess Natural Limited",          role:"Implementing Partner", abbr:"DNL"  },
+    { key:"borderless", name:"Borderless Trade & Investments",   role:"Implementing Partner", abbr:"BTI"  },
+  ];
+
   return (
-  <div>
-    {/* HERO */}
-    <section style={{ minHeight: m?"auto":"100vh", background:`radial-gradient(ellipse at 70% 30%, rgba(200,230,218,0.4) 0%, transparent 55%), radial-gradient(ellipse at 10% 80%, rgba(200,230,218,0.2) 0%, transparent 45%), var(--sand2)`, display:"flex", flexDirection:"column", justifyContent:"center", padding: m?"100px 24px 48px":"140px 80px 80px", position:"relative", overflow:"hidden" }}>
-      <div style={{ position:"absolute", inset:0, opacity:0.4, backgroundImage:"radial-gradient(circle, rgba(27,61,47,0.06) 1px, transparent 1px)", backgroundSize:"36px 36px" }} />
-      {!m && <>
-        <div style={{ position:"absolute", right:-120, top:"10%", width:600, height:600, borderRadius:"50%", border:"1px solid rgba(27,61,47,0.08)", pointerEvents:"none" }} />
-        <div style={{ position:"absolute", right:-60, top:"5%", width:480, height:480, borderRadius:"50%", background:"radial-gradient(circle, rgba(200,230,218,0.35) 0%, transparent 70%)", pointerEvents:"none" }} />
-      </>}
+  <div style={{ overflowX:"hidden" }}>
 
-      <div className="fade-up" style={{ maxWidth: m?"100%":760, position:"relative" }}>
-        <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"var(--forest)", color:"white", borderRadius:100, padding:"5px 14px 5px 10px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:32 }}>
-          <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
-        </div>
-        <h1 style={{ fontSize: m?"2.8rem":"clamp(3rem,6vw,6rem)", fontWeight:700, lineHeight:1.05, color:"var(--forest)", marginBottom:24, letterSpacing:"-0.02em" }}>
-          Training to<br /><span style={{ fontStyle:"italic", fontWeight:400, color:"var(--sage)" }}>Transaction.</span>
-        </h1>
-        <p style={{ fontSize: m?"1rem":"1.15rem", color:"var(--text2)", lineHeight:1.75, maxWidth:560, marginBottom:12, fontWeight:300 }}>
-          A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
-        </p>
-        <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.1rem", color:"var(--sage)", marginBottom: m?32:48 }}>Lagos and Abuja · Commencing April 13, 2026</p>
-        <div style={{ display:"flex", flexDirection: m?"column":"row", gap:12 }}>
-          <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", boxShadow:"0 8px 32px rgba(27,61,47,0.28)" }}>
-            Apply to the Programme
-          </button>
-          <button onClick={()=>setPage("newsroom")} style={{ background:"transparent", border:"1.5px solid var(--forest)", color:"var(--forest)", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer" }}
-            onMouseEnter={e=>{e.currentTarget.style.background="var(--forest)";e.currentTarget.style.color="white";}}
-            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="var(--forest)";}}
-          >Press and Media</button>
-        </div>
-      </div>
+    {/* ── HERO ── */}
+    <section style={{ position:"relative", minHeight:"100vh", display:"flex", alignItems:"center", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 60%, #2E6249 100%)" }}>
+      {/* Subtle dot pattern */}
+      <div style={{ position:"absolute", inset:0, opacity:0.15, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.4) 1px, transparent 1px)", backgroundSize:"32px 32px" }} />
+      <div style={{ position:"absolute", right:"-10%", top:"10%", width:"50vw", height:"50vw", maxWidth:700, maxHeight:700, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.07)", pointerEvents:"none" }} />
+      <div style={{ position:"absolute", right:"5%", top:"20%", width:"30vw", height:"30vw", maxWidth:400, maxHeight:400, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.05)", pointerEvents:"none" }} />
+      {/* TO ADD HERO BG IMAGE: add a div with background url('/images/hero-bg.jpg') here, and another div with a dark green overlay */}
 
-      {/* Overview card — absolute on desktop, stacked on mobile */}
-      <div style={{ position: m?"relative":"absolute", right: m?"auto":80, bottom: m?"auto":80, marginTop: m?40:0, background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"28px 32px", boxShadow: m?"none":"0 20px 60px rgba(27,61,47,0.1)", width: m?"100%":"auto", minWidth: m?"unset":260 }}>
-        <p style={{ fontSize:"0.68rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.1em", marginBottom:16 }}>PROGRAMME OVERVIEW</p>
-        {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"March 31, 2026"},{label:"Commencement",val:"April 13, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val})=>(
-          <div key={label} style={{ marginBottom:12, paddingBottom:12, borderBottom:"1px solid var(--border2)" }}>
-            <p style={{ fontSize:"0.7rem", color:"var(--text3)", marginBottom:2 }}>{label}</p>
-            <p style={{ fontSize:"0.9rem", fontWeight:600, color:"var(--forest)" }}>{val}</p>
+      <div className="wrap" style={{ position:"relative", zIndex:2, padding: m?"100px 24px 60px":"130px 80px 100px", display:"flex", flexDirection: m?"column":"row", alignItems:"center", gap: m?40:60, width:"100%" }}>
+        {/* Left — headline */}
+        <div className="fade-up" style={{ flex:1 }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
+            <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
           </div>
-        ))}
+          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"3rem":"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
+            Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
+          </h1>
+          <p style={{ fontSize: m?"1rem":"1.15rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, maxWidth:520, marginBottom:16, fontWeight:300 }}>
+            A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
+          </p>
+          <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom: m?32:44, opacity:0.85 }}>
+            Lagos and Abuja · Commencing April 13, 2026
+          </p>
+          <div style={{ display:"flex", flexDirection: m?"column":"row", gap:12 }}>
+            <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
+              onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="white";}}
+            >Apply to the Programme</button>
+            <button onClick={()=>setPage("newsroom")} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.4)", color:"white", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.2)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
+            >Press and Media</button>
+          </div>
+        </div>
+
+        {/* Right — overview card */}
+        {!m && (
+          <div style={{ width:280, background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:20, padding:"32px 28px", flexShrink:0 }}>
+            <p style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(200,230,218,0.6)", letterSpacing:"0.12em", marginBottom:20 }}>PROGRAMME OVERVIEW</p>
+            {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"March 31, 2026"},{label:"Commencement",val:"April 13, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val},i,arr)=>(
+              <div key={label} style={{ marginBottom: i<arr.length-1?16:0, paddingBottom: i<arr.length-1?16:0, borderBottom: i<arr.length-1?"1px solid rgba(200,230,218,0.12)":"none" }}>
+                <p style={{ fontSize:"0.68rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
+                <p style={{ fontSize:"0.9rem", fontWeight:600, color:"white" }}>{val}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* Mobile overview — below hero */}
+      {m && (
+        <div className="wrap" style={{ position:"relative", zIndex:2, padding:"0 24px 48px" }}>
+          <div style={{ background:"rgba(255,255,255,0.1)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:16, padding:"24px" }}>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+              {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"3 Months"},{label:"Deadline",val:"March 31, 2026"},{label:"Starts",val:"April 13, 2026"}].map(({label,val})=>(
+                <div key={label}><p style={{ fontSize:"0.65rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p><p style={{ fontSize:"0.875rem", fontWeight:600, color:"white" }}>{val}</p></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
 
-    {/* PARTNERS */}
-    <section style={{ background:"var(--forest)", padding: m?"40px 24px":"60px 80px" }}>
-      <p style={{ fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.12em", color:"rgba(200,230,218,0.55)", marginBottom:32, textAlign:"center" }}>IN PARTNERSHIP WITH</p>
-      <div style={{ display:"grid", gridTemplateColumns: m?"repeat(2,1fr)":"repeat(5, 1fr)", gap:12, maxWidth:960, margin:"0 auto" }}>
-        {[{name:"Providus Bank",role:"Lead Sponsor",abbr:"PB"},{name:"ECOWAS Parliament",role:"Institutional Backer",abbr:"EP"},{name:"Global African Business Association",role:"GABA",abbr:"GABA"},{name:"Duchess Natural Limited",role:"Implementing Partner",abbr:"DNL"},{name:"Borderless Trade and Investments",role:"Implementing Partner",abbr:"BTI"}].map(({name,role,abbr})=>(
-          <div key={name} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(200,230,218,0.15)", borderRadius:12, padding:"16px 12px", textAlign:"center", transition:"all 0.2s" }}
-            onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
-            onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)";}}
-          >
-            <div style={{ width:40, height:40, background:"rgba(200,230,218,0.15)", borderRadius:10, margin:"0 auto 10px", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Cormorant Garamond", fontWeight:700, color:"var(--mint)", fontSize:"0.85rem" }}>{abbr}</div>
-            <p style={{ fontWeight:600, color:"white", fontSize: m?"0.72rem":"0.8rem", marginBottom:3, lineHeight:1.3 }}>{name}</p>
-            <p style={{ fontSize:"0.65rem", color:"rgba(200,230,218,0.55)" }}>{role}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    {/* STAGES */}
-    <section style={{ padding: m?"60px 24px":"100px 80px", background:"var(--cream)" }}>
-      <div style={{ maxWidth:1100, margin:"0 auto", display:"grid", gridTemplateColumns: m?"1fr":"1fr 1.4fr", gap: m?40:80, alignItems:"start" }}>
-        <div>
-          <span style={{ display:"inline-block", background:"var(--mint2)", color:"var(--forest)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:20 }}>THE PROGRAMME</span>
-          <h2 style={{ fontSize:"clamp(2rem,3.5vw,3rem)", fontWeight:600, lineHeight:1.15, color:"var(--forest)", marginBottom:24 }}>From readiness<br />to real deals.</h2>
-          <p style={{ color:"var(--text2)", lineHeight:1.8, marginBottom:16, fontWeight:300 }}>The T2T Programme is a structured, institutional initiative that walks market-ready African SMEs through a proven pathway into their first international transactions.</p>
-          <p style={{ color:"var(--text2)", lineHeight:1.8, fontWeight:300 }}>Spanning three months, the programme covers export readiness, trade compliance, buyer linkage, and access to trade finance — all designed around real commercial outcomes.</p>
-          <button onClick={()=>setPage("register")} style={{ marginTop:32, background:"var(--forest)", color:"white", border:"none", padding:"12px 28px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer" }}>Apply to the Programme</button>
-        </div>
-        <div style={{ display:"flex", flexDirection:"column", gap:3 }}>
-          {[{num:"01",stage:"Stage One",title:"Business and Export Readiness",desc:"Compliance documentation, NAFDAC and product standards, KYC completion, operational assessment",dur:"Lagos: 4 days · Abuja: 2 days"},{num:"02",stage:"Stage Two",title:"Market Access and Buyer Linkage",desc:"Buyer connections, ECOWAS region and US–Canada market access, trade documentation",dur:"Lagos: 4 days · Abuja: 2 days"},{num:"03",stage:"Stage Three",title:"Transaction Execution",desc:"Trade finance solutions, FX access via Providus Bank, pilot transaction guidance, first deal closed",dur:"Lagos: 4 days · Abuja: 2 days"}].map(({num,stage,title,desc,dur})=>(
-            <div key={num} style={{ background:"white", border:"1px solid var(--border2)", borderRadius:12, padding:"24px 20px", display:"grid", gridTemplateColumns:"44px 1fr", gap:16, alignItems:"start", transition:"all 0.2s" }}>
-              <div style={{ width:44, height:44, background:"var(--forest)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Cormorant Garamond", fontWeight:700, color:"var(--mint)", fontSize:"1rem", flexShrink:0 }}>{num}</div>
-              <div>
-                <p style={{ fontSize:"0.7rem", color:"var(--sage)", fontWeight:600, letterSpacing:"0.08em", marginBottom:4 }}>{stage.toUpperCase()}</p>
-                <p style={{ fontFamily:"Cormorant Garamond", fontWeight:600, fontSize:"1.15rem", color:"var(--forest)", marginBottom:6 }}>{title}</p>
-                <p style={{ fontSize:"0.85rem", color:"var(--text2)", lineHeight:1.6, marginBottom:10 }}>{desc}</p>
-                <span style={{ background:"var(--mint2)", color:"var(--forest3)", padding:"3px 10px", borderRadius:100, fontSize:"0.72rem", fontWeight:500 }}>{dur}</span>
+    {/* ── PARTNERS — logo grid like ASF ── */}
+    <section style={{ background:"white", padding: m?"40px 24px":"56px 0", borderBottom:"1px solid var(--border)" }}>
+      <div className="wrap" style={{ padding: m?"0":"0 80px" }}>
+        <p style={{ fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.14em", color:"var(--text3)", marginBottom:36, textAlign:"center" }}>IN PARTNERSHIP WITH</p>
+        <div style={{ display:"grid", gridTemplateColumns: m?"repeat(2,1fr)":"repeat(5,1fr)", gap: m?24:40, alignItems:"center", maxWidth:1000, margin:"0 auto" }}>
+          {partners.map(({key,name,role,abbr})=>(
+            <div key={key} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:12 }}>
+              {/* Logo box — replace src once logos are provided */}
+              <div style={{ width:"100%", maxWidth:140, height:72, background:"var(--sand2)", border:"1.5px dashed var(--border)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
+                {PARTNER_LOGOS[key]
+                  ? <img src={PARTNER_LOGOS[key]} alt={name} style={{ width:"100%", height:"100%", objectFit:"contain", padding:8 }} />
+                  : <div style={{ textAlign:"center", padding:8 }}>
+                      <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1rem", color:"var(--forest)" }}>{abbr}</p>
+                      <p style={{ fontSize:"0.55rem", color:"var(--text3)", marginTop:2 }}>ADD LOGO</p>
+                    </div>
+                }
+              </div>
+              <div style={{ textAlign:"center" }}>
+                <p style={{ fontWeight:600, fontSize: m?"0.72rem":"0.78rem", color:"var(--text)", lineHeight:1.3, marginBottom:2 }}>{name}</p>
+                <p style={{ fontSize:"0.65rem", color:"var(--text3)" }}>{role}</p>
               </div>
             </div>
           ))}
@@ -330,47 +369,136 @@ const Landing = ({ setPage }) => {
       </div>
     </section>
 
-    {/* ELIGIBILITY */}
-    <section style={{ padding: m?"60px 24px":"80px 80px", background:"var(--sand2)" }}>
-      <div style={{ maxWidth:1100, margin:"0 auto" }}>
-        <div style={{ textAlign:"center", marginBottom:48 }}>
-          <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:16, display:"inline-block" }}>WHO IT IS FOR</span>
-          <h2 style={{ fontSize: m?"2rem":"2.5rem", fontWeight:600, color:"var(--forest)", marginTop:12 }}>Built for Market-Ready African SMEs</h2>
+    {/* ── ABOUT / IMPACT ── */}
+    {/* TO ADD ABOUT IMAGE: wrap the inner div in a 2-col grid and add an img div with src="/images/about-image.jpg" */}
+    <section style={{ padding: m?"60px 24px":"100px 0", background:"var(--cream)" }}>
+      <div className="wrap" style={{ padding: m?"0":"0 80px", maxWidth:1200, margin:"0 auto" }}>
+        <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"1fr 1fr", gap: m?32:80, alignItems:"start" }}>
+
+          {/* Left — text */}
+          <div>
+            <span style={{ display:"inline-block", background:"var(--mint2)", color:"var(--forest)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:20 }}>THE PROGRAMME</span>
+            <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"clamp(2.2rem,3.5vw,3.2rem)", fontWeight:600, lineHeight:1.1, color:"var(--forest)", marginBottom:24 }}>
+              Built to move African businesses into global markets.
+            </h2>
+            <p style={{ color:"var(--text2)", lineHeight:1.9, marginBottom:16, fontWeight:300, fontSize:"0.95rem" }}>
+              The T2T Programme is a structured, institutional initiative that walks market-ready African SMEs through a proven pathway into their first international transactions.
+            </p>
+            <p style={{ color:"var(--text2)", lineHeight:1.9, fontWeight:300, fontSize:"0.95rem", marginBottom:32 }}>
+              Spanning three months across Lagos and Abuja, the programme covers export readiness, trade compliance, buyer linkage, and direct access to trade finance — all designed around real commercial outcomes.
+            </p>
+            <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"13px 32px", borderRadius:9, fontSize:"0.9rem", fontWeight:600, cursor:"pointer", boxShadow:"0 4px 20px rgba(27,61,47,0.25)" }}>Apply to the Programme</button>
+          </div>
+
+          {/* Right — impact numbers */}
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+            {[{num:"3",label:"Month intensive programme"},{num:"2",label:"Delivery cities"},{num:"3",label:"Target global markets"},{num:"50+",label:"SMEs to be selected"}].map(({num,label})=>(
+              <div key={label} style={{ background:"var(--sand2)", border:"1px solid var(--border)", borderRadius:12, padding:"24px 20px" }}>
+                <p style={{ fontFamily:"Cormorant Garamond", fontSize:"2.5rem", fontWeight:700, color:"var(--forest)", lineHeight:1 }}>{num}</p>
+                <p style={{ fontSize:"0.78rem", color:"var(--text3)", marginTop:8, lineHeight:1.4 }}>{label}</p>
+              </div>
+            ))}
+          </div>
+
         </div>
-        <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3, 1fr)", gap:16 }}>
-          {[{icon:"🌾",title:"Agriculture and Agro-Processing",desc:"Grains, spices, legumes, functional powders, nuts, seeds and related processed goods."},{icon:"📋",title:"Verifiable Business Operations",desc:"Registered business with stable operations, production capacity and demonstrable business stability."},{icon:"🤝",title:"Transaction Readiness",desc:"Businesses ready for structured international trade engagement and committed to programme activities."}].map(({icon,title,desc})=>(
-            <div key={title} style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"28px 24px" }}>
-              <div style={{ fontSize:"2rem", marginBottom:14 }}>{icon}</div>
-              <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.25rem", fontWeight:600, color:"var(--forest)", marginBottom:10 }}>{title}</h3>
-              <p style={{ fontSize:"0.875rem", color:"var(--text2)", lineHeight:1.7 }}>{desc}</p>
+      </div>
+    </section>
+
+    {/* ── STAGES ── */}
+    <section style={{ padding: m?"60px 24px":"100px 0", background:"var(--forest)", position:"relative", overflow:"hidden" }}>
+      {/* Subtle dot overlay */}
+      <div style={{ position:"absolute", inset:0, opacity:0.08, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.5) 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
+      {/* TO ADD STAGES BG IMAGE: add a div with background url('/images/stages-bg.jpg') and opacity 0.08 here */}
+      <div className="wrap" style={{ position:"relative", zIndex:1, padding: m?"0":"0 80px" }}>
+        <div style={{ textAlign:"center", marginBottom: m?40:64 }}>
+          <span style={{ background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", display:"inline-block", marginBottom:16 }}>HOW IT WORKS</span>
+          <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"3rem", fontWeight:600, color:"white", lineHeight:1.1 }}>Three stages. Real outcomes.</h2>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3,1fr)", gap: m?20:24 }}>
+          {[
+            {num:"01",title:"Business and Export Readiness",desc:"Compliance documentation, NAFDAC and product standards, KYC completion, and operational assessment.",dur:"Lagos: 4 days · Abuja: 2 days",img:"https://images.unsplash.com/photo-1589156215461-7c73de0ab923?w=600&q=80"},
+            {num:"02",title:"Market Access and Buyer Linkage",desc:"Buyer connections, ECOWAS region and US-Canada market access, and full trade documentation.",dur:"Lagos: 4 days · Abuja: 2 days",img:"https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80"},
+            {num:"03",title:"Transaction Execution",desc:"Trade finance solutions, FX access via Providus Bank, pilot transaction guidance, and first deal closed.",dur:"Lagos: 4 days · Abuja: 2 days",img:"https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80"},
+          ].map(({num,title,desc,dur,img})=>(
+            <div key={num} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(200,230,218,0.12)", borderRadius:16, overflow:"hidden" }}>
+              {/* TO ADD STAGE IMAGE: add an img div here with src={'/images/stage-' + num + '.jpg'} then remove the number badge div below */}
+              <div style={{ padding:"28px 24px" }}>
+                <div style={{ width:44, height:44, background:"rgba(200,230,218,0.12)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Cormorant Garamond", fontWeight:700, color:"var(--mint)", fontSize:"1.1rem", marginBottom:16 }}>{num}</div>
+                <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"white", marginBottom:10, lineHeight:1.2 }}>{title}</h3>
+                <p style={{ fontSize:"0.85rem", color:"rgba(200,230,218,0.7)", lineHeight:1.7, marginBottom:16 }}>{desc}</p>
+                <span style={{ background:"rgba(200,230,218,0.1)", border:"1px solid rgba(200,230,218,0.2)", color:"var(--mint)", padding:"4px 12px", borderRadius:100, fontSize:"0.7rem", fontWeight:500 }}>{dur}</span>
+            </div>
             </div>
           ))}
         </div>
-        <p style={{ textAlign:"center", marginTop:28, fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1rem", color:"var(--text3)" }}>Prior export experience is considered an advantage but is not mandatory.</p>
       </div>
     </section>
 
-    {/* CTA */}
-    <section style={{ background:"var(--forest)", padding: m?"60px 24px":"100px 80px", textAlign:"center", position:"relative", overflow:"hidden" }}>
-      {!m && <div style={{ position:"absolute", left:"50%", top:"50%", transform:"translate(-50%,-50%)", width:700, height:700, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.06)", pointerEvents:"none" }} />}
-      <div style={{ position:"relative" }}>
-        <h2 style={{ fontSize: m?"2rem":"clamp(2.2rem,5vw,4rem)", fontWeight:600, color:"white", lineHeight:1.1, marginBottom:16 }}>
-          Applications Close<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:400 }}>March 31, 2026</span>
-        </h2>
-        <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:40, fontSize:"1.05rem", fontWeight:300 }}>Programme commences April 13 in Lagos and Abuja.</p>
-        <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"16px 44px", borderRadius:10, fontSize:"1rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.2)" }}>Begin Your Application</button>
-      </div>
-    </section>
-
-    {/* FOOTER */}
-    <footer style={{ background:"var(--text)", padding: m?"32px 24px":"40px 80px" }}>
-      <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap: m?16:20 }}>
-        <div>
-          <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.1rem", color:"white", marginBottom:4 }}>T2T Programme</p>
-          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.35)" }}>Training to Transaction · 2026</p>
+    {/* ── WHO IT'S FOR — image cards like ASF programmes ── */}
+    <section style={{ padding: m?"60px 24px":"100px 0", background:"var(--sand2)" }}>
+      <div className="wrap" style={{ padding: m?"0":"0 80px" }}>
+        <div style={{ textAlign:"center", marginBottom: m?40:60 }}>
+          <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", display:"inline-block", marginBottom:16 }}>WHO IT IS FOR</span>
+          <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"3rem", fontWeight:600, color:"var(--forest)", lineHeight:1.1 }}>Built for market-ready<br />African SMEs</h2>
         </div>
-        {!m && <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.35)", maxWidth:420, textAlign:"center" }}>Implemented by Duchess NL and Borderless Trade and Investments. Sponsored by Providus Bank.</p>}
-        <p style={{ fontSize:"0.78rem", color:"rgba(255,255,255,0.35)" }}>media@t2tprogramme.org</p>
+        <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3,1fr)", gap: m?20:28 }}>
+          {[
+            {icon:"🌾", title:"Agriculture and Agro-Processing", desc:"Grains, spices, legumes, functional powders, nuts, seeds and related processed goods ready for export.", img:"/images/who-agriculture.jpg"},
+            {icon:"📋", title:"Verifiable Business Operations", desc:"Registered businesses with stable operations, production capacity and demonstrable business stability.", img:"/images/who-operations.jpg"},
+            {icon:"🤝", title:"Transaction Readiness", desc:"Businesses ready for structured international trade engagement and committed to programme activities.", img:"/images/who-readiness.jpg"},
+          ].map(({icon,title,desc,img})=>(
+            <div key={title} style={{ borderRadius:16, overflow:"hidden", background:"white", border:"1px solid var(--border)", boxShadow:"0 2px 20px rgba(27,61,47,0.06)" }}>
+              {/* TO ADD CARD IMAGE: add an img div here with src={img} — img paths are already set in the data array above */}
+              <div style={{ padding:"28px 24px" }}>
+                <div style={{ width:52, height:52, background:"var(--mint2)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.6rem", marginBottom:16 }}>{icon}</div>
+                <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:10 }}>{title}</h3>
+                <p style={{ fontSize:"0.875rem", color:"var(--text2)", lineHeight:1.7 }}>{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p style={{ textAlign:"center", marginTop:32, fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1rem", color:"var(--text3)" }}>Prior export experience is an advantage but is not mandatory.</p>
+      </div>
+    </section>
+
+    {/* ── CTA BANNER ── */}
+    <section style={{ position:"relative", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #1a3d2e 100%)" }}>
+      <div style={{ position:"absolute", inset:0, opacity:0.1, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.5) 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
+      {/* TO ADD CTA BG IMAGE: add a div with background url('/images/cta-bg.jpg') and a dark overlay div after it */}
+      <div className="wrap" style={{ position:"relative", zIndex:1, padding: m?"60px 24px":"100px 80px", textAlign:"center" }}>
+        <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"clamp(2.5rem,5vw,4.5rem)", fontWeight:600, color:"white", lineHeight:1.05, marginBottom:16 }}>
+          Applications Close<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:300 }}>March 31, 2026</span>
+        </h2>
+        <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:44, fontSize: m?"1rem":"1.1rem", fontWeight:300 }}>Programme commences April 13 in Lagos and Abuja.</p>
+        <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"16px 48px", borderRadius:10, fontSize:"1rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
+          onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
+          onMouseLeave={e=>{e.currentTarget.style.background="white";}}
+        >Begin Your Application</button>
+      </div>
+    </section>
+
+    {/* ── FOOTER ── */}
+    <footer style={{ background:"var(--text)", padding: m?"32px 24px":"48px 0" }}>
+      <div className="wrap" style={{ padding: m?"0":"0 80px" }}>
+        <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap: m?20:40, paddingBottom: m?20:32, borderBottom:"1px solid rgba(255,255,255,0.08)", marginBottom: m?20:28 }}>
+          <div>
+            {/* Footer logo */}
+            {T2T_LOGO
+              ? <img src={T2T_LOGO} alt="T2T Programme" style={{ height:36, width:"auto", objectFit:"contain", marginBottom:8, filter:"brightness(0) invert(1)" }} />
+              : <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.3rem", color:"white", marginBottom:4 }}>T2T Programme</p>
+            }
+            <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>Training to Transaction · 2026</p>
+          </div>
+          <div style={{ display:"flex", gap: m?16:32, flexWrap:"wrap" }}>
+            {[["Home","landing"],["Newsroom","newsroom"],["Apply Now","register"]].map(([l,k])=>(
+              <button key={k} onClick={()=>setPage(k)} style={{ background:"none", border:"none", color:"rgba(255,255,255,0.5)", fontSize:"0.85rem", cursor:"pointer", fontWeight:400, padding:0 }}>{l}</button>
+            ))}
+          </div>
+        </div>
+        <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap:12 }}>
+          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>Implemented by Duchess NL and Borderless Trade and Investments. Sponsored by Providus Bank.</p>
+          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>media@t2tprogramme.org</p>
+        </div>
       </div>
     </footer>
   </div>
