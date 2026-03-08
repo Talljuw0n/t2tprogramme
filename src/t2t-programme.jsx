@@ -42,6 +42,9 @@ const GlobalStyles = () => (
     input,select,textarea { font-family:'Outfit',sans-serif; }
     input:focus,select:focus,textarea:focus { outline:none;border-color:var(--forest) !important;box-shadow:0 0 0 3px rgba(27,61,47,0.08); }
     button { font-family:'Outfit',sans-serif; }
+    .field-error { border-color:var(--red) !important; background:#FEF0EF !important; }
+    @keyframes shake { 0%,100%{transform:translateX(0);} 20%,60%{transform:translateX(-6px);} 40%,80%{transform:translateX(6px);} }
+    .shake { animation:shake 0.4s ease; }
     /* ── MOBILE RESPONSIVE ── */
     @media (max-width: 768px) {
       .wrap { padding:0 24px !important; }
@@ -257,18 +260,21 @@ const PARTNER_LOGOS = {
   ecowas:     "/logos/ecowas.png",
   gaba:       "/logos/gaba.png",
   duchess:    "/logos/duchess.png",
+  cmd:        "/logos/CMD.png",
   borderless: "/logos/borderless.png",
 };
 
 const Landing = ({ setPage }) => {
   const m = useMobile();
 
+  // CMD Tourism added before Borderless Trade
   const partners = [
-    { key:"providus",   name:"Providus Bank",                    role:"Lead Sponsor",         abbr:"PB"   },
-    { key:"ecowas",     name:"ECOWAS Parliament",                role:"Institutional Backer", abbr:"EP"   },
-    { key:"gaba",       name:"Global African Business Assoc.",   role:"GABA",                 abbr:"GABA" },
-    { key:"duchess",    name:"Duchess Natural Limited",          role:"Implementing Partner", abbr:"DNL"  },
-    { key:"borderless", name:"Borderless Trade & Investments",   role:"Implementing Partner", abbr:"BTI"  },
+    { key:"providus",   name:"Providus Bank",                        role:"Lead Sponsor",         abbr:"PB"   },
+    { key:"ecowas",     name:"ECOWAS Parliament",                    role:"Institutional Backer", abbr:"EP"   },
+    { key:"gaba",       name:"Global African Business Assoc.",       role:"GABA",                 abbr:"GABA" },
+    { key:"duchess",    name:"Duchess Natural Limited",              role:"Implementing Partner", abbr:"DNL"  },
+    { key:"cmd",        name:"CMD Tourism & Trade Enterprises Ltd",  role:"Implementing Partner", abbr:"CMD"  },
+    { key:"borderless", name:"Borderless Trade & Investments",       role:"Implementing Partner", abbr:"BTI"  },
   ];
 
   return (
@@ -339,10 +345,11 @@ const Landing = ({ setPage }) => {
     <section style={{ background:"white", padding: m?"40px 0":"56px 0", borderBottom:"1px solid var(--border)" }}>
       <div className="wrap">
         <p style={{ fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.14em", color:"var(--text3)", marginBottom:36, textAlign:"center" }}>IN PARTNERSHIP WITH</p>
-        <div style={{ display:"grid", gridTemplateColumns: m?"repeat(2,1fr)":"repeat(5,1fr)", gap: m?24:40, alignItems:"center", maxWidth:1000, margin:"0 auto" }}>
+        {/* 6 partners: 3+3 on desktop, 2 cols on mobile */}
+        <div style={{ display:"grid", gridTemplateColumns: m?"repeat(2,1fr)":"repeat(6,1fr)", gap: m?24:32, alignItems:"center", maxWidth:1100, margin:"0 auto" }}>
           {partners.map(({key,name,role,abbr})=>(
             <div key={key} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:12 }}>
-              <div style={{ width:"100%", maxWidth:140, height:72, background:"var(--sand2)", border:"1.5px dashed var(--border)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
+              <div style={{ width:"100%", maxWidth:130, height:68, background:"var(--sand2)", border:"1.5px dashed var(--border)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
                 {PARTNER_LOGOS[key]
                   ? <img src={PARTNER_LOGOS[key]} alt={name} style={{ width:"100%", height:"100%", objectFit:"contain", padding:8 }} />
                   : <div style={{ textAlign:"center", padding:8 }}>
@@ -352,8 +359,8 @@ const Landing = ({ setPage }) => {
                 }
               </div>
               <div style={{ textAlign:"center" }}>
-                <p style={{ fontWeight:600, fontSize: m?"0.72rem":"0.78rem", color:"var(--text)", lineHeight:1.3, marginBottom:2 }}>{name}</p>
-                <p style={{ fontSize:"0.65rem", color:"var(--text3)" }}>{role}</p>
+                <p style={{ fontWeight:600, fontSize: m?"0.68rem":"0.72rem", color:"var(--text)", lineHeight:1.3, marginBottom:2 }}>{name}</p>
+                <p style={{ fontSize:"0.62rem", color:"var(--text3)" }}>{role}</p>
               </div>
             </div>
           ))}
@@ -476,7 +483,7 @@ const Landing = ({ setPage }) => {
           </div>
         </div>
         <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap:12 }}>
-          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>Implemented by Duchess NL and Borderless Trade and Investments. Sponsored by Providus Bank.</p>
+          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>Implemented by Duchess NL, CMD Tourism & Trade Enterprises Ltd and Borderless Trade and Investments. Sponsored by Providus Bank.</p>
           <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>media@t2tprogramme.org</p>
         </div>
       </div>
@@ -486,21 +493,63 @@ const Landing = ({ setPage }) => {
 };
 
 // ─── FORM PRIMITIVES ──────────────────────────────────────────────────────────
-const FF = ({num,label,hint,children}) => (
+const FF = ({num,label,hint,children,hasError}) => (
   <div>
     <div style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:hint?4:10 }}>
-      <span style={{ background:"var(--forest)", color:"var(--mint)", width:22, height:22, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.65rem", fontWeight:700, flexShrink:0, marginTop:1 }}>{num}</span>
-      <label style={{ fontWeight:600, fontSize:"0.93rem", color:"var(--text)", lineHeight:1.4 }}>{label}</label>
+      <span style={{ background: hasError ? "var(--red)" : "var(--forest)", color:"var(--mint)", width:22, height:22, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.65rem", fontWeight:700, flexShrink:0, marginTop:1, transition:"background 0.2s" }}>{num}</span>
+      <label style={{ fontWeight:600, fontSize:"0.93rem", color: hasError ? "var(--red)" : "var(--text)", lineHeight:1.4 }}>{label}{hasError && <span style={{ fontFamily:"Outfit", fontWeight:400, fontSize:"0.78rem", marginLeft:8, color:"var(--red)" }}>· This field is required</span>}</label>
     </div>
     {hint&&<p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:10, paddingLeft:32 }}>{hint}</p>}
     {children}
   </div>
 );
-const TI = ({value,onChange,placeholder}) => <input value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{ width:"100%", background:"white", border:"1.5px solid var(--border)", borderRadius:8, padding:"11px 14px", color:"var(--text)", fontSize:"0.9rem" }} />;
-const SI = ({value,onChange,options}) => <select value={value||""} onChange={e=>onChange(e.target.value)} style={{ width:"100%", background:"white", border:"1.5px solid var(--border)", borderRadius:8, padding:"11px 14px", color:value?"var(--text)":"var(--text3)", fontSize:"0.9rem", cursor:"pointer" }}><option value="">Select an option</option>{options.map(o=><option key={o} value={o}>{o}</option>)}</select>;
-const Rad = ({value,onChange,options}) => <div style={{ display:"flex", flexDirection:"column", gap:8 }}>{options.map(o=><label key={o} onClick={()=>onChange(o)} style={{ display:"flex", alignItems:"center", gap:12, background:value===o?"var(--mint2)":"white", border:`1.5px solid ${value===o?"var(--sage)":"var(--border)"}`, borderRadius:8, padding:"11px 16px", cursor:"pointer", transition:"all 0.15s" }}><div style={{ width:18, height:18, borderRadius:"50%", border:`2px solid ${value===o?"var(--forest)":"var(--border)"}`, background:value===o?"var(--forest)":"white", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>{value===o&&<div style={{ width:6, height:6, borderRadius:"50%", background:"white" }} />}</div><span style={{ fontSize:"0.875rem", color:value===o?"var(--forest)":"var(--text2)", fontWeight:value===o?500:400 }}>{o}</span><input type="radio" checked={value===o} onChange={()=>onChange(o)} style={{ display:"none" }} /></label>)}</div>;
-const Chk = ({value=[],onChange,options}) => { const tog=o=>onChange(value.includes(o)?value.filter(v=>v!==o):[...value,o]); return <div style={{ display:"flex", flexDirection:"column", gap:8 }}>{options.map(o=><label key={o} onClick={()=>tog(o)} style={{ display:"flex", alignItems:"center", gap:12, background:value.includes(o)?"var(--mint2)":"white", border:`1.5px solid ${value.includes(o)?"var(--sage)":"var(--border)"}`, borderRadius:8, padding:"11px 16px", cursor:"pointer", transition:"all 0.15s" }}><div style={{ width:18, height:18, borderRadius:5, border:`2px solid ${value.includes(o)?"var(--forest)":"var(--border)"}`, background:value.includes(o)?"var(--forest)":"white", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", color:"white" }}>{value.includes(o)&&"✓"}</div><span style={{ fontSize:"0.875rem", color:value.includes(o)?"var(--forest)":"var(--text2)", fontWeight:value.includes(o)?500:400 }}>{o}</span></label>)}</div>; };
-const TA = ({value,onChange,placeholder,rows=3}) => <textarea value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={rows} style={{ width:"100%", background:"white", border:"1.5px solid var(--border)", borderRadius:8, padding:"11px 14px", color:"var(--text)", fontSize:"0.9rem", resize:"vertical" }} />;
+const TI = ({value,onChange,placeholder,hasError}) => <input value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{ width:"100%", background: hasError ? "#FEF0EF" : "white", border:`1.5px solid ${hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 14px", color:"var(--text)", fontSize:"0.9rem" }} />;
+const SI = ({value,onChange,options,hasError}) => <select value={value||""} onChange={e=>onChange(e.target.value)} style={{ width:"100%", background: hasError ? "#FEF0EF" : "white", border:`1.5px solid ${hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 14px", color:value?"var(--text)":"var(--text3)", fontSize:"0.9rem", cursor:"pointer" }}><option value="">Select an option</option>{options.map(o=><option key={o} value={o}>{o}</option>)}</select>;
+const Rad = ({value,onChange,options,hasError}) => <div style={{ display:"flex", flexDirection:"column", gap:8, borderRadius:8, outline: hasError ? "2px solid var(--red)" : "none", outlineOffset:4 }}>{options.map(o=><label key={o} onClick={()=>onChange(o)} style={{ display:"flex", alignItems:"center", gap:12, background:value===o?"var(--mint2)":"white", border:`1.5px solid ${value===o?"var(--sage)":"var(--border)"}`, borderRadius:8, padding:"11px 16px", cursor:"pointer", transition:"all 0.15s" }}><div style={{ width:18, height:18, borderRadius:"50%", border:`2px solid ${value===o?"var(--forest)":"var(--border)"}`, background:value===o?"var(--forest)":"white", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>{value===o&&<div style={{ width:6, height:6, borderRadius:"50%", background:"white" }} />}</div><span style={{ fontSize:"0.875rem", color:value===o?"var(--forest)":"var(--text2)", fontWeight:value===o?500:400 }}>{o}</span><input type="radio" checked={value===o} onChange={()=>onChange(o)} style={{ display:"none" }} /></label>)}</div>;
+const Chk = ({value=[],onChange,options,hasError}) => { const tog=o=>onChange(value.includes(o)?value.filter(v=>v!==o):[...value,o]); return <div style={{ display:"flex", flexDirection:"column", gap:8, borderRadius:8, outline: hasError ? "2px solid var(--red)" : "none", outlineOffset:4 }}>{options.map(o=><label key={o} onClick={()=>tog(o)} style={{ display:"flex", alignItems:"center", gap:12, background:value.includes(o)?"var(--mint2)":"white", border:`1.5px solid ${value.includes(o)?"var(--sage)":"var(--border)"}`, borderRadius:8, padding:"11px 16px", cursor:"pointer", transition:"all 0.15s" }}><div style={{ width:18, height:18, borderRadius:5, border:`2px solid ${value.includes(o)?"var(--forest)":"var(--border)"}`, background:value.includes(o)?"var(--forest)":"white", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", color:"white" }}>{value.includes(o)&&"✓"}</div><span style={{ fontSize:"0.875rem", color:value.includes(o)?"var(--forest)":"var(--text2)", fontWeight:value.includes(o)?500:400 }}>{o}</span></label>)}</div>; };
+const TA = ({value,onChange,placeholder,rows=3,hasError}) => <textarea value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={rows} style={{ width:"100%", background: hasError ? "#FEF0EF" : "white", border:`1.5px solid ${hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 14px", color:"var(--text)", fontSize:"0.9rem", resize:"vertical" }} />;
+
+// ─── VALIDATION HELPERS ───────────────────────────────────────────────────────
+
+// Returns array of field keys that are empty/invalid for a given phase
+const validatePhase = (phase, d) => {
+  const missing = [];
+  if (phase === 1) {
+    if (!d.businessName?.trim()) missing.push("businessName");
+    if (!d.businessAddress?.trim()) missing.push("businessAddress");
+    if (!d.businessNiche) missing.push("businessNiche");
+    if (!d.businessStructure) missing.push("businessStructure");
+    if (!d.businessAge) missing.push("businessAge");
+    if (!d.role) missing.push("role");
+    if (!d.exportExperience) missing.push("exportExperience");
+    if (!d.targetMarkets?.length) missing.push("targetMarkets");
+    if (!d.contactPhone?.trim()) missing.push("contactPhone");
+    if (!d.contactEmail?.trim()) missing.push("contactEmail");
+    if (!d.contactTime) missing.push("contactTime");
+  }
+  if (phase === 2) {
+    if (!d.productionCapacity) missing.push("productionCapacity");
+    if (!d.scalability) missing.push("scalability");
+    if (!d.qualityStandards?.length) missing.push("qualityStandards");
+    if (!d.monthlyTurnover) missing.push("monthlyTurnover");
+    if (!d.loanHistory) missing.push("loanHistory");
+    if (!d.digitalCapability) missing.push("digitalCapability");
+    if (!d.exportDocsFamiliarity) missing.push("exportDocsFamiliarity");
+    if (!d.documents?.length) missing.push("documents");
+    if (!d.kycConsent) missing.push("kycConsent");
+  }
+  if (phase === 3) {
+    if (!d.exportProducts?.trim()) missing.push("exportProducts");
+    if (!d.shippingCompany) missing.push("shippingCompany");
+    if (!d.exportTimeline) missing.push("exportTimeline");
+    if (!d.challenges?.length) missing.push("challenges");
+    if (!d.supportNeeded?.length) missing.push("supportNeeded");
+    if (!d.workingCapital) missing.push("workingCapital");
+    if (!d.pilotAgreement) missing.push("pilotAgreement");
+    // additionalInfo is optional — no validation
+  }
+  return missing;
+};
 
 // ─── SME REGISTRATION ─────────────────────────────────────────────────────────
 const Registration = ({ addApp }) => {
@@ -508,10 +557,40 @@ const Registration = ({ addApp }) => {
   const [d,setD]=useState({});
   const [done,setDone]=useState(false);
   const [ref,setRef]=useState("");
+  const [errors,setErrors]=useState([]);
+  const [shaking,setShaking]=useState(false);
   const top=useRef(null);
-  const set=(k,v)=>setD(p=>({...p,[k]:v}));
-  const next=()=>{setPhase(p=>p+1);setTimeout(()=>top.current?.scrollIntoView({behavior:"smooth"}),80);};
-  const submit=()=>{const a=addApp(d);setRef(a.id);setDone(true);setTimeout(()=>top.current?.scrollIntoView({behavior:"smooth"}),80);};
+  const set=(k,v)=>{setD(p=>({...p,[k]:v}));setErrors(prev=>prev.filter(e=>e!==k));};
+
+  const tryNext = () => {
+    const missing = validatePhase(phase, d);
+    if (missing.length > 0) {
+      setErrors(missing);
+      setShaking(true);
+      setTimeout(() => setShaking(false), 500);
+      // Scroll to first error
+      setTimeout(() => {
+        const firstEl = document.querySelector(".field-error-anchor");
+        if (firstEl) firstEl.scrollIntoView({ behavior:"smooth", block:"center" });
+      }, 80);
+      return;
+    }
+    setErrors([]);
+    setPhase(p=>p+1);
+    setTimeout(()=>top.current?.scrollIntoView({behavior:"smooth"}),80);
+  };
+
+  const submit = () => {
+    const missing = validatePhase(3, d);
+    if (missing.length > 0) {
+      setErrors(missing);
+      setShaking(true);
+      setTimeout(() => setShaking(false), 500);
+      return;
+    }
+    const a=addApp(d);setRef(a.id);setDone(true);setTimeout(()=>top.current?.scrollIntoView({behavior:"smooth"}),80);
+  };
+
   const pct=phase===1?33:phase===2?66:100;
 
   if(done) return (
@@ -536,6 +615,20 @@ const Registration = ({ addApp }) => {
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>Phase {phase} of 3 · {phase===1?"Business Basics":phase===2?"Compliance and Readiness":"Export Capacity"}</span>
           <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:600, color:"var(--forest)", marginBottom:8, lineHeight:1.15 }}>{phase===1?"Tell us about your business":phase===2?"Compliance and operational readiness":"Export capability and commitment"}</h1>
           <p style={{ color:"var(--text3)", fontSize:"0.875rem" }}>{phase===1?"9 questions · approx. 4 to 5 minutes":phase===2?"9 questions · approx. 4 to 5 minutes":"8 questions · approx. 2 to 3 minutes"}</p>
+
+          {/* Validation error banner */}
+          {errors.length > 0 && (
+            <div className={shaking ? "shake" : ""} style={{ marginTop:20, background:"#FEF0EF", border:"1.5px solid var(--red)", borderRadius:10, padding:"14px 18px", display:"flex", alignItems:"flex-start", gap:10 }}>
+              <span style={{ fontSize:"1rem", flexShrink:0 }}>⚠️</span>
+              <div>
+                <p style={{ fontSize:"0.85rem", fontWeight:600, color:"var(--red)", marginBottom:3 }}>Please complete all required fields</p>
+                <p style={{ fontSize:"0.78rem", color:"#8B2020", lineHeight:1.5 }}>
+                  {errors.length} field{errors.length > 1 ? "s" : ""} {errors.length > 1 ? "are" : "is"} missing or incomplete. All questions must be answered before continuing.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div style={{ marginTop:20 }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
               {["Business Basics","Compliance","Export Capacity"].map((l,i)=>(<span key={l} style={{ fontSize:"0.72rem", fontWeight:i+1<=phase?600:400, color:i+1<=phase?"var(--forest)":"var(--text3)" }}>{l}</span>))}
@@ -546,23 +639,65 @@ const Registration = ({ addApp }) => {
           </div>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:28 }}>
-          {phase===1&&<Ph1 d={d} s={set} />}
-          {phase===2&&<Ph2 d={d} s={set} />}
-          {phase===3&&<Ph3 d={d} s={set} />}
+          {phase===1&&<Ph1 d={d} s={set} errors={errors} />}
+          {phase===2&&<Ph2 d={d} s={set} errors={errors} />}
+          {phase===3&&<Ph3 d={d} s={set} errors={errors} />}
         </div>
         <div style={{ display:"flex", justifyContent:"space-between", marginTop:48, paddingTop:28, borderTop:"1px solid var(--border)" }}>
-          {phase>1?<button onClick={()=>setPhase(p=>p-1)} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Back</button>:<div/>}
-          {phase<3?<button onClick={next} style={{ background:"var(--forest)", border:"none", color:"white", padding:"13px 32px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer" }}>Continue</button>
-          :<button onClick={submit} style={{ background:"var(--green-ok)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", boxShadow:"0 4px 16px rgba(27,122,74,0.3)" }}>Submit Application</button>}
+          {phase>1?<button onClick={()=>{setPhase(p=>p-1);setErrors([]);}} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Back</button>:<div/>}
+          {phase<3
+            ?<button onClick={tryNext} style={{ background:"var(--forest)", border:"none", color:"white", padding:"13px 32px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer" }}>Continue</button>
+            :<button onClick={submit} style={{ background:"var(--green-ok)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", boxShadow:"0 4px 16px rgba(27,122,74,0.3)" }}>Submit Application</button>
+          }
         </div>
       </div>
     </div>
   );
 };
 
-const Ph1=({d,s})=>(<><FF num="1" label="Business Name"><TI value={d.businessName} onChange={v=>s("businessName",v)} placeholder="Your registered business name" /></FF><FF num="2" label="Business Address"><TI value={d.businessAddress} onChange={v=>s("businessAddress",v)} placeholder="Physical business address" /></FF><FF num="3" label="Business Niche"><SI value={d.businessNiche} onChange={v=>s("businessNiche",v)} options={["Grains","Spices","Legumes","Functional Powders","Nuts","Seeds","Others"]} /></FF><FF num="4" label="Business Structure"><Rad value={d.businessStructure} onChange={v=>s("businessStructure",v)} options={["Business Name","Limited Liability","Partnership","None"]} /></FF><FF num="5" label="How long has your business been operating?"><Rad value={d.businessAge} onChange={v=>s("businessAge",v)} options={["Less than 6 months","6 to 12 months","1 to 2 years","2+ years"]} /></FF><FF num="6" label="Your role in the business"><Rad value={d.role} onChange={v=>s("role",v)} options={["Founder / Owner","Co-founder","Manager","Other"]} /></FF><FF num="7" label="Have you ever sold products or services formally outside Nigeria?"><Rad value={d.exportExperience} onChange={v=>s("exportExperience",v)} options={["Yes, currently","Yes, previously","No, but interested","Not sure"]} /></FF><FF num="8" label="Which markets interest you most?" hint="Select all that apply"><Chk value={d.targetMarkets} onChange={v=>s("targetMarkets",v)} options={["ECOWAS countries","USA","Canada","Caribbean","Other African countries","Not sure yet"]} /></FF><FF num="9" label="Best contact details"><div style={{ display:"flex",flexDirection:"column",gap:10 }}><TI value={d.contactPhone} onChange={v=>s("contactPhone",v)} placeholder="Phone number" /><TI value={d.contactEmail} onChange={v=>s("contactEmail",v)} placeholder="Email address" /><SI value={d.contactTime} onChange={v=>s("contactTime",v)} options={["Morning (8am to 12pm)","Afternoon (12pm to 4pm)","Evening (4pm to 7pm)"]} /></div></FF></>);
-const Ph2=({d,s})=>(<><FF num="10" label="Current monthly production capacity"><Rad value={d.productionCapacity} onChange={v=>s("productionCapacity",v)} options={["0.1kg to 100kg","101kg to 500kg","501kg to 1 metric ton","Above 1 tonne"]} /></FF><FF num="11" label="Can you scale production if orders increase by 50%?"><Rad value={d.scalability} onChange={v=>s("scalability",v)} options={["Yes, immediately","Yes, within 1 month","Yes, with investment","No","Not sure"]} /></FF><FF num="12" label="Do your products meet any quality standards?" hint="Select all that apply"><Chk value={d.qualityStandards} onChange={v=>s("qualityStandards",v)} options={["NAFDAC","SON","ISO","ECOWAS standards","None yet","Not applicable"]} /></FF><FF num="13" label="Monthly business turnover"><Rad value={d.monthlyTurnover} onChange={v=>s("monthlyTurnover",v)} options={["Below ₦50k","₦50k to ₦200k","₦200k to ₦500k","₦500k to ₦1M","₦1M to ₦5M","₦5M and above"]} /></FF><FF num="14" label="Have you ever received a business loan or grant?"><Rad value={d.loanHistory} onChange={v=>s("loanHistory",v)} options={["Yes, currently repaying","Yes, fully repaid","No, but applied","Never applied"]} /></FF><FF num="15" label="Internet access and digital capability"><Rad value={d.digitalCapability} onChange={v=>s("digitalCapability",v)} options={["Strong internet, use digital tools daily","Regular internet access","Limited access","Minimal digital skills"]} /></FF><FF num="16" label="Are you familiar with export documentation requirements?"><Rad value={d.exportDocsFamiliarity} onChange={v=>s("exportDocsFamiliarity",v)} options={["Yes, experienced","Somewhat familiar","No, but willing to learn","No knowledge"]} /></FF><FF num="17" label="Do you have or can you obtain:" hint="Select all that apply"><Chk value={d.documents} onChange={v=>s("documents",v)} options={["Tax ID","Company letterhead","Product certifications","Export license","None yet"]} /></FF><FF num="18" label="KYC Verification Consent" hint="Full KYC verification is mandatory for participation and access to this programme."><Rad value={d.kycConsent} onChange={v=>s("kycConsent",v)} options={["Yes, I will participate","No","I need further information on the KYC process"]} /></FF></>);
-const Ph3=({d,s})=>(<><FF num="19" label="What products or services do you want to export?" hint="Please be as specific as possible."><TA value={d.exportProducts} onChange={v=>s("exportProducts",v)} placeholder="Describe your specific products or services..." /></FF><FF num="20" label="Do you use a shipping company?"><Rad value={d.shippingCompany} onChange={v=>s("shippingCompany",v)} options={["Yes, always","Yes, sometimes","No"]} /></FF><FF num="21" label="Estimated time needed to prepare for your first export"><Rad value={d.exportTimeline} onChange={v=>s("exportTimeline",v)} options={["Ready now","1 to 3 months","3 to 6 months","6 to 12 months","Over 1 year"]} /></FF><FF num="22" label="Biggest challenge in accessing international markets" hint="Select your top 2 challenges"><Chk value={d.challenges} onChange={v=>s("challenges",v)} options={["Finding buyers","Understanding regulations","Pricing","Shipping and logistics","Payment collection","Product certification","Other"]} /></FF><FF num="23" label="What support do you need most from this programme?" hint="Select your top 3 priorities"><Chk value={d.supportNeeded} onChange={v=>s("supportNeeded",v)} options={["Buyer connections","Training","Compliance guidance","Financing","Shipping support","Marketing","Other"]} /></FF><FF num="24" label="Estimated working capital available"><Rad value={d.workingCapital} onChange={v=>s("workingCapital",v)} options={["Below ₦100k","₦100k to ₦500k","₦500k to ₦2M","₦2M and above"]} /></FF><FF num="25" label="Pilot transaction requirement" hint="As a standard requirement, initial engagement will commence with small pilot transactions prior to full-scale deals."><Rad value={d.pilotAgreement} onChange={v=>s("pilotAgreement",v)} options={["Yes, please provide further details on the pilot transaction requirements","No, I will not proceed under this condition"]} /></FF><FF num="26" label="Is there anything else we should know about your business?" hint="Optional"><TA value={d.additionalInfo} onChange={v=>s("additionalInfo",v)} placeholder="Any other relevant information..." rows={4} /></FF></>);
+// Helper: wraps a field with an anchor for scrolling to errors
+const EA = ({id, children}) => <div className={id ? "field-error-anchor" : ""} id={`field-${id}`}>{children}</div>;
+
+const Ph1=({d,s,errors})=>(<>
+  <EA id="businessName"><FF num="1" label="Business Name" hasError={errors.includes("businessName")}><TI value={d.businessName} onChange={v=>s("businessName",v)} placeholder="Your registered business name" hasError={errors.includes("businessName")} /></FF></EA>
+  <EA id="businessAddress"><FF num="2" label="Business Address" hasError={errors.includes("businessAddress")}><TI value={d.businessAddress} onChange={v=>s("businessAddress",v)} placeholder="Physical business address" hasError={errors.includes("businessAddress")} /></FF></EA>
+  <EA id="businessNiche"><FF num="3" label="Business Niche" hasError={errors.includes("businessNiche")}><SI value={d.businessNiche} onChange={v=>s("businessNiche",v)} options={["Grains","Spices","Legumes","Functional Powders","Nuts","Seeds","Others"]} hasError={errors.includes("businessNiche")} /></FF></EA>
+  <EA id="businessStructure"><FF num="4" label="Business Structure" hasError={errors.includes("businessStructure")}><Rad value={d.businessStructure} onChange={v=>s("businessStructure",v)} options={["Business Name","Limited Liability","Partnership","None"]} hasError={errors.includes("businessStructure")} /></FF></EA>
+  <EA id="businessAge"><FF num="5" label="How long has your business been operating?" hasError={errors.includes("businessAge")}><Rad value={d.businessAge} onChange={v=>s("businessAge",v)} options={["Less than 6 months","6 to 12 months","1 to 2 years","2+ years"]} hasError={errors.includes("businessAge")} /></FF></EA>
+  <EA id="role"><FF num="6" label="Your role in the business" hasError={errors.includes("role")}><Rad value={d.role} onChange={v=>s("role",v)} options={["Founder / Owner","Co-founder","Manager","Other"]} hasError={errors.includes("role")} /></FF></EA>
+  <EA id="exportExperience"><FF num="7" label="Have you ever sold products or services formally outside Nigeria?" hasError={errors.includes("exportExperience")}><Rad value={d.exportExperience} onChange={v=>s("exportExperience",v)} options={["Yes, currently","Yes, previously","No, but interested","Not sure"]} hasError={errors.includes("exportExperience")} /></FF></EA>
+  <EA id="targetMarkets"><FF num="8" label="Which markets interest you most?" hint="Select all that apply" hasError={errors.includes("targetMarkets")}><Chk value={d.targetMarkets} onChange={v=>s("targetMarkets",v)} options={["ECOWAS countries","USA","Canada","Caribbean","Other African countries","Not sure yet"]} hasError={errors.includes("targetMarkets")} /></FF></EA>
+  <EA id="contactPhone"><FF num="9" label="Best contact details" hasError={errors.includes("contactPhone")||errors.includes("contactEmail")||errors.includes("contactTime")}>
+    <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
+      <TI value={d.contactPhone} onChange={v=>s("contactPhone",v)} placeholder="Phone number" hasError={errors.includes("contactPhone")} />
+      <TI value={d.contactEmail} onChange={v=>s("contactEmail",v)} placeholder="Email address" hasError={errors.includes("contactEmail")} />
+      <SI value={d.contactTime} onChange={v=>s("contactTime",v)} options={["Morning (8am to 12pm)","Afternoon (12pm to 4pm)","Evening (4pm to 7pm)"]} hasError={errors.includes("contactTime")} />
+    </div>
+  </FF></EA>
+</>);
+
+const Ph2=({d,s,errors})=>(<>
+  <EA id="productionCapacity"><FF num="10" label="Current monthly production capacity" hasError={errors.includes("productionCapacity")}><Rad value={d.productionCapacity} onChange={v=>s("productionCapacity",v)} options={["0.1kg to 100kg","101kg to 500kg","501kg to 1 metric ton","Above 1 tonne"]} hasError={errors.includes("productionCapacity")} /></FF></EA>
+  <EA id="scalability"><FF num="11" label="Can you scale production if orders increase by 50%?" hasError={errors.includes("scalability")}><Rad value={d.scalability} onChange={v=>s("scalability",v)} options={["Yes, immediately","Yes, within 1 month","Yes, with investment","No","Not sure"]} hasError={errors.includes("scalability")} /></FF></EA>
+  <EA id="qualityStandards"><FF num="12" label="Do your products meet any quality standards?" hint="Select all that apply" hasError={errors.includes("qualityStandards")}><Chk value={d.qualityStandards} onChange={v=>s("qualityStandards",v)} options={["NAFDAC","SON","ISO","ECOWAS standards","None yet","Not applicable"]} hasError={errors.includes("qualityStandards")} /></FF></EA>
+  <EA id="monthlyTurnover"><FF num="13" label="Monthly business turnover" hasError={errors.includes("monthlyTurnover")}><Rad value={d.monthlyTurnover} onChange={v=>s("monthlyTurnover",v)} options={["Below ₦50k","₦50k to ₦200k","₦200k to ₦500k","₦500k to ₦1M","₦1M to ₦5M","₦5M and above"]} hasError={errors.includes("monthlyTurnover")} /></FF></EA>
+  <EA id="loanHistory"><FF num="14" label="Have you ever received a business loan or grant?" hasError={errors.includes("loanHistory")}><Rad value={d.loanHistory} onChange={v=>s("loanHistory",v)} options={["Yes, currently repaying","Yes, fully repaid","No, but applied","Never applied"]} hasError={errors.includes("loanHistory")} /></FF></EA>
+  <EA id="digitalCapability"><FF num="15" label="Internet access and digital capability" hasError={errors.includes("digitalCapability")}><Rad value={d.digitalCapability} onChange={v=>s("digitalCapability",v)} options={["Strong internet, use digital tools daily","Regular internet access","Limited access","Minimal digital skills"]} hasError={errors.includes("digitalCapability")} /></FF></EA>
+  <EA id="exportDocsFamiliarity"><FF num="16" label="Are you familiar with export documentation requirements?" hasError={errors.includes("exportDocsFamiliarity")}><Rad value={d.exportDocsFamiliarity} onChange={v=>s("exportDocsFamiliarity",v)} options={["Yes, experienced","Somewhat familiar","No, but willing to learn","No knowledge"]} hasError={errors.includes("exportDocsFamiliarity")} /></FF></EA>
+  <EA id="documents"><FF num="17" label="Do you have or can you obtain:" hint="Select all that apply" hasError={errors.includes("documents")}><Chk value={d.documents} onChange={v=>s("documents",v)} options={["Tax ID","Company letterhead","Product certifications","Export license","None yet"]} hasError={errors.includes("documents")} /></FF></EA>
+  <EA id="kycConsent"><FF num="18" label="KYC Verification Consent" hint="Full KYC verification is mandatory for participation and access to this programme." hasError={errors.includes("kycConsent")}><Rad value={d.kycConsent} onChange={v=>s("kycConsent",v)} options={["Yes, I will participate","No","I need further information on the KYC process"]} hasError={errors.includes("kycConsent")} /></FF></EA>
+</>);
+
+const Ph3=({d,s,errors})=>(<>
+  <EA id="exportProducts"><FF num="19" label="What products or services do you want to export?" hint="Please be as specific as possible." hasError={errors.includes("exportProducts")}><TA value={d.exportProducts} onChange={v=>s("exportProducts",v)} placeholder="Describe your specific products or services..." hasError={errors.includes("exportProducts")} /></FF></EA>
+  <EA id="shippingCompany"><FF num="20" label="Do you use a shipping company?" hasError={errors.includes("shippingCompany")}><Rad value={d.shippingCompany} onChange={v=>s("shippingCompany",v)} options={["Yes, always","Yes, sometimes","No"]} hasError={errors.includes("shippingCompany")} /></FF></EA>
+  <EA id="exportTimeline"><FF num="21" label="Estimated time needed to prepare for your first export" hasError={errors.includes("exportTimeline")}><Rad value={d.exportTimeline} onChange={v=>s("exportTimeline",v)} options={["Ready now","1 to 3 months","3 to 6 months","6 to 12 months","Over 1 year"]} hasError={errors.includes("exportTimeline")} /></FF></EA>
+  <EA id="challenges"><FF num="22" label="Biggest challenge in accessing international markets" hint="Select your top 2 challenges" hasError={errors.includes("challenges")}><Chk value={d.challenges} onChange={v=>s("challenges",v)} options={["Finding buyers","Understanding regulations","Pricing","Shipping and logistics","Payment collection","Product certification","Other"]} hasError={errors.includes("challenges")} /></FF></EA>
+  <EA id="supportNeeded"><FF num="23" label="What support do you need most from this programme?" hint="Select your top 3 priorities" hasError={errors.includes("supportNeeded")}><Chk value={d.supportNeeded} onChange={v=>s("supportNeeded",v)} options={["Buyer connections","Training","Compliance guidance","Financing","Shipping support","Marketing","Other"]} hasError={errors.includes("supportNeeded")} /></FF></EA>
+  <EA id="workingCapital"><FF num="24" label="Estimated working capital available" hasError={errors.includes("workingCapital")}><Rad value={d.workingCapital} onChange={v=>s("workingCapital",v)} options={["Below ₦100k","₦100k to ₦500k","₦500k to ₦2M","₦2M and above"]} hasError={errors.includes("workingCapital")} /></FF></EA>
+  <EA id="pilotAgreement"><FF num="25" label="Pilot transaction requirement" hint="As a standard requirement, initial engagement will commence with small pilot transactions prior to full-scale deals." hasError={errors.includes("pilotAgreement")}><Rad value={d.pilotAgreement} onChange={v=>s("pilotAgreement",v)} options={["Yes, please provide further details on the pilot transaction requirements","No, I will not proceed under this condition"]} hasError={errors.includes("pilotAgreement")} /></FF></EA>
+  <FF num="26" label="Is there anything else we should know about your business?" hint="Optional"><TA value={d.additionalInfo} onChange={v=>s("additionalInfo",v)} placeholder="Any other relevant information..." rows={4} /></FF>
+</>);
 
 // ─── JOURNALIST PORTAL ────────────────────────────────────────────────────────
 const PressPortal = ({ addSubmission, onExit }) => {
