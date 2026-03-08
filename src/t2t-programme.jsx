@@ -48,7 +48,7 @@ const GlobalStyles = () => (
     @keyframes spin { to { transform:rotate(360deg); } }
     /* ── MOBILE RESPONSIVE ── */
     @media (max-width: 768px) {
-      .wrap { padding:0 24px !important; }
+      .wrap { padding-left:24px !important; padding-right:24px !important; }
       .hero-section { padding:100px 0 48px !important; min-height:auto !important; }
       .hero-buttons { flex-direction:column !important; }
       .hero-buttons button { width:100% !important; }
@@ -461,40 +461,77 @@ const Landing = ({ setPage }) => {
   <div style={{ overflowX:"hidden" }}>
 
     {/* ── HERO ── */}
-    <section style={{ position:"relative", minHeight:"100vh", display:"flex", alignItems:"center", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 60%, #2E6249 100%)" }}>
+    <section style={{ position:"relative", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 60%, #2E6249 100%)", ...(m ? {} : { minHeight:"100vh", display:"flex", alignItems:"center" }) }}>
       <div style={{ position:"absolute", inset:0, opacity:0.15, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.4) 1px, transparent 1px)", backgroundSize:"32px 32px" }} />
       <div style={{ position:"absolute", right:"-10%", top:"10%", width:"50vw", height:"50vw", maxWidth:700, maxHeight:700, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.07)", pointerEvents:"none" }} />
       <div style={{ position:"absolute", right:"5%", top:"20%", width:"30vw", height:"30vw", maxWidth:400, maxHeight:400, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.05)", pointerEvents:"none" }} />
 
-      <div className="wrap" style={{ position:"relative", zIndex:2, paddingTop: m?100:130, paddingBottom: m?60:100, display:"flex", flexDirection: m?"column":"row", alignItems:"center", gap: m?40:60 }}>
-        {/* Left — headline */}
-        <div className="fade-up" style={{ flex:1 }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
+      {/* ── MOBILE HERO ── */}
+      {m && (
+        <div className="fade-up" style={{ position:"relative", zIndex:2, padding:"112px 24px 48px", display:"flex", flexDirection:"column", gap:24, width:"100%", boxSizing:"border-box" }}>
+          {/* Badge */}
+          <div style={{ display:"inline-flex", alignSelf:"flex-start", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.72rem", fontWeight:500, letterSpacing:"0.04em" }}>
             <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
           </div>
-          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"3rem":"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
+          {/* Headline */}
+          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3rem", fontWeight:600, lineHeight:1.0, color:"white", letterSpacing:"-0.01em" }}>
             Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
           </h1>
-          <p style={{ fontSize: m?"1rem":"1.15rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, maxWidth:520, marginBottom:16, fontWeight:300 }}>
+          {/* Body */}
+          <p style={{ fontSize:"0.95rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, fontWeight:300 }}>
             A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
           </p>
-          <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom: m?32:44, opacity:0.85 }}>
+          <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"0.95rem", color:"var(--mint)", opacity:0.85 }}>
             Lagos and Abuja · Commencing April 13, 2026
           </p>
-          <div style={{ display:"flex", flexDirection: m?"column":"row", gap:12 }}>
-            <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
-              onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="white";}}
-            >Apply to the Programme</button>
-            <button onClick={()=>setPage("newsroom")} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.4)", color:"white", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}
-              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.2)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
-            >Press and Media</button>
+          {/* Buttons */}
+          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"14px 24px", borderRadius:10, fontSize:"0.9rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", textAlign:"center" }}>Apply to the Programme</button>
+            <button onClick={()=>setPage("newsroom")} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.35)", color:"white", padding:"13px 24px", borderRadius:10, fontSize:"0.9rem", fontWeight:500, cursor:"pointer", textAlign:"center" }}>Press and Media</button>
+          </div>
+          {/* Mobile overview grid — sits cleanly below buttons */}
+          <div style={{ background:"rgba(255,255,255,0.08)", backdropFilter:"blur(16px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:14, padding:"20px" }}>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+              {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"3 Months"},{label:"Deadline",val:"March 31, 2026"},{label:"Starts",val:"April 13, 2026"}].map(({label,val})=>(
+                <div key={label}>
+                  <p style={{ fontSize:"0.62rem", color:"rgba(200,230,218,0.5)", marginBottom:4, letterSpacing:"0.06em", fontWeight:600 }}>{label.toUpperCase()}</p>
+                  <p style={{ fontSize:"0.875rem", fontWeight:600, color:"white", lineHeight:1.3 }}>{val}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Right — overview card */}
-        {!m && (
+      {/* ── DESKTOP HERO ── */}
+      {!m && (
+        <div className="wrap" style={{ position:"relative", zIndex:2, paddingTop:130, paddingBottom:100, display:"flex", flexDirection:"row", alignItems:"center", gap:60 }}>
+          {/* Left — headline */}
+          <div className="fade-up" style={{ flex:1 }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
+              <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
+            </div>
+            <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
+              Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
+            </h1>
+            <p style={{ fontSize:"1.15rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, maxWidth:520, marginBottom:16, fontWeight:300 }}>
+              A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
+            </p>
+            <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:44, opacity:0.85 }}>
+              Lagos and Abuja · Commencing April 13, 2026
+            </p>
+            <div style={{ display:"flex", flexDirection:"row", gap:12 }}>
+              <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
+                onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="white";}}
+              >Apply to the Programme</button>
+              <button onClick={()=>setPage("newsroom")} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.4)", color:"white", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}
+                onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.2)";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
+              >Press and Media</button>
+            </div>
+          </div>
+          {/* Right — overview card */}
           <div style={{ width:280, background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:20, padding:"32px 28px", flexShrink:0 }}>
             <p style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(200,230,218,0.6)", letterSpacing:"0.12em", marginBottom:20 }}>PROGRAMME OVERVIEW</p>
             {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"March 31, 2026"},{label:"Commencement",val:"April 13, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val},i,arr)=>(
@@ -503,19 +540,6 @@ const Landing = ({ setPage }) => {
                 <p style={{ fontSize:"0.9rem", fontWeight:600, color:"white" }}>{val}</p>
               </div>
             ))}
-          </div>
-        )}
-      </div>
-
-      {/* Mobile overview — below hero */}
-      {m && (
-        <div className="wrap" style={{ position:"relative", zIndex:2, paddingBottom:48 }}>
-          <div style={{ background:"rgba(255,255,255,0.1)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:16, padding:"24px" }}>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-              {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"3 Months"},{label:"Deadline",val:"March 31, 2026"},{label:"Starts",val:"April 13, 2026"}].map(({label,val})=>(
-                <div key={label}><p style={{ fontSize:"0.65rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p><p style={{ fontSize:"0.875rem", fontWeight:600, color:"white" }}>{val}</p></div>
-              ))}
-            </div>
           </div>
         </div>
       )}
