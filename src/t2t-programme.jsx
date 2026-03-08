@@ -45,6 +45,7 @@ const GlobalStyles = () => (
     .field-error { border-color:var(--red) !important; background:#FEF0EF !important; }
     @keyframes shake { 0%,100%{transform:translateX(0);} 20%,60%{transform:translateX(-6px);} 40%,80%{transform:translateX(6px);} }
     .shake { animation:shake 0.4s ease; }
+    @keyframes spin { to { transform:rotate(360deg); } }
     /* ── MOBILE RESPONSIVE ── */
     @media (max-width: 768px) {
       .wrap { padding:0 24px !important; }
@@ -75,36 +76,215 @@ const GlobalStyles = () => (
 const ADMIN_PASSWORD = "T2T@Admin2026";
 const PRESS_PASSWORD = "T2TPress2026";
 
+// ─── SUPABASE CONFIG ──────────────────────────────────────────────────────────
+const SUPABASE_URL  = "https://rgtorhxyznizhjjqsfyt.supabase.co";
+const SUPABASE_ANON = "sb_publishable_etlhOo9Wb0Laye683RGJug_iNzG1JJK";
+
+const sb = async (path, opts = {}) => {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      "apikey": SUPABASE_ANON,
+      "Authorization": `Bearer ${SUPABASE_ANON}`,
+      "Content-Type": "application/json",
+      "Prefer": opts.prefer || "return=representation",
+      ...(opts.headers || {}),
+    },
+    ...opts,
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+};
+
+// ─── EMAILJS CONFIG ───────────────────────────────────────────────────────────
+const EMAILJS_SERVICE   = "service_h050sxm";
+const EMAILJS_PUBKEY    = "_8-ZOysExnIB07wdD";
+const EMAILJS_T_CONFIRM = "template_o9zjxfb";
+const EMAILJS_T_STATUS  = "template_zk4tkrr";
+
+const sendEmail = async (templateId, params) => {
+  try {
+    await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service_id:      EMAILJS_SERVICE,
+        template_id:     templateId,
+        user_id:         EMAILJS_PUBKEY,
+        template_params: params,
+      }),
+    });
+  } catch (err) {
+    console.warn("EmailJS error:", err);
+  }
+};
+
 // ─── DATA STORE ───────────────────────────────────────────────────────────────
 const useDataStore = () => {
-  const [apps, setApps] = useState(() => { try { return JSON.parse(localStorage.getItem("t2t_apps")||"[]"); } catch { return []; } });
-  const [submissions, setSubmissions] = useState(() => { try { return JSON.parse(localStorage.getItem("t2t_press")||"[]"); } catch { return []; } });
+  const [apps, setApps]               = useState([]);
+  const [submissions, setSubmissions] = useState([]);
+  const [loading, setLoading]         = useState(true);
+  const [dbError, setDbError]         = useState(null);
 
-  const addApp = (data) => {
-    const a = { ...data, id:`T2T-${String(Date.now()).slice(-8)}`, submittedAt:new Date().toISOString(), status:"pending", score:scoreApp(data) };
-    const up = [...apps, a]; setApps(up);
-    try { localStorage.setItem("t2t_apps", JSON.stringify(up)); } catch {}
-    return a;
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [a, s] = await Promise.all([
+          sb("applications?select=*&order=submitted_at.desc"),
+          sb("press_submissions?select=*&order=submitted_at.desc"),
+        ]);
+        setApps(a);
+        setSubmissions(s);
+      } catch (e) {
+        console.error("Supabase load error:", e);
+        setDbError("Could not connect to database. Please check your network.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  // ── ADD APPLICATION ──
+  const addApp = async (data) => {
+    const id    = `T2T-${String(Date.now()).slice(-8)}`;
+    const score = scoreApp(data);
+    const row   = {
+      id, score, status: "pending",
+      submitted_at:            new Date().toISOString(),
+      business_name:           data.businessName,
+      business_address:        data.businessAddress,
+      business_niche:          data.businessNiche,
+      business_structure:      data.businessStructure,
+      business_age:            data.businessAge,
+      role:                    data.role,
+      export_experience:       data.exportExperience,
+      target_markets:          data.targetMarkets,
+      contact_phone:           data.contactPhone,
+      contact_email:           data.contactEmail,
+      contact_time:            data.contactTime,
+      production_capacity:     data.productionCapacity,
+      scalability:             data.scalability,
+      quality_standards:       data.qualityStandards,
+      monthly_turnover:        data.monthlyTurnover,
+      loan_history:            data.loanHistory,
+      digital_capability:      data.digitalCapability,
+      export_docs_familiarity: data.exportDocsFamiliarity,
+      documents:               data.documents,
+      kyc_consent:             data.kycConsent,
+      export_products:         data.exportProducts,
+      shipping_company:        data.shippingCompany,
+      export_timeline:         data.exportTimeline,
+      challenges:              data.challenges,
+      support_needed:          data.supportNeeded,
+      working_capital:         data.workingCapital,
+      pilot_agreement:         data.pilotAgreement,
+      additional_info:         data.additionalInfo,
+    };
+
+    try {
+      await sb("applications", {
+        method: "POST",
+        body: JSON.stringify(row),
+        prefer: "return=minimal",
+      });
+      setApps(prev => [{ ...row, submittedAt: row.submitted_at, businessName: data.businessName, contactEmail: data.contactEmail }, ...prev]);
+
+      if (data.contactEmail) {
+        await sendEmail(EMAILJS_T_CONFIRM, {
+          to_email:       data.contactEmail,
+          to_name:        data.businessName || "Applicant",
+          applicant_name: data.businessName || "Applicant",
+          reference_id:   id,
+        });
+      }
+    } catch (e) {
+      console.error("Supabase insert error:", e);
+    }
+    return { id, score };
   };
 
-  const upAppStatus = (id, status) => {
-    const up = apps.map(a=>a.id===id?{...a,status}:a); setApps(up);
-    try { localStorage.setItem("t2t_apps", JSON.stringify(up)); } catch {}
+  // ── UPDATE APPLICATION STATUS ──
+  const upAppStatus = async (id, status) => {
+    try {
+      await sb(`applications?id=eq.${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+        prefer: "return=minimal",
+      });
+      setApps(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+
+      const app   = apps.find(a => a.id === id);
+      const email = app?.contact_email || app?.contactEmail;
+      const name  = app?.business_name || app?.businessName || "Applicant";
+
+      if (email) {
+        const isApproved = status === "approved";
+        await sendEmail(EMAILJS_T_STATUS, {
+          to_email:       email,
+          to_name:        name,
+          applicant_name: name,
+          reference_id:   id,
+          status:         isApproved ? "Approved" : "Unsuccessful",
+          status_message: isApproved
+            ? "Congratulations — your application has been shortlisted. Our team will be in touch shortly with next steps."
+            : "Thank you for applying. After careful review, we are unable to offer you a place in this cohort. We encourage you to apply again in future cycles.",
+        });
+      }
+    } catch (e) {
+      console.error("Supabase status update error:", e);
+    }
   };
 
-  const addSubmission = (data) => {
-    const s = { ...data, id:`PR-${String(Date.now()).slice(-8)}`, submittedAt:new Date().toISOString(), status:"pending" };
-    const up = [...submissions, s]; setSubmissions(up);
-    try { localStorage.setItem("t2t_press", JSON.stringify(up)); } catch {}
-    return s;
+  // ── ADD PRESS SUBMISSION ──
+  const addSubmission = async (data) => {
+    const id  = `PR-${String(Date.now()).slice(-8)}`;
+    const row = {
+      id, status: "pending",
+      submitted_at: new Date().toISOString(),
+      name:         data.name,
+      outlet:       data.outlet,
+      email:        data.email,
+      phone:        data.phone,
+      country:      data.country,
+      story_type:   data.storyType,
+      headline:     data.headline,
+      summary:      data.summary,
+      content:      data.content,
+      image_url:    data.imageUrl,
+      category:     data.category,
+      notes:        data.notes,
+      declaration:  data.declaration,
+    };
+
+    try {
+      await sb("press_submissions", {
+        method: "POST",
+        body: JSON.stringify(row),
+        prefer: "return=minimal",
+      });
+      setSubmissions(prev => [{ ...row, submittedAt: row.submitted_at, storyType: data.storyType, imageUrl: data.imageUrl }, ...prev]);
+    } catch (e) {
+      console.error("Supabase press insert error:", e);
+    }
+    return { id };
   };
 
-  const upSubStatus = (id, status) => {
-    const up = submissions.map(s=>s.id===id?{...s,status}:s); setSubmissions(up);
-    try { localStorage.setItem("t2t_press", JSON.stringify(up)); } catch {}
+  // ── UPDATE PRESS STATUS ──
+  const upSubStatus = async (id, status) => {
+    try {
+      await sb(`press_submissions?id=eq.${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+        prefer: "return=minimal",
+      });
+      setSubmissions(prev => prev.map(s => s.id === id ? { ...s, status } : s));
+    } catch (e) {
+      console.error("Supabase press status error:", e);
+    }
   };
 
-  return { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus };
+  return { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError };
 };
 
 const scoreApp = (d) => {
@@ -135,7 +315,7 @@ const staticNews = [
 
 // ─── SHARED GATE COMPONENT ────────────────────────────────────────────────────
 const PasswordGate = ({ title, subtitle, password, buttonLabel, onUnlock }) => {
-  const [pw, setPw] = useState("");
+  const [pw, setPw]   = useState("");
   const [err, setErr] = useState(false);
   const [show, setShow] = useState(false);
 
@@ -178,9 +358,9 @@ const PasswordGate = ({ title, subtitle, password, buttonLabel, onUnlock }) => {
 const T2T_LOGO = "/logo.png";
 
 const Nav = ({ page, setPage, onLogoClick }) => {
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [scrolled, setScrolled]   = useState(false);
+  const [menuOpen, setMenuOpen]   = useState(false);
+  const [isMobile, setIsMobile]   = useState(window.innerWidth <= 768);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -267,7 +447,7 @@ const PARTNER_LOGOS = {
 const Landing = ({ setPage }) => {
   const m = useMobile();
 
-  // CMD Tourism added before Borderless Trade
+  // 6 partners including CMD Tourism (from v1)
   const partners = [
     { key:"providus",   name:"Providus Bank",                        role:"Lead Sponsor",         abbr:"PB"   },
     { key:"ecowas",     name:"ECOWAS Parliament",                    role:"Institutional Backer", abbr:"EP"   },
@@ -341,11 +521,10 @@ const Landing = ({ setPage }) => {
       )}
     </section>
 
-    {/* ── PARTNERS ── */}
+    {/* ── PARTNERS — 6 partners, 6-col desktop / 2-col mobile ── */}
     <section style={{ background:"white", padding: m?"40px 0":"56px 0", borderBottom:"1px solid var(--border)" }}>
       <div className="wrap">
         <p style={{ fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.14em", color:"var(--text3)", marginBottom:36, textAlign:"center" }}>IN PARTNERSHIP WITH</p>
-        {/* 6 partners: 3+3 on desktop, 2 cols on mobile */}
         <div style={{ display:"grid", gridTemplateColumns: m?"repeat(2,1fr)":"repeat(6,1fr)", gap: m?24:32, alignItems:"center", maxWidth:1100, margin:"0 auto" }}>
           {partners.map(({key,name,role,abbr})=>(
             <div key={key} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:12 }}>
@@ -510,8 +689,6 @@ const Chk = ({value=[],onChange,options,hasError}) => { const tog=o=>onChange(va
 const TA = ({value,onChange,placeholder,rows=3,hasError}) => <textarea value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={rows} style={{ width:"100%", background: hasError ? "#FEF0EF" : "white", border:`1.5px solid ${hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 14px", color:"var(--text)", fontSize:"0.9rem", resize:"vertical" }} />;
 
 // ─── VALIDATION HELPERS ───────────────────────────────────────────────────────
-
-// Returns array of field keys that are empty/invalid for a given phase
 const validatePhase = (phase, d) => {
   const missing = [];
   if (phase === 1) {
@@ -546,21 +723,22 @@ const validatePhase = (phase, d) => {
     if (!d.supportNeeded?.length) missing.push("supportNeeded");
     if (!d.workingCapital) missing.push("workingCapital");
     if (!d.pilotAgreement) missing.push("pilotAgreement");
-    // additionalInfo is optional — no validation
+    // additionalInfo is optional
   }
   return missing;
 };
 
 // ─── SME REGISTRATION ─────────────────────────────────────────────────────────
 const Registration = ({ addApp }) => {
-  const [phase,setPhase]=useState(1);
-  const [d,setD]=useState({});
-  const [done,setDone]=useState(false);
-  const [ref,setRef]=useState("");
-  const [errors,setErrors]=useState([]);
-  const [shaking,setShaking]=useState(false);
-  const top=useRef(null);
-  const set=(k,v)=>{setD(p=>({...p,[k]:v}));setErrors(prev=>prev.filter(e=>e!==k));};
+  const [phase, setPhase]       = useState(1);
+  const [d, setD]               = useState({});
+  const [done, setDone]         = useState(false);
+  const [ref, setRef]           = useState("");
+  const [errors, setErrors]     = useState([]);
+  const [shaking, setShaking]   = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const top = useRef(null);
+  const set = (k,v) => { setD(p=>({...p,[k]:v})); setErrors(prev=>prev.filter(e=>e!==k)); };
 
   const tryNext = () => {
     const missing = validatePhase(phase, d);
@@ -568,7 +746,6 @@ const Registration = ({ addApp }) => {
       setErrors(missing);
       setShaking(true);
       setTimeout(() => setShaking(false), 500);
-      // Scroll to first error
       setTimeout(() => {
         const firstEl = document.querySelector(".field-error-anchor");
         if (firstEl) firstEl.scrollIntoView({ behavior:"smooth", block:"center" });
@@ -580,7 +757,7 @@ const Registration = ({ addApp }) => {
     setTimeout(()=>top.current?.scrollIntoView({behavior:"smooth"}),80);
   };
 
-  const submit = () => {
+  const submit = async () => {
     const missing = validatePhase(3, d);
     if (missing.length > 0) {
       setErrors(missing);
@@ -588,12 +765,17 @@ const Registration = ({ addApp }) => {
       setTimeout(() => setShaking(false), 500);
       return;
     }
-    const a=addApp(d);setRef(a.id);setDone(true);setTimeout(()=>top.current?.scrollIntoView({behavior:"smooth"}),80);
+    setSubmitting(true);
+    const a = await addApp(d);
+    setRef(a.id);
+    setDone(true);
+    setSubmitting(false);
+    setTimeout(()=>top.current?.scrollIntoView({behavior:"smooth"}),80);
   };
 
-  const pct=phase===1?33:phase===2?66:100;
+  const pct = phase===1?33:phase===2?66:100;
 
-  if(done) return (
+  if (done) return (
     <div style={{ minHeight:"100vh", background:"var(--sand2)", display:"flex", alignItems:"center", justifyContent:"center", padding:"100px 24px" }}>
       <div className="fade-up" style={{ background:"white", border:"1px solid var(--border)", borderRadius:20, padding:"60px 48px", maxWidth:500, width:"100%", textAlign:"center", boxShadow:"0 24px 80px rgba(27,61,47,0.1)" }}>
         <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.8rem" }}>✓</div>
@@ -647,7 +829,7 @@ const Registration = ({ addApp }) => {
           {phase>1?<button onClick={()=>{setPhase(p=>p-1);setErrors([]);}} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Back</button>:<div/>}
           {phase<3
             ?<button onClick={tryNext} style={{ background:"var(--forest)", border:"none", color:"white", padding:"13px 32px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer" }}>Continue</button>
-            :<button onClick={submit} style={{ background:"var(--green-ok)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", boxShadow:"0 4px 16px rgba(27,122,74,0.3)" }}>Submit Application</button>
+            :<button onClick={submit} disabled={submitting} style={{ background:submitting?"var(--sage)":"var(--green-ok)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:submitting?"not-allowed":"pointer", boxShadow:"0 4px 16px rgba(27,122,74,0.3)", opacity:submitting?0.8:1 }}>{submitting?"Submitting…":"Submit Application"}</button>
           }
         </div>
       </div>
@@ -701,16 +883,19 @@ const Ph3=({d,s,errors})=>(<>
 
 // ─── JOURNALIST PORTAL ────────────────────────────────────────────────────────
 const PressPortal = ({ addSubmission, onExit }) => {
-  const [d, setD] = useState({});
-  const [done, setDone] = useState(false);
-  const [refId, setRefId] = useState("");
+  const [d, setD]               = useState({});
+  const [done, setDone]         = useState(false);
+  const [refId, setRefId]       = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const set = (k,v) => setD(p=>({...p,[k]:v}));
 
-  const submit = () => {
+  const submit = async () => {
     if (!d.name || !d.outlet || !d.email || !d.storyType || !d.headline || !d.content) return;
-    const s = addSubmission(d);
+    setSubmitting(true);
+    const s = await addSubmission(d);
     setRefId(s.id);
     setDone(true);
+    setSubmitting(false);
   };
 
   if (done) return (
@@ -786,7 +971,9 @@ const PressPortal = ({ addSubmission, onExit }) => {
         </div>
         <div style={{ marginTop:40, paddingTop:28, borderTop:"1px solid var(--border)", display:"flex", justifyContent:"flex-end", gap:12 }}>
           <button onClick={onExit} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Cancel</button>
-          <button onClick={submit} style={{ background:"var(--forest)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>Submit for Review</button>
+          <button onClick={submit} disabled={submitting} style={{ background:submitting?"var(--sage)":"var(--forest)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:submitting?"not-allowed":"pointer", boxShadow:"0 4px 16px rgba(27,61,47,0.25)", opacity:submitting?0.8:1 }}>
+            {submitting ? "Submitting…" : "Submit for Review"}
+          </button>
         </div>
       </div>
     </div>
@@ -800,9 +987,9 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
 
   const approvedAsArticles = approvedSubmissions.map(s => ({
     id: s.id, cat: s.category || "PRESS RELEASE",
-    date: new Date(s.submittedAt).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}),
+    date: new Date(s.submitted_at || s.submittedAt).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}),
     headline: s.headline, summary: s.summary || s.content?.substring(0,180)+"...",
-    img: s.imageUrl || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80",
+    img: s.image_url || s.imageUrl || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80",
     source: s.outlet, featured: false, fullContent: s.content,
   }));
 
@@ -928,15 +1115,15 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
 
 // ─── ADMIN DASHBOARD ──────────────────────────────────────────────────────────
 const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
-  const [tab, setTab] = useState("sme");
-  const [filter, setFilter] = useState("all");
-  const [sort, setSort] = useState("score");
-  const [exp, setExp] = useState(null);
+  const [tab, setTab]                 = useState("sme");
+  const [filter, setFilter]           = useState("all");
+  const [sort, setSort]               = useState("score");
+  const [exp, setExp]                 = useState(null);
   const [pressFilter, setPressFilter] = useState("all");
-  const [pressExp, setPressExp] = useState(null);
+  const [pressExp, setPressExp]       = useState(null);
 
-  const list = apps.filter(a=>filter==="all"||a.status===filter).sort((a,b)=>sort==="score"?b.score-a.score:new Date(b.submittedAt)-new Date(a.submittedAt));
-  const pressList = submissions.filter(s=>pressFilter==="all"||s.status===pressFilter).sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
+  const list = apps.filter(a=>filter==="all"||a.status===filter).sort((a,b)=>sort==="score"?b.score-a.score:new Date(b.submitted_at||b.submittedAt)-new Date(a.submitted_at||a.submittedAt));
+  const pressList = submissions.filter(s=>pressFilter==="all"||s.status===pressFilter).sort((a,b)=>new Date(b.submitted_at||b.submittedAt)-new Date(a.submitted_at||a.submittedAt));
 
   const counts = { total:apps.length, pending:apps.filter(a=>a.status==="pending").length, approved:apps.filter(a=>a.status==="approved").length, rejected:apps.filter(a=>a.status==="rejected").length, avg:apps.length?Math.round(apps.reduce((s,a)=>s+a.score,0)/apps.length):0 };
   const pCounts = { total:submissions.length, pending:submissions.filter(s=>s.status==="pending").length, approved:submissions.filter(s=>s.status==="approved").length, rejected:submissions.filter(s=>s.status==="rejected").length };
@@ -1002,9 +1189,9 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                   {list.map((a,i)=>(
                     <div key={a.id}>
                       <div onClick={()=>setExp(exp===a.id?null:a.id)} style={{ display:"grid", gridTemplateColumns:"2fr 1.4fr 1fr 1fr 1fr 110px", alignItems:"center", padding:"16px 24px", background:exp===a.id?"var(--mint2)":i%2===0?"white":"var(--cream)", borderBottom:"1px solid var(--border2)", cursor:"pointer" }}>
-                        <div><p style={{ fontWeight:600, fontSize:"0.9rem", color:"var(--forest)" }}>{a.businessName||"Not provided"}</p><p style={{ color:"var(--text3)", fontSize:"0.72rem", marginTop:2 }}>{a.id}</p></div>
-                        <div><p style={{ fontSize:"0.85rem" }}>{a.businessNiche||"Not specified"}</p><p style={{ color:"var(--text3)", fontSize:"0.72rem" }}>{a.businessAddress?a.businessAddress.split(",")[0]:"Not provided"}</p></div>
-                        <p style={{ fontSize:"0.85rem", color:"var(--text2)" }}>{a.monthlyTurnover||"Not stated"}</p>
+                        <div><p style={{ fontWeight:600, fontSize:"0.9rem", color:"var(--forest)" }}>{a.business_name||a.businessName||"Not provided"}</p><p style={{ color:"var(--text3)", fontSize:"0.72rem", marginTop:2 }}>{a.id}</p></div>
+                        <div><p style={{ fontSize:"0.85rem" }}>{a.business_niche||a.businessNiche||"Not specified"}</p><p style={{ color:"var(--text3)", fontSize:"0.72rem" }}>{(a.business_address||a.businessAddress)?(a.business_address||a.businessAddress).split(",")[0]:"Not provided"}</p></div>
+                        <p style={{ fontSize:"0.85rem", color:"var(--text2)" }}>{a.monthly_turnover||a.monthlyTurnover||"Not stated"}</p>
                         <ScorePill v={a.score} />
                         <StPill st={a.status} />
                         <div style={{ display:"flex", gap:6 }} onClick={e=>e.stopPropagation()}>
@@ -1014,7 +1201,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                       </div>
                       {exp===a.id && (
                         <div className="fade-up" style={{ padding:"28px 24px 32px", background:"var(--mint2)", borderBottom:"1px solid var(--border)", display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:20 }}>
-                          {[["Business Name",a.businessName],["Address",a.businessAddress],["Niche",a.businessNiche],["Structure",a.businessStructure],["Operating Since",a.businessAge],["Role",a.role],["Export Experience",a.exportExperience],["Target Markets",(a.targetMarkets||[]).join(", ")],["Contact Email",a.contactEmail],["Phone",a.contactPhone],["Production Capacity",a.productionCapacity],["Monthly Turnover",a.monthlyTurnover],["Working Capital",a.workingCapital],["Export Familiarity",a.exportDocsFamiliarity],["Quality Standards",(a.qualityStandards||[]).join(", ")],["KYC Consent",a.kycConsent],["Export Products",a.exportProducts],["Export Timeline",a.exportTimeline],["Challenges",(a.challenges||[]).join(", ")],["Support Needed",(a.supportNeeded||[]).join(", ")],["Submitted",new Date(a.submittedAt).toLocaleDateString("en-NG",{day:"numeric",month:"long",year:"numeric"})]].filter(([,v])=>v&&v!=="").map(([label,value])=>(
+                          {[["Business Name",a.business_name||a.businessName],["Address",a.business_address||a.businessAddress],["Niche",a.business_niche||a.businessNiche],["Structure",a.business_structure||a.businessStructure],["Operating Since",a.business_age||a.businessAge],["Role",a.role],["Export Experience",a.export_experience||a.exportExperience],["Target Markets",((a.target_markets||a.targetMarkets)||[]).join(", ")],["Contact Email",a.contact_email||a.contactEmail],["Phone",a.contact_phone||a.contactPhone],["Production Capacity",a.production_capacity||a.productionCapacity],["Monthly Turnover",a.monthly_turnover||a.monthlyTurnover],["Working Capital",a.working_capital||a.workingCapital],["Export Familiarity",a.export_docs_familiarity||a.exportDocsFamiliarity],["Quality Standards",((a.quality_standards||a.qualityStandards)||[]).join(", ")],["KYC Consent",a.kyc_consent||a.kycConsent],["Export Products",a.export_products||a.exportProducts],["Export Timeline",a.export_timeline||a.exportTimeline],["Challenges",((a.challenges)||[]).join(", ")],["Support Needed",((a.support_needed||a.supportNeeded)||[]).join(", ")],["Submitted",new Date(a.submitted_at||a.submittedAt).toLocaleDateString("en-NG",{day:"numeric",month:"long",year:"numeric"})]].filter(([,v])=>v&&v!=="").map(([label,value])=>(
                             <div key={label}><p style={{ fontSize:"0.65rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:3 }}>{label.toUpperCase()}</p><p style={{ fontSize:"0.85rem", color:"var(--text)", lineHeight:1.5 }}>{value}</p></div>
                           ))}
                         </div>
@@ -1054,13 +1241,13 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                       <div onClick={()=>setPressExp(pressExp===s.id?null:s.id)} style={{ display:"grid", gridTemplateColumns:"2.5fr 1.5fr 1fr 1fr 120px", alignItems:"center", padding:"16px 24px", background:pressExp===s.id?"var(--mint2)":i%2===0?"white":"var(--cream)", borderBottom:"1px solid var(--border2)", cursor:"pointer" }}>
                         <div>
                           <p style={{ fontWeight:600, fontSize:"0.88rem", color:"var(--forest)", lineHeight:1.3 }}>{s.headline||"Untitled"}</p>
-                          <p style={{ color:"var(--text3)", fontSize:"0.72rem", marginTop:2 }}>{s.id} · {new Date(s.submittedAt).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}</p>
+                          <p style={{ color:"var(--text3)", fontSize:"0.72rem", marginTop:2 }}>{s.id} · {new Date(s.submitted_at||s.submittedAt).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}</p>
                         </div>
                         <div>
                           <p style={{ fontSize:"0.85rem", fontWeight:500 }}>{s.name||"Unknown"}</p>
                           <p style={{ color:"var(--text3)", fontSize:"0.75rem" }}>{s.outlet||"No outlet"}</p>
                         </div>
-                        <span style={{ background:"var(--mint2)", color:"var(--forest3)", padding:"3px 8px", borderRadius:4, fontSize:"0.68rem", fontWeight:600 }}>{s.storyType||"Submission"}</span>
+                        <span style={{ background:"var(--mint2)", color:"var(--forest3)", padding:"3px 8px", borderRadius:4, fontSize:"0.68rem", fontWeight:600 }}>{s.story_type||s.storyType||"Submission"}</span>
                         <StPill st={s.status} />
                         <div style={{ display:"flex", gap:6 }} onClick={e=>e.stopPropagation()}>
                           <button onClick={()=>upSubStatus(s.id,"approved")} style={{ background:"#E8F5EF", border:"1px solid #1B7A4A40", color:"#1B7A4A", padding:"6px 10px", borderRadius:6, fontSize:"0.75rem", cursor:"pointer", fontWeight:700 }}>Publish</button>
@@ -1070,13 +1257,13 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                       {pressExp===s.id && (
                         <div className="fade-up" style={{ padding:"28px 32px", background:"var(--mint2)", borderBottom:"1px solid var(--border)" }}>
                           <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:20, marginBottom:24 }}>
-                            {[["Journalist",s.name],["Outlet",s.outlet],["Email",s.email],["Phone",s.phone],["Country",s.country],["Category",s.category],["Story Type",s.storyType],["Submitted",new Date(s.submittedAt).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})]].filter(([,v])=>v).map(([l,v])=>(
+                            {[["Journalist",s.name],["Outlet",s.outlet],["Email",s.email],["Phone",s.phone],["Country",s.country],["Category",s.category],["Story Type",s.story_type||s.storyType],["Submitted",new Date(s.submitted_at||s.submittedAt).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})]].filter(([,v])=>v).map(([l,v])=>(
                               <div key={l}><p style={{ fontSize:"0.65rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:3 }}>{l.toUpperCase()}</p><p style={{ fontSize:"0.85rem", color:"var(--text)" }}>{v}</p></div>
                             ))}
                           </div>
                           {s.summary && <div style={{ marginBottom:16 }}><p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:6 }}>SUMMARY</p><p style={{ fontSize:"0.875rem", color:"var(--text)", lineHeight:1.7 }}>{s.summary}</p></div>}
                           {s.content && <div style={{ marginBottom:16 }}><p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:6 }}>FULL CONTENT</p><div style={{ background:"white", border:"1px solid var(--border)", borderRadius:8, padding:"16px 20px", maxHeight:300, overflowY:"auto" }}><p style={{ fontSize:"0.875rem", color:"var(--text)", lineHeight:1.8, whiteSpace:"pre-wrap" }}>{s.content}</p></div></div>}
-                          {s.imageUrl && <div style={{ marginBottom:16 }}><p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:6 }}>IMAGE URL</p><p style={{ fontSize:"0.85rem", color:"var(--forest)" }}>{s.imageUrl}</p></div>}
+                          {(s.image_url||s.imageUrl) && <div style={{ marginBottom:16 }}><p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:6 }}>IMAGE URL</p><p style={{ fontSize:"0.85rem", color:"var(--forest)" }}>{s.image_url||s.imageUrl}</p></div>}
                           {s.notes && <div><p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:6 }}>EDITORIAL NOTES</p><p style={{ fontSize:"0.85rem", color:"var(--text)", lineHeight:1.6 }}>{s.notes}</p></div>}
                         </div>
                       )}
@@ -1093,13 +1280,13 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
 
 // ─── APP ─────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [page, setPage] = useState("landing");
+  const [page, setPage]                   = useState("landing");
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [pressUnlocked, setPressUnlocked] = useState(false);
-  const { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus } = useDataStore();
+  const { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError } = useDataStore();
 
   const logoClicks = useRef(0);
-  const logoTimer = useRef(null);
+  const logoTimer  = useRef(null);
 
   const handleLogoClick = () => {
     logoClicks.current += 1;
@@ -1117,14 +1304,34 @@ export default function App() {
   const approvedSubmissions = submissions.filter(s => s.status === "approved");
   const showNav = !["admin-gate","dashboard"].includes(page);
 
-  return (
-    <div style={{ overflowX:"hidden", width:"100%" }}>
+  // ── DB error banner (non-blocking) ──
+  const DbBanner = () => dbError ? (
+    <div style={{ position:"fixed", bottom:20, left:"50%", transform:"translateX(-50%)", zIndex:9999, background:"#FEF0EF", border:"1.5px solid var(--red)", borderRadius:10, padding:"12px 20px", display:"flex", alignItems:"center", gap:10, boxShadow:"0 4px 20px rgba(0,0,0,0.12)", maxWidth:480 }}>
+      <span>⚠️</span>
+      <p style={{ fontSize:"0.82rem", color:"var(--red)", fontWeight:500 }}>{dbError}</p>
+    </div>
+  ) : null;
+
+  // ── Loading screen ──
+  if (loading) return (
+    <>
       <GlobalStyles />
+      <div style={{ minHeight:"100vh", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 100%)", display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:20 }}>
+        <div style={{ width:48, height:48, border:"3px solid rgba(200,230,218,0.2)", borderTop:"3px solid var(--mint)", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
+        <p style={{ color:"rgba(200,230,218,0.7)", fontSize:"0.875rem", fontWeight:300 }}>Loading T2T Programme…</p>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      <GlobalStyles />
+      <DbBanner />
       {showNav && <Nav page={page} setPage={setPage} onLogoClick={handleLogoClick} />}
 
-      {page==="landing" && <Landing setPage={setPage} />}
-      {page==="register" && <Registration addApp={addApp} />}
-      {page==="newsroom" && <Newsroom setPage={setPage} approvedSubmissions={approvedSubmissions} />}
+      {page==="landing"   && <Landing setPage={setPage} />}
+      {page==="register"  && <Registration addApp={addApp} />}
+      {page==="newsroom"  && <Newsroom setPage={setPage} approvedSubmissions={approvedSubmissions} />}
 
       {page==="press-gate" && !pressUnlocked && (
         <PasswordGate
@@ -1151,6 +1358,6 @@ export default function App() {
       {page==="dashboard" && adminUnlocked && (
         <Dashboard apps={apps} upAppStatus={upAppStatus} submissions={submissions} upSubStatus={upSubStatus} onExit={() => { setAdminUnlocked(false); setPage("landing"); }} />
       )}
-    </div>
+    </>
   );
 }
