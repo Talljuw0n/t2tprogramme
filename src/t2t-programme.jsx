@@ -16,14 +16,14 @@ const GlobalStyles = () => (
     @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root {
-      --forest:#0D1147; --forest2:#111660; --forest3:#1A2080;
-      --sage:#C8A96E; --sage-light:#D9C08E;
-      --mint:#C8A96E; --mint2:#F5EDD8;
-      --sand:#F0E8D5; --sand2:#FAF6EE; --cream:#FDFAF5;
-      --text:#0D1147; --text2:#2A3060; --text3:#7A7FA8;
-      --border:#DDD5C0; --border2:#EDE8D8;
+      --forest:#1B3D2F; --forest2:#234D3B; --forest3:#2E6249;
+      --sage:#4A7C63; --sage-light:#6B9E84;
+      --mint:#C8E6DA; --mint2:#E8F5EF;
+      --sand:#F5EFE0; --sand2:#FDF9F3; --cream:#FFFEF9;
+      --text:#1A2820; --text2:#3D5449; --text3:#6B7F76;
+      --border:#D8E8E0; --border2:#EAF2EC;
       --white:#FFFFFF; --red:#C0392B; --green-ok:#1B7A4A;
-      --amber:#C8A96E; --amber-bg:#F5EDD8;
+      --amber:#B8943F; --amber-bg:#FDF5E0;
       --max-w:1440px;
     }
     .wrap { max-width:var(--max-w); margin:0 auto; width:100%; padding:0 80px; box-sizing:border-box; }
@@ -38,9 +38,9 @@ const GlobalStyles = () => (
     .live-dot { width:7px;height:7px;background:#2ECC71;border-radius:50%;display:inline-block;animation:livePulse 2s infinite; }
     @keyframes livePulse { 0%,100%{box-shadow:0 0 0 0 rgba(46,204,113,0.4);} 50%{box-shadow:0 0 0 5px rgba(46,204,113,0);} }
     .card-hover { transition:transform 0.25s ease,box-shadow 0.25s ease; }
-    .card-hover:hover { transform:translateY(-4px);box-shadow:0 20px 60px rgba(13,17,71,0.12); }
+    .card-hover:hover { transform:translateY(-4px);box-shadow:0 20px 60px rgba(27,61,47,0.12); }
     input,select,textarea { font-family:'Outfit',sans-serif; }
-    input:focus,select:focus,textarea:focus { outline:none;border-color:var(--forest) !important;box-shadow:0 0 0 3px rgba(13,17,71,0.08); }
+    input:focus,select:focus,textarea:focus { outline:none;border-color:var(--forest) !important;box-shadow:0 0 0 3px rgba(27,61,47,0.08); }
     button { font-family:'Outfit',sans-serif; }
     .field-error { border-color:var(--red) !important; background:#FEF0EF !important; }
     @keyframes shake { 0%,100%{transform:translateX(0);} 20%,60%{transform:translateX(-6px);} 40%,80%{transform:translateX(6px);} }
@@ -461,7 +461,7 @@ const Landing = ({ setPage }) => {
   <div style={{ overflowX:"hidden" }}>
 
     {/* ── HERO ── */}
-    <section style={{ position:"relative", overflow:"hidden", background:"linear-gradient(135deg, #0D1147 0%, #111660 60%, #1A2080 100%)", ...(m ? {} : { minHeight:"100vh", display:"flex", alignItems:"center" }) }}>
+    <section style={{ position:"relative", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 60%, #2E6249 100%)", ...(m ? {} : { minHeight:"100vh", display:"flex", alignItems:"center" }) }}>
       <div style={{ position:"absolute", inset:0, opacity:0.15, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.4) 1px, transparent 1px)", backgroundSize:"32px 32px" }} />
       <div style={{ position:"absolute", right:"-10%", top:"10%", width:"50vw", height:"50vw", maxWidth:700, maxHeight:700, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.07)", pointerEvents:"none" }} />
       <div style={{ position:"absolute", right:"5%", top:"20%", width:"30vw", height:"30vw", maxWidth:400, maxHeight:400, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.05)", pointerEvents:"none" }} />
@@ -654,7 +654,7 @@ const Landing = ({ setPage }) => {
     </section>
 
     {/* ── CTA BANNER ── */}
-    <section style={{ position:"relative", overflow:"hidden", background:"linear-gradient(135deg, #0D1147 0%, #0A0E3A 100%)" }}>
+    <section style={{ position:"relative", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #1a3d2e 100%)" }}>
       <div style={{ position:"absolute", inset:0, opacity:0.1, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.5) 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
       <div className="wrap" style={{ position:"relative", zIndex:1, paddingTop: m?60:100, paddingBottom: m?60:100, textAlign:"center" }}>
         <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"clamp(2.5rem,5vw,4.5rem)", fontWeight:600, color:"white", lineHeight:1.05, marginBottom:16 }}>
@@ -669,7 +669,7 @@ const Landing = ({ setPage }) => {
     </section>
 
     {/* ── FOOTER ── */}
-    <footer style={{ background:"#080B30", padding: m?"32px 0":"48px 0" }}>
+    <footer style={{ background:"var(--text)", padding: m?"32px 0":"48px 0" }}>
       <div className="wrap">
         <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap: m?20:40, paddingBottom: m?20:32, borderBottom:"1px solid rgba(255,255,255,0.08)", marginBottom: m?20:28 }}>
           <div>
@@ -687,7 +687,7 @@ const Landing = ({ setPage }) => {
         </div>
         <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap:12 }}>
           <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>Implemented by Duchess NL, CMD Tourism & Trade Enterprises Ltd and Borderless Trade and Investments. Sponsored by Providus Bank.</p>
-          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>applications@t2tprogramme.com</p>
+          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>media@t2tprogramme.org</p>
         </div>
       </div>
     </footer>
@@ -935,7 +935,7 @@ const PressPortal = ({ addSubmission, onExit }) => {
           <p style={{ fontFamily:"Cormorant Garamond", fontSize:"1.5rem", fontWeight:700, color:"var(--forest)" }}>{refId}</p>
         </div>
         <p style={{ fontSize:"0.82rem", color:"var(--text3)", marginBottom:24 }}>
-          For urgent enquiries contact: <strong>applications@t2tprogramme.com</strong>
+          For urgent enquiries contact: <strong>media@t2tprogramme.org</strong>
         </p>
         <button onClick={onExit} style={{ background:"var(--forest)", color:"white", border:"none", padding:"12px 28px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer" }}>Back to Newsroom</button>
       </div>
@@ -1045,7 +1045,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
         <div style={{ marginTop:56, background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:16, padding:"36px 40px" }}>
           <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.4rem", color:"var(--forest)", marginBottom:20 }}>Media Contacts</h3>
           <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3, 1fr)", gap:20 }}>
-            {[{name:"Media Enquiries",email:"applications@t2tprogramme.com",org:"T2T Programme Office"},{name:"Providus Bank Comms",email:"applications@t2tprogramme.com",org:"Providus Bank"},{name:"Programme Updates",email:"applications@t2tprogramme.com",org:"Duchess NL and BTI"}].map(c=>(
+            {[{name:"Media Enquiries",email:"media@t2tprogramme.org",org:"T2T Programme Office"},{name:"Providus Bank Comms",email:"comms@providusbank.com",org:"Providus Bank"},{name:"Programme Updates",email:"updates@duchessnl.com",org:"Duchess NL and BTI"}].map(c=>(
               <div key={c.email}><p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:3 }}>{c.name}</p><p style={{ color:"var(--forest)", fontSize:"0.83rem", marginBottom:2 }}>{c.email}</p><p style={{ color:"var(--text3)", fontSize:"0.78rem" }}>{c.org}</p></div>
             ))}
           </div>
@@ -1066,7 +1066,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
           <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems: m?"flex-start":"flex-end" }}>
             <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:12, padding:"16px 20px" }}>
               <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:4 }}>PRESS CONTACT</p>
-              <p style={{ color:"var(--forest)", fontWeight:600, fontSize:"0.875rem" }}>applications@t2tprogramme.com</p>
+              <p style={{ color:"var(--forest)", fontWeight:600, fontSize:"0.875rem" }}>media@t2tprogramme.org</p>
             </div>
             <button onClick={()=>setPage("press-gate")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"10px 20px", borderRadius:8, fontSize:"0.82rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em" }}>Submit a Story</button>
           </div>
@@ -1122,7 +1122,7 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
           <div style={{ paddingTop:32, borderTop:"1px solid var(--border)" }}>
             <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:16 }}>Press Contacts</h3>
             <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:12 }}>
-              {[{name:"Media Enquiries",email:"applications@t2tprogramme.com",org:"T2T Programme Office"},{name:"Providus Bank Comms",email:"applications@t2tprogramme.com",org:"Providus Bank"},{name:"Programme Updates",email:"applications@t2tprogramme.com",org:"Duchess NL and BTI"}].map(c=>(
+              {[{name:"Media Enquiries",email:"media@t2tprogramme.org",org:"T2T Programme Office"},{name:"Providus Bank Comms",email:"comms@providusbank.com",org:"Providus Bank"},{name:"Programme Updates",email:"updates@duchessnl.com",org:"Duchess NL and BTI"}].map(c=>(
                 <div key={c.email} style={{ background:"white", border:"1px solid var(--border)", borderRadius:10, padding:"16px 18px" }}>
                   <p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:3 }}>{c.name}</p>
                   <p style={{ color:"var(--forest)", fontSize:"0.82rem", marginBottom:2 }}>{c.email}</p>
@@ -1340,7 +1340,7 @@ export default function App() {
   if (loading) return (
     <>
       <GlobalStyles />
-      <div style={{ minHeight:"100vh", background:"linear-gradient(135deg, #0D1147 0%, #111660 100%)", display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:20 }}>
+      <div style={{ minHeight:"100vh", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 100%)", display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:20 }}>
         <div style={{ width:48, height:48, border:"3px solid rgba(200,230,218,0.2)", borderTop:"3px solid var(--mint)", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
         <p style={{ color:"rgba(200,230,218,0.7)", fontSize:"0.875rem", fontWeight:300 }}>Loading T2T Programme…</p>
       </div>
