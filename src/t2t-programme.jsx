@@ -403,7 +403,6 @@ const Nav = ({ page, setPage, onLogoClick }) => {
                 <button key={key} onClick={()=>setPage(key)} style={{ background:page===key?"var(--mint2)":"transparent", border:"none", color:page===key?"var(--forest)":"var(--text3)", padding:"7px 18px", borderRadius:6, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}>{label}</button>
               ))}
               <div style={{ width:1, height:20, background:"var(--border)", margin:"0 8px" }} />
-
               <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", border:"none", color:"white", padding:"9px 22px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>Apply Now</button>
             </div>
           )}
@@ -450,56 +449,87 @@ const Landing = ({ setPage }) => {
   ];
   return (
   <div style={{ overflowX:"hidden" }}>
-    <section style={{ position:"relative", minHeight:"100vh", display:"flex", alignItems:"center", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 60%, #2E6249 100%)" }}>
+    {/* ── HERO ── */}
+    <section style={{ position:"relative", minHeight:"100vh", display:"flex", flexDirection:"column", justifyContent:"center", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 60%, #2E6249 100%)" }}>
       <div style={{ position:"absolute", inset:0, opacity:0.15, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.4) 1px, transparent 1px)", backgroundSize:"32px 32px" }} />
-      <div className="wrap" style={{ position:"relative", zIndex:2, padding: m?"100px 24px 60px":"130px 80px 100px", display:"flex", flexDirection: m?"column":"row", alignItems:"center", gap: m?40:60, width:"100%" }}>
-        <div className="fade-up" style={{ flex:1 }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
-            <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
-          </div>
-          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"3rem":"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
-            Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
-          </h1>
-          <p style={{ fontSize: m?"1rem":"1.15rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, maxWidth:520, marginBottom:16, fontWeight:300 }}>
-            A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
-          </p>
-          <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom: m?32:44, opacity:0.85 }}>
-            Lagos and Abuja · Commencing April 13, 2026
-          </p>
-          <div style={{ display:"flex", flexDirection: m?"column":"row", gap:12 }}>
-            <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
-              onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="white";}}
-            >Apply to the Programme</button>
-            <button onClick={()=>setPage("newsroom")} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.4)", color:"white", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}
-              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.2)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
-            >Press and Media</button>
-          </div>
-        </div>
+
+      <div className="wrap" style={{ position:"relative", zIndex:2, padding: m?"100px 24px 60px":"130px 80px 100px", width:"100%" }}>
+
+        {/* Desktop: side-by-side layout */}
         {!m && (
-          <div style={{ width:280, background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:20, padding:"32px 28px", flexShrink:0 }}>
-            <p style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(200,230,218,0.6)", letterSpacing:"0.12em", marginBottom:20 }}>PROGRAMME OVERVIEW</p>
-            {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"March 31, 2026"},{label:"Commencement",val:"April 13, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val},i,arr)=>(
-              <div key={label} style={{ marginBottom: i<arr.length-1?16:0, paddingBottom: i<arr.length-1?16:0, borderBottom: i<arr.length-1?"1px solid rgba(200,230,218,0.12)":"none" }}>
-                <p style={{ fontSize:"0.68rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
-                <p style={{ fontSize:"0.9rem", fontWeight:600, color:"white" }}>{val}</p>
+          <div style={{ display:"flex", flexDirection:"row", alignItems:"center", gap:60 }}>
+            {/* Left content */}
+            <div className="fade-up" style={{ flex:1 }}>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
+                <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-      {m && (
-        <div className="wrap" style={{ position:"relative", zIndex:2, padding:"0 24px 48px" }}>
-          <div style={{ background:"rgba(255,255,255,0.1)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:16, padding:"24px" }}>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-              {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"3 Months"},{label:"Deadline",val:"March 31, 2026"},{label:"Starts",val:"April 13, 2026"}].map(({label,val})=>(
-                <div key={label}><p style={{ fontSize:"0.65rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p><p style={{ fontSize:"0.875rem", fontWeight:600, color:"white" }}>{val}</p></div>
+              <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
+                Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
+              </h1>
+              <p style={{ fontSize:"1.15rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, maxWidth:520, marginBottom:16, fontWeight:300 }}>
+                A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
+              </p>
+              <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:44, opacity:0.85 }}>
+                Lagos and Abuja · Commencing April 13, 2026
+              </p>
+              <div style={{ display:"flex", flexDirection:"row", gap:12 }}>
+                <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
+                  onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.background="white";}}
+                >Apply to the Programme</button>
+                <button onClick={()=>setPage("newsroom")} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.4)", color:"white", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}
+                  onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.2)";}}
+                  onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
+                >Press and Media</button>
+              </div>
+            </div>
+            {/* Right overview card — desktop only */}
+            <div style={{ width:280, background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:20, padding:"32px 28px", flexShrink:0 }}>
+              <p style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(200,230,218,0.6)", letterSpacing:"0.12em", marginBottom:20 }}>PROGRAMME OVERVIEW</p>
+              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"March 31, 2026"},{label:"Commencement",val:"April 13, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val},i,arr)=>(
+                <div key={label} style={{ marginBottom: i<arr.length-1?16:0, paddingBottom: i<arr.length-1?16:0, borderBottom: i<arr.length-1?"1px solid rgba(200,230,218,0.12)":"none" }}>
+                  <p style={{ fontSize:"0.68rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
+                  <p style={{ fontSize:"0.9rem", fontWeight:600, color:"white" }}>{val}</p>
+                </div>
               ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Mobile: stacked layout — card sits INSIDE the content column, after buttons */}
+        {m && (
+          <div className="fade-up" style={{ display:"flex", flexDirection:"column" }}>
+            <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28, alignSelf:"flex-start" }}>
+              <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
+            </div>
+            <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3rem", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
+              Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
+            </h1>
+            <p style={{ fontSize:"1rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, marginBottom:16, fontWeight:300 }}>
+              A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
+            </p>
+            <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:32, opacity:0.85 }}>
+              Lagos and Abuja · Commencing April 13, 2026
+            </p>
+            {/* Buttons */}
+            <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
+              <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}>Apply to the Programme</button>
+              <button onClick={()=>setPage("newsroom")} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.4)", color:"white", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}>Press and Media</button>
+            </div>
+            {/* Overview card — mobile, full width, INSIDE the column */}
+            <div style={{ background:"rgba(255,255,255,0.1)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:16, padding:"24px" }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"3 Months"},{label:"Deadline",val:"March 31, 2026"},{label:"Starts",val:"April 13, 2026"}].map(({label,val})=>(
+                  <div key={label}>
+                    <p style={{ fontSize:"0.65rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
+                    <p style={{ fontSize:"0.875rem", fontWeight:600, color:"white" }}>{val}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </section>
 
     <section style={{ background:"white", padding: m?"40px 24px":"56px 0", borderBottom:"1px solid var(--border)" }}>
@@ -1279,7 +1309,6 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                       </div>
                       {exp===a.id && (
                         <div className="fade-up" style={{ padding:"28px 24px 32px", background:"var(--mint2)", borderBottom:"1px solid var(--border)" }}>
-                          {/* Product Photos */}
                           {((a.product_photos||a.productPhotos)||[]).length > 0 && (
                             <div style={{ marginBottom:24, paddingBottom:24, borderBottom:"1px solid var(--border)" }}>
                               <p style={{ fontSize:"0.65rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:12 }}>PRODUCT PHOTOS</p>
@@ -1296,7 +1325,6 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                               </div>
                             </div>
                           )}
-                          {/* Product Certificates */}
                           {((a.product_certs||a.productCerts)||[]).length > 0 && (
                             <div style={{ marginBottom:24, paddingBottom:24, borderBottom:"1px solid var(--border)" }}>
                               <p style={{ fontSize:"0.65rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:12 }}>PRODUCT CERTIFICATES</p>
@@ -1316,7 +1344,6 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                               </div>
                             </div>
                           )}
-                          {/* All other fields */}
                           <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:20 }}>
                             {[["Business Name",a.business_name||a.businessName],["Address",a.business_address||a.businessAddress],["Niche",a.business_niche||a.businessNiche],["Structure",a.business_structure||a.businessStructure],["Operating Since",a.business_age||a.businessAge],["Role",a.role],["Export Experience",a.export_experience||a.exportExperience],["Target Markets",((a.target_markets||a.targetMarkets)||[]).join(", ")],["Contact Email",a.contact_email||a.contactEmail],["Phone",a.contact_phone||a.contactPhone],["Production Capacity",a.production_capacity||a.productionCapacity],["Monthly Turnover",a.monthly_turnover||a.monthlyTurnover],["Working Capital",a.working_capital||a.workingCapital],["Export Familiarity",a.export_docs_familiarity||a.exportDocsFamiliarity],["Quality Standards",((a.quality_standards||a.qualityStandards)||[]).join(", ")],["KYC Consent",a.kyc_consent||a.kycConsent],["Export Products",a.export_products||a.exportProducts],["Export Timeline",a.export_timeline||a.exportTimeline],["Challenges",((a.challenges)||[]).join(", ")],["Support Needed",((a.support_needed||a.supportNeeded)||[]).join(", ")],["Submitted",new Date(a.submitted_at||a.submittedAt).toLocaleDateString("en-NG",{day:"numeric",month:"long",year:"numeric"})]].filter(([,v])=>v&&v!=="").map(([label,value])=>(
                               <div key={label}><p style={{ fontSize:"0.65rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:3 }}>{label.toUpperCase()}</p><p style={{ fontSize:"0.85rem", color:"var(--text)", lineHeight:1.5 }}>{value}</p></div>
