@@ -26,7 +26,7 @@ const GlobalStyles = () => (
       --amber:#B8943F; --amber-bg:#FDF5E0;
       --max-w:1440px;
     }
-    .wrap { max-width:var(--max-w); margin:0 auto; width:100%; padding:0 80px; box-sizing:border-box; }
+    .wrap { max-width:var(--max-w); margin:0 auto; width:100%; }
     html { scroll-behavior:smooth; }
     body { font-family:'Outfit',sans-serif; background:var(--cream); color:var(--text); overflow-x:hidden; }
     h1,h2,h3,h4 { font-family:'Cormorant Garamond',serif; }
@@ -37,26 +37,24 @@ const GlobalStyles = () => (
     @keyframes fadeUp { from{opacity:0;transform:translateY(28px);} to{opacity:1;transform:translateY(0);} }
     .live-dot { width:7px;height:7px;background:#2ECC71;border-radius:50%;display:inline-block;animation:livePulse 2s infinite; }
     @keyframes livePulse { 0%,100%{box-shadow:0 0 0 0 rgba(46,204,113,0.4);} 50%{box-shadow:0 0 0 5px rgba(46,204,113,0);} }
+    .field-error { border-color:var(--red) !important; background:#FEF0EF !important; }
+    @keyframes shake { 0%,100%{transform:translateX(0);} 20%,60%{transform:translateX(-6px);} 40%,80%{transform:translateX(6px);} }
+    .shake { animation:shake 0.4s ease; }
+    @keyframes spin { to { transform:rotate(360deg); } }
     .card-hover { transition:transform 0.25s ease,box-shadow 0.25s ease; }
     .card-hover:hover { transform:translateY(-4px);box-shadow:0 20px 60px rgba(27,61,47,0.12); }
     input,select,textarea { font-family:'Outfit',sans-serif; }
     input:focus,select:focus,textarea:focus { outline:none;border-color:var(--forest) !important;box-shadow:0 0 0 3px rgba(27,61,47,0.08); }
     button { font-family:'Outfit',sans-serif; }
-    .field-error { border-color:var(--red) !important; background:#FEF0EF !important; }
-    @keyframes shake { 0%,100%{transform:translateX(0);} 20%,60%{transform:translateX(-6px);} 40%,80%{transform:translateX(6px);} }
-    .shake { animation:shake 0.4s ease; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    /* ── MOBILE RESPONSIVE ── */
     @media (max-width: 768px) {
-      .wrap { padding-left:24px !important; padding-right:24px !important; }
-      .hero-section { padding:100px 0 48px !important; min-height:auto !important; }
+      .hero-section { padding:100px 24px 48px !important; min-height:auto !important; }
       .hero-buttons { flex-direction:column !important; }
       .hero-buttons button { width:100% !important; }
       .overview-card { position:relative !important; right:auto !important; bottom:auto !important; width:100% !important; min-width:unset !important; margin-top:36px !important; box-shadow:none !important; }
       .partners-grid { grid-template-columns:repeat(2,1fr) !important; }
       .stages-grid { grid-template-columns:1fr !important; gap:40px !important; }
       .eligibility-grid { grid-template-columns:1fr !important; }
-      .section-pad { padding:60px 0 !important; }
+      .section-pad { padding:60px 24px !important; }
       .newsroom-featured { grid-template-columns:1fr !important; }
       .newsroom-featured-img { height:220px !important; }
       .newsroom-grid { grid-template-columns:1fr !important; }
@@ -67,16 +65,13 @@ const GlobalStyles = () => (
       .dash-stats { grid-template-columns:repeat(2,1fr) !important; }
       .dash-detail-grid { grid-template-columns:repeat(2,1fr) !important; }
       .footer-inner { flex-direction:column !important; align-items:flex-start !important; gap:16px !important; }
-      .cta-section { padding:60px 0 !important; }
+      .cta-section { padding:60px 24px !important; }
     }
   `}</style>
 );
 
-// ─── PASSWORDS ────────────────────────────────────────────────────────────────
 const ADMIN_PASSWORD = "T2T@Admin2026";
 const PRESS_PASSWORD = "T2TPress2026";
-
-// ─── SUPABASE CONFIG ──────────────────────────────────────────────────────────
 const SUPABASE_URL  = "https://rgtorhxyznizhjjqsfyt.supabase.co";
 const SUPABASE_ANON = "sb_publishable_etlhOo9Wb0Laye683RGJug_iNzG1JJK";
 
@@ -96,9 +91,8 @@ const sb = async (path, opts = {}) => {
   return text ? JSON.parse(text) : [];
 };
 
-// ─── EMAILJS CONFIG ───────────────────────────────────────────────────────────
-const EMAILJS_SERVICE   = "service_h050sxm";
-const EMAILJS_PUBKEY    = "_8-ZOysExnIB07wdD";
+const EMAILJS_SERVICE  = "service_h050sxm";
+const EMAILJS_PUBKEY   = "_8-ZOysExnIB07wdD";
 const EMAILJS_T_CONFIRM = "template_o9zjxfb";
 const EMAILJS_T_STATUS  = "template_zk4tkrr";
 
@@ -108,9 +102,9 @@ const sendEmail = async (templateId, params) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        service_id:      EMAILJS_SERVICE,
-        template_id:     templateId,
-        user_id:         EMAILJS_PUBKEY,
+        service_id:  EMAILJS_SERVICE,
+        template_id: templateId,
+        user_id:     EMAILJS_PUBKEY,
         template_params: params,
       }),
     });
@@ -119,7 +113,6 @@ const sendEmail = async (templateId, params) => {
   }
 };
 
-// ─── DATA STORE ───────────────────────────────────────────────────────────────
 const useDataStore = () => {
   const [apps, setApps]               = useState([]);
   const [submissions, setSubmissions] = useState([]);
@@ -145,51 +138,47 @@ const useDataStore = () => {
     load();
   }, []);
 
-  // ── ADD APPLICATION ──
   const addApp = async (data) => {
     const id    = `T2T-${String(Date.now()).slice(-8)}`;
     const score = scoreApp(data);
     const row   = {
       id, score, status: "pending",
-      submitted_at:            new Date().toISOString(),
-      business_name:           data.businessName,
-      business_address:        data.businessAddress,
-      business_niche:          data.businessNiche,
-      business_structure:      data.businessStructure,
-      business_age:            data.businessAge,
-      role:                    data.role,
-      export_experience:       data.exportExperience,
-      target_markets:          data.targetMarkets,
-      contact_phone:           data.contactPhone,
-      contact_email:           data.contactEmail,
-      contact_time:            data.contactTime,
-      production_capacity:     data.productionCapacity,
-      scalability:             data.scalability,
-      quality_standards:       data.qualityStandards,
-      monthly_turnover:        data.monthlyTurnover,
-      loan_history:            data.loanHistory,
-      digital_capability:      data.digitalCapability,
-      export_docs_familiarity: data.exportDocsFamiliarity,
-      documents:               data.documents,
-      kyc_consent:             data.kycConsent,
-      export_products:         data.exportProducts,
-      shipping_company:        data.shippingCompany,
-      export_timeline:         data.exportTimeline,
-      challenges:              data.challenges,
-      support_needed:          data.supportNeeded,
-      working_capital:         data.workingCapital,
-      pilot_agreement:         data.pilotAgreement,
-      additional_info:         data.additionalInfo,
+      submitted_at:           new Date().toISOString(),
+      business_name:          data.businessName,
+      business_address:       data.businessAddress,
+      business_niche:         data.businessNiche,
+      business_structure:     data.businessStructure,
+      business_age:           data.businessAge,
+      role:                   data.role,
+      export_experience:      data.exportExperience,
+      target_markets:         data.targetMarkets,
+      contact_phone:          data.contactPhone,
+      contact_email:          data.contactEmail,
+      contact_time:           data.contactTime,
+      production_capacity:    data.productionCapacity,
+      scalability:            data.scalability,
+      quality_standards:      data.qualityStandards,
+      monthly_turnover:       data.monthlyTurnover,
+      loan_history:           data.loanHistory,
+      digital_capability:     data.digitalCapability,
+      export_docs_familiarity:data.exportDocsFamiliarity,
+      documents:              data.documents,
+      kyc_consent:            data.kycConsent,
+      export_products:        data.exportProducts,
+      shipping_company:       data.shippingCompany,
+      export_timeline:        data.exportTimeline,
+      challenges:             data.challenges,
+      support_needed:         data.supportNeeded,
+      working_capital:        data.workingCapital,
+      pilot_agreement:        data.pilotAgreement,
+      additional_info:        data.additionalInfo,
+      product_photos:         data.productPhotos || [],
+      product_certs:          data.productCerts  || [],
     };
 
     try {
-      await sb("applications", {
-        method: "POST",
-        body: JSON.stringify(row),
-        prefer: "return=minimal",
-      });
-      setApps(prev => [{ ...row, submittedAt: row.submitted_at, businessName: data.businessName, contactEmail: data.contactEmail }, ...prev]);
-
+      await sb("applications", { method:"POST", body:JSON.stringify(row), prefer:"return=minimal" });
+      setApps(prev => [{ ...row, submittedAt:row.submitted_at, businessName:data.businessName, contactEmail:data.contactEmail }, ...prev]);
       if (data.contactEmail) {
         await sendEmail(EMAILJS_T_CONFIRM, {
           to_email:       data.contactEmail,
@@ -204,20 +193,13 @@ const useDataStore = () => {
     return { id, score };
   };
 
-  // ── UPDATE APPLICATION STATUS ──
   const upAppStatus = async (id, status) => {
     try {
-      await sb(`applications?id=eq.${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ status }),
-        prefer: "return=minimal",
-      });
+      await sb(`applications?id=eq.${id}`, { method:"PATCH", body:JSON.stringify({ status }), prefer:"return=minimal" });
       setApps(prev => prev.map(a => a.id === id ? { ...a, status } : a));
-
       const app   = apps.find(a => a.id === id);
       const email = app?.contact_email || app?.contactEmail;
       const name  = app?.business_name || app?.businessName || "Applicant";
-
       if (email) {
         const isApproved = status === "approved";
         await sendEmail(EMAILJS_T_STATUS, {
@@ -236,7 +218,6 @@ const useDataStore = () => {
     }
   };
 
-  // ── ADD PRESS SUBMISSION ──
   const addSubmission = async (data) => {
     const id  = `PR-${String(Date.now()).slice(-8)}`;
     const row = {
@@ -256,28 +237,18 @@ const useDataStore = () => {
       notes:        data.notes,
       declaration:  data.declaration,
     };
-
     try {
-      await sb("press_submissions", {
-        method: "POST",
-        body: JSON.stringify(row),
-        prefer: "return=minimal",
-      });
-      setSubmissions(prev => [{ ...row, submittedAt: row.submitted_at, storyType: data.storyType, imageUrl: data.imageUrl }, ...prev]);
+      await sb("press_submissions", { method:"POST", body:JSON.stringify(row), prefer:"return=minimal" });
+      setSubmissions(prev => [{ ...row, submittedAt:row.submitted_at, storyType:data.storyType, imageUrl:data.imageUrl }, ...prev]);
     } catch (e) {
       console.error("Supabase press insert error:", e);
     }
     return { id };
   };
 
-  // ── UPDATE PRESS STATUS ──
   const upSubStatus = async (id, status) => {
     try {
-      await sb(`press_submissions?id=eq.${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ status }),
-        prefer: "return=minimal",
-      });
+      await sb(`press_submissions?id=eq.${id}`, { method:"PATCH", body:JSON.stringify({ status }), prefer:"return=minimal" });
       setSubmissions(prev => prev.map(s => s.id === id ? { ...s, status } : s));
     } catch (e) {
       console.error("Supabase press status error:", e);
@@ -285,6 +256,45 @@ const useDataStore = () => {
   };
 
   return { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError };
+};
+
+const validatePhase = (phase, d) => {
+  const missing = [];
+  if (phase === 1) {
+    if (!d.businessName?.trim()) missing.push("businessName");
+    if (!d.businessAddress?.trim()) missing.push("businessAddress");
+    if (!d.businessNiche) missing.push("businessNiche");
+    if (!d.businessStructure) missing.push("businessStructure");
+    if (!d.businessAge) missing.push("businessAge");
+    if (!d.role) missing.push("role");
+    if (!d.exportExperience) missing.push("exportExperience");
+    if (!d.productPhotos?.length) missing.push("productPhotos");
+    if (!d.targetMarkets?.length) missing.push("targetMarkets");
+    if (!d.contactPhone?.trim()) missing.push("contactPhone");
+    if (!d.contactEmail?.trim()) missing.push("contactEmail");
+    if (!d.contactTime) missing.push("contactTime");
+  }
+  if (phase === 2) {
+    if (!d.productionCapacity) missing.push("productionCapacity");
+    if (!d.qualityStandards?.length) missing.push("qualityStandards");
+    if (!d.scalability) missing.push("scalability");
+    if (!d.monthlyTurnover) missing.push("monthlyTurnover");
+    if (!d.loanHistory) missing.push("loanHistory");
+    if (!d.digitalCapability) missing.push("digitalCapability");
+    if (!d.exportDocsFamiliarity) missing.push("exportDocsFamiliarity");
+    if (!d.documents?.length) missing.push("documents");
+    if (!d.kycConsent) missing.push("kycConsent");
+  }
+  if (phase === 3) {
+    if (!d.exportProducts?.trim()) missing.push("exportProducts");
+    if (!d.shippingCompany) missing.push("shippingCompany");
+    if (!d.exportTimeline) missing.push("exportTimeline");
+    if (!d.challenges?.length) missing.push("challenges");
+    if (!d.supportNeeded?.length) missing.push("supportNeeded");
+    if (!d.workingCapital) missing.push("workingCapital");
+    if (!d.pilotAgreement) missing.push("pilotAgreement");
+  }
+  return missing;
 };
 
 const scoreApp = (d) => {
@@ -297,7 +307,6 @@ const scoreApp = (d) => {
   return Math.min(s,100);
 };
 
-// ─── STATIC NEWS ──────────────────────────────────────────────────────────────
 const staticNews = [
   { id:"s1", cat:"PRESS RELEASE", date:"March 1, 2026", featured:true,
     headline:"Providus Bank, ECOWAS Parliament and GABA Launch Landmark T2T Programme for African SMEs",
@@ -313,17 +322,14 @@ const staticNews = [
     img:"https://images.unsplash.com/photo-1551836022-4c4c79ecde51?w=900&q=80", source:"T2T Programme Office" },
 ];
 
-// ─── SHARED GATE COMPONENT ────────────────────────────────────────────────────
 const PasswordGate = ({ title, subtitle, password, buttonLabel, onUnlock }) => {
-  const [pw, setPw]   = useState("");
+  const [pw, setPw] = useState("");
   const [err, setErr] = useState(false);
   const [show, setShow] = useState(false);
-
   const attempt = () => {
     if (pw === password) { onUnlock(); setErr(false); }
     else { setErr(true); setPw(""); }
   };
-
   return (
     <div style={{ minHeight:"100vh", background:"var(--sand2)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
       <div className="fade-up" style={{ background:"white", border:"1px solid var(--border)", borderRadius:20, padding:"56px 48px", maxWidth:420, width:"100%", textAlign:"center", boxShadow:"0 24px 80px rgba(27,61,47,0.1)" }}>
@@ -354,14 +360,12 @@ const PasswordGate = ({ title, subtitle, password, buttonLabel, onUnlock }) => {
   );
 };
 
-// ─── NAV ─────────────────────────────────────────────────────────────────────
-const T2T_LOGO = "/logo.png";
+const T2T_LOGO = null;
 
 const Nav = ({ page, setPage, onLogoClick }) => {
-  const [scrolled, setScrolled]   = useState(false);
-  const [menuOpen, setMenuOpen]   = useState(false);
-  const [isMobile, setIsMobile]   = useState(window.innerWidth <= 768);
-
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
     const onResize = () => setIsMobile(window.innerWidth <= 768);
@@ -369,47 +373,40 @@ const Nav = ({ page, setPage, onLogoClick }) => {
     window.addEventListener("resize", onResize);
     return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onResize); };
   }, []);
-
   const bg = scrolled || menuOpen ? "rgba(255,254,249,0.97)" : "rgba(255,254,249,0)";
-
   return (
     <>
       <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:1000, height:72, background:bg, backdropFilter:scrolled||menuOpen?"blur(20px)":"none", borderBottom:scrolled||menuOpen?"1px solid var(--border)":"none", transition:"all 0.3s ease" }}>
-        <div className="wrap" style={{ height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-
-          {/* ── LOGO AREA ── */}
+        <div className="wrap" style={{ height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 40px" }}>
           <div onClick={()=>{onLogoClick();setMenuOpen(false);}} style={{ cursor:"pointer", display:"flex", alignItems:"center", gap:12 }}>
             {T2T_LOGO
-              ? <img src={T2T_LOGO} alt="T2T Programme" style={{ height:40, width:"auto", objectFit:"contain", display:"block" }} onError={e=>{ e.currentTarget.style.display="none"; e.currentTarget.nextSibling.style.display="flex"; }} />
-              : null
+              ? <img src={T2T_LOGO} alt="T2T Programme" style={{ height:40, width:"auto", objectFit:"contain" }} />
+              : (
+                <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                  <div style={{ width:38, height:38, background:"var(--forest)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, border:"2px dashed rgba(200,230,218,0.4)" }}>
+                    <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
+                      <path d="M8 1L14 4.5V11.5L8 15L2 11.5V4.5L8 1Z" stroke="white" strokeWidth="1.5" fill="none"/>
+                      <path d="M8 5L11 7V11L8 13L5 11V7L8 5Z" fill="white"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.1rem", color:"var(--forest)", lineHeight:1 }}>T2T Programme</p>
+                    <p style={{ fontSize:"0.6rem", color:"var(--text3)", letterSpacing:"0.08em", fontWeight:500 }}>TRAINING TO TRANSACTION</p>
+                  </div>
+                </div>
+              )
             }
-            <div style={{ display: T2T_LOGO ? "none" : "flex", alignItems:"center", gap:10 }}>
-              <div style={{ width:38, height:38, background:"var(--forest)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, border:"2px dashed rgba(200,230,218,0.4)" }}>
-                <svg width="17" height="17" viewBox="0 0 16 16" fill="none">
-                  <path d="M8 1L14 4.5V11.5L8 15L2 11.5V4.5L8 1Z" stroke="white" strokeWidth="1.5" fill="none"/>
-                  <path d="M8 5L11 7V11L8 13L5 11V7L8 5Z" fill="white"/>
-                </svg>
-              </div>
-              <div>
-                <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.1rem", color:"var(--forest)", lineHeight:1 }}>T2T Programme</p>
-                <p style={{ fontSize:"0.6rem", color:"var(--text3)", letterSpacing:"0.08em", fontWeight:500 }}>TRAINING TO TRANSACTION</p>
-              </div>
-            </div>
           </div>
-
-          {/* Desktop links */}
           {!isMobile && (
             <div style={{ display:"flex", gap:4, alignItems:"center" }}>
               {[{key:"landing",label:"Home"},{key:"newsroom",label:"Newsroom"}].map(({key,label})=>(
                 <button key={key} onClick={()=>setPage(key)} style={{ background:page===key?"var(--mint2)":"transparent", border:"none", color:page===key?"var(--forest)":"var(--text3)", padding:"7px 18px", borderRadius:6, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}>{label}</button>
               ))}
               <div style={{ width:1, height:20, background:"var(--border)", margin:"0 8px" }} />
-              <button onClick={()=>setPage("press-gate")} style={{ background:"transparent", border:"1.5px solid var(--forest)", color:"var(--forest)", padding:"7px 18px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer", marginRight:6 }}>Press Portal</button>
+
               <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", border:"none", color:"white", padding:"9px 22px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em", boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>Apply Now</button>
             </div>
           )}
-
-          {/* Mobile hamburger */}
           {isMobile && (
             <button onClick={()=>setMenuOpen(o=>!o)} style={{ background:"transparent", border:"1.5px solid var(--border)", borderRadius:8, padding:"8px 10px", cursor:"pointer", display:"flex", flexDirection:"column", gap:5, alignItems:"center", justifyContent:"center" }}>
               <span style={{ display:"block", width:20, height:2, background:"var(--forest)", borderRadius:2, transition:"all 0.25s", transform:menuOpen?"rotate(45deg) translate(5px,5px)":"none" }} />
@@ -419,11 +416,9 @@ const Nav = ({ page, setPage, onLogoClick }) => {
           )}
         </div>
       </nav>
-
-      {/* Mobile dropdown */}
       {isMobile && menuOpen && (
         <div style={{ position:"fixed", top:72, left:0, right:0, zIndex:999, background:"rgba(255,254,249,0.98)", backdropFilter:"blur(20px)", borderBottom:"1px solid var(--border)", padding:"16px 24px 24px", display:"flex", flexDirection:"column", gap:8 }}>
-          {[{key:"landing",label:"Home"},{key:"newsroom",label:"Newsroom"},{key:"press-gate",label:"Press Portal"},{key:"register",label:"Apply Now",primary:true}].map(({key,label,primary})=>(
+          {[{key:"landing",label:"Home"},{key:"newsroom",label:"Newsroom"},{key:"register",label:"Apply Now",primary:true}].map(({key,label,primary})=>(
             <button key={key} onClick={()=>{setPage(key);setMenuOpen(false);}} style={{ background:primary?"var(--forest)":page===key?"var(--mint2)":"transparent", border:primary?"none":"1.5px solid var(--border)", color:primary?"white":page===key?"var(--forest)":"var(--text2)", padding:"13px 20px", borderRadius:8, fontSize:"0.95rem", fontWeight:primary?600:500, cursor:"pointer", textAlign:"left", width:"100%" }}>
               {label}
             </button>
@@ -434,7 +429,6 @@ const Nav = ({ page, setPage, onLogoClick }) => {
   );
 };
 
-// ─── LANDING ─────────────────────────────────────────────────────────────────
 const PARTNER_LOGOS = {
   providus:   "/logos/providus.png",
   ecowas:     "/logos/ecowas.png",
@@ -446,8 +440,6 @@ const PARTNER_LOGOS = {
 
 const Landing = ({ setPage }) => {
   const m = useMobile();
-
-  // 6 partners including CMD Tourism (from v1)
   const partners = [
     { key:"providus",   name:"Providus Bank",                        role:"Lead Sponsor",         abbr:"PB"   },
     { key:"ecowas",     name:"ECOWAS Parliament",                    role:"Institutional Backer", abbr:"EP"   },
@@ -456,82 +448,36 @@ const Landing = ({ setPage }) => {
     { key:"cmd",        name:"CMD Tourism & Trade Enterprises Ltd",  role:"Implementing Partner", abbr:"CMD"  },
     { key:"borderless", name:"Borderless Trade & Investments",       role:"Implementing Partner", abbr:"BTI"  },
   ];
-
   return (
   <div style={{ overflowX:"hidden" }}>
-
-    {/* ── HERO ── */}
-    <section style={{ position:"relative", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 60%, #2E6249 100%)", ...(m ? {} : { minHeight:"100vh", display:"flex", alignItems:"center" }) }}>
+    <section style={{ position:"relative", minHeight:"100vh", display:"flex", alignItems:"center", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 60%, #2E6249 100%)" }}>
       <div style={{ position:"absolute", inset:0, opacity:0.15, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.4) 1px, transparent 1px)", backgroundSize:"32px 32px" }} />
-      <div style={{ position:"absolute", right:"-10%", top:"10%", width:"50vw", height:"50vw", maxWidth:700, maxHeight:700, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.07)", pointerEvents:"none" }} />
-      <div style={{ position:"absolute", right:"5%", top:"20%", width:"30vw", height:"30vw", maxWidth:400, maxHeight:400, borderRadius:"50%", border:"1px solid rgba(200,230,218,0.05)", pointerEvents:"none" }} />
-
-      {/* ── MOBILE HERO ── */}
-      {m && (
-        <div className="fade-up" style={{ position:"relative", zIndex:2, padding:"112px 24px 48px", display:"flex", flexDirection:"column", gap:24, width:"100%", boxSizing:"border-box" }}>
-          {/* Badge */}
-          <div style={{ display:"inline-flex", alignSelf:"flex-start", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.72rem", fontWeight:500, letterSpacing:"0.04em" }}>
+      <div className="wrap" style={{ position:"relative", zIndex:2, padding: m?"100px 24px 60px":"130px 80px 100px", display:"flex", flexDirection: m?"column":"row", alignItems:"center", gap: m?40:60, width:"100%" }}>
+        <div className="fade-up" style={{ flex:1 }}>
+          <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
             <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
           </div>
-          {/* Headline */}
-          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3rem", fontWeight:600, lineHeight:1.0, color:"white", letterSpacing:"-0.01em" }}>
+          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"3rem":"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
             Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
           </h1>
-          {/* Body */}
-          <p style={{ fontSize:"0.95rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, fontWeight:300 }}>
+          <p style={{ fontSize: m?"1rem":"1.15rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, maxWidth:520, marginBottom:16, fontWeight:300 }}>
             A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
           </p>
-          <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"0.95rem", color:"var(--mint)", opacity:0.85 }}>
+          <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom: m?32:44, opacity:0.85 }}>
             Lagos and Abuja · Commencing April 13, 2026
           </p>
-          {/* Buttons */}
-          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-            <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"14px 24px", borderRadius:10, fontSize:"0.9rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", textAlign:"center" }}>Apply to the Programme</button>
-            <button onClick={()=>setPage("newsroom")} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.35)", color:"white", padding:"13px 24px", borderRadius:10, fontSize:"0.9rem", fontWeight:500, cursor:"pointer", textAlign:"center" }}>Press and Media</button>
-          </div>
-          {/* Mobile overview grid — sits cleanly below buttons */}
-          <div style={{ background:"rgba(255,255,255,0.08)", backdropFilter:"blur(16px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:14, padding:"20px" }}>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-              {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"3 Months"},{label:"Deadline",val:"March 31, 2026"},{label:"Starts",val:"April 13, 2026"}].map(({label,val})=>(
-                <div key={label}>
-                  <p style={{ fontSize:"0.62rem", color:"rgba(200,230,218,0.5)", marginBottom:4, letterSpacing:"0.06em", fontWeight:600 }}>{label.toUpperCase()}</p>
-                  <p style={{ fontSize:"0.875rem", fontWeight:600, color:"white", lineHeight:1.3 }}>{val}</p>
-                </div>
-              ))}
-            </div>
+          <div style={{ display:"flex", flexDirection: m?"column":"row", gap:12 }}>
+            <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
+              onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="white";}}
+            >Apply to the Programme</button>
+            <button onClick={()=>setPage("newsroom")} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.4)", color:"white", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.2)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
+            >Press and Media</button>
           </div>
         </div>
-      )}
-
-      {/* ── DESKTOP HERO ── */}
-      {!m && (
-        <div className="wrap" style={{ position:"relative", zIndex:2, paddingTop:130, paddingBottom:100, display:"flex", flexDirection:"row", alignItems:"center", gap:60 }}>
-          {/* Left — headline */}
-          <div className="fade-up" style={{ flex:1 }}>
-            <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
-              <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
-            </div>
-            <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
-              Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
-            </h1>
-            <p style={{ fontSize:"1.15rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, maxWidth:520, marginBottom:16, fontWeight:300 }}>
-              A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
-            </p>
-            <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:44, opacity:0.85 }}>
-              Lagos and Abuja · Commencing April 13, 2026
-            </p>
-            <div style={{ display:"flex", flexDirection:"row", gap:12 }}>
-              <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
-                onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
-                onMouseLeave={e=>{e.currentTarget.style.background="white";}}
-              >Apply to the Programme</button>
-              <button onClick={()=>setPage("newsroom")} style={{ background:"rgba(255,255,255,0.1)", border:"1.5px solid rgba(255,255,255,0.4)", color:"white", padding:"15px 28px", borderRadius:10, fontSize:"0.95rem", fontWeight:500, cursor:"pointer", transition:"all 0.2s" }}
-                onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.2)";}}
-                onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";}}
-              >Press and Media</button>
-            </div>
-          </div>
-          {/* Right — overview card */}
+        {!m && (
           <div style={{ width:280, background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:20, padding:"32px 28px", flexShrink:0 }}>
             <p style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(200,230,218,0.6)", letterSpacing:"0.12em", marginBottom:20 }}>PROGRAMME OVERVIEW</p>
             {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"March 31, 2026"},{label:"Commencement",val:"April 13, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val},i,arr)=>(
@@ -541,18 +487,28 @@ const Landing = ({ setPage }) => {
               </div>
             ))}
           </div>
+        )}
+      </div>
+      {m && (
+        <div className="wrap" style={{ position:"relative", zIndex:2, padding:"0 24px 48px" }}>
+          <div style={{ background:"rgba(255,255,255,0.1)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:16, padding:"24px" }}>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+              {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"3 Months"},{label:"Deadline",val:"March 31, 2026"},{label:"Starts",val:"April 13, 2026"}].map(({label,val})=>(
+                <div key={label}><p style={{ fontSize:"0.65rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p><p style={{ fontSize:"0.875rem", fontWeight:600, color:"white" }}>{val}</p></div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </section>
 
-    {/* ── PARTNERS — 6 partners, 6-col desktop / 2-col mobile ── */}
-    <section style={{ background:"white", padding: m?"40px 0":"56px 0", borderBottom:"1px solid var(--border)" }}>
-      <div className="wrap">
+    <section style={{ background:"white", padding: m?"40px 24px":"56px 0", borderBottom:"1px solid var(--border)" }}>
+      <div className="wrap" style={{ padding: m?"0":"0 80px" }}>
         <p style={{ fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.14em", color:"var(--text3)", marginBottom:36, textAlign:"center" }}>IN PARTNERSHIP WITH</p>
-        <div style={{ display:"grid", gridTemplateColumns: m?"repeat(2,1fr)":"repeat(6,1fr)", gap: m?24:32, alignItems:"center", maxWidth:1100, margin:"0 auto" }}>
+        <div style={{ display:"grid", gridTemplateColumns: m?"repeat(2,1fr)":"repeat(5,1fr)", gap: m?24:40, alignItems:"center", maxWidth:1000, margin:"0 auto" }}>
           {partners.map(({key,name,role,abbr})=>(
             <div key={key} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:12 }}>
-              <div style={{ width:"100%", maxWidth:130, height:68, background:"var(--sand2)", border:"1.5px dashed var(--border)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
+              <div style={{ width:"100%", maxWidth:140, height:72, background:"var(--sand2)", border:"1.5px dashed var(--border)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", overflow:"hidden" }}>
                 {PARTNER_LOGOS[key]
                   ? <img src={PARTNER_LOGOS[key]} alt={name} style={{ width:"100%", height:"100%", objectFit:"contain", padding:8 }} />
                   : <div style={{ textAlign:"center", padding:8 }}>
@@ -562,8 +518,8 @@ const Landing = ({ setPage }) => {
                 }
               </div>
               <div style={{ textAlign:"center" }}>
-                <p style={{ fontWeight:600, fontSize: m?"0.68rem":"0.72rem", color:"var(--text)", lineHeight:1.3, marginBottom:2 }}>{name}</p>
-                <p style={{ fontSize:"0.62rem", color:"var(--text3)" }}>{role}</p>
+                <p style={{ fontWeight:600, fontSize: m?"0.72rem":"0.78rem", color:"var(--text)", lineHeight:1.3, marginBottom:2 }}>{name}</p>
+                <p style={{ fontSize:"0.65rem", color:"var(--text3)" }}>{role}</p>
               </div>
             </div>
           ))}
@@ -571,9 +527,8 @@ const Landing = ({ setPage }) => {
       </div>
     </section>
 
-    {/* ── ABOUT / IMPACT ── */}
-    <section style={{ padding: m?"60px 0":"100px 0", background:"var(--cream)" }}>
-      <div className="wrap">
+    <section style={{ padding: m?"60px 24px":"100px 0", background:"var(--cream)" }}>
+      <div className="wrap" style={{ padding: m?"0":"0 80px", maxWidth:1200, margin:"0 auto" }}>
         <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"1fr 1fr", gap: m?32:80, alignItems:"start" }}>
           <div>
             <span style={{ display:"inline-block", background:"var(--mint2)", color:"var(--forest)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:20 }}>THE PROGRAMME</span>
@@ -600,10 +555,9 @@ const Landing = ({ setPage }) => {
       </div>
     </section>
 
-    {/* ── STAGES ── */}
-    <section style={{ padding: m?"60px 0":"100px 0", background:"var(--forest)", position:"relative", overflow:"hidden" }}>
+    <section style={{ padding: m?"60px 24px":"100px 0", background:"var(--forest)", position:"relative", overflow:"hidden" }}>
       <div style={{ position:"absolute", inset:0, opacity:0.08, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.5) 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
-      <div className="wrap" style={{ position:"relative", zIndex:1 }}>
+      <div className="wrap" style={{ position:"relative", zIndex:1, padding: m?"0":"0 80px" }}>
         <div style={{ textAlign:"center", marginBottom: m?40:64 }}>
           <span style={{ background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", display:"inline-block", marginBottom:16 }}>HOW IT WORKS</span>
           <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"3rem", fontWeight:600, color:"white", lineHeight:1.1 }}>Three stages. Real outcomes.</h2>
@@ -627,9 +581,8 @@ const Landing = ({ setPage }) => {
       </div>
     </section>
 
-    {/* ── WHO IT'S FOR ── */}
-    <section style={{ padding: m?"60px 0":"100px 0", background:"var(--sand2)" }}>
-      <div className="wrap">
+    <section style={{ padding: m?"60px 24px":"100px 0", background:"var(--sand2)" }}>
+      <div className="wrap" style={{ padding: m?"0":"0 80px" }}>
         <div style={{ textAlign:"center", marginBottom: m?40:60 }}>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", display:"inline-block", marginBottom:16 }}>WHO IT IS FOR</span>
           <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"3rem", fontWeight:600, color:"var(--forest)", lineHeight:1.1 }}>Built for market-ready<br />African SMEs</h2>
@@ -653,10 +606,9 @@ const Landing = ({ setPage }) => {
       </div>
     </section>
 
-    {/* ── CTA BANNER ── */}
     <section style={{ position:"relative", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #1a3d2e 100%)" }}>
       <div style={{ position:"absolute", inset:0, opacity:0.1, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.5) 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
-      <div className="wrap" style={{ position:"relative", zIndex:1, paddingTop: m?60:100, paddingBottom: m?60:100, textAlign:"center" }}>
+      <div className="wrap" style={{ position:"relative", zIndex:1, padding: m?"60px 24px":"100px 80px", textAlign:"center" }}>
         <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"clamp(2.5rem,5vw,4.5rem)", fontWeight:600, color:"white", lineHeight:1.05, marginBottom:16 }}>
           Applications Close<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:300 }}>March 31, 2026</span>
         </h2>
@@ -668,9 +620,8 @@ const Landing = ({ setPage }) => {
       </div>
     </section>
 
-    {/* ── FOOTER ── */}
-    <footer style={{ background:"var(--text)", padding: m?"32px 0":"48px 0" }}>
-      <div className="wrap">
+    <footer style={{ background:"var(--text)", padding: m?"32px 24px":"48px 0" }}>
+      <div className="wrap" style={{ padding: m?"0":"0 80px" }}>
         <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap: m?20:40, paddingBottom: m?20:32, borderBottom:"1px solid rgba(255,255,255,0.08)", marginBottom: m?20:28 }}>
           <div>
             {T2T_LOGO
@@ -686,7 +637,7 @@ const Landing = ({ setPage }) => {
           </div>
         </div>
         <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap:12 }}>
-          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>Implemented by Duchess NL, CMD Tourism & Trade Enterprises Ltd and Borderless Trade and Investments. Sponsored by Providus Bank.</p>
+          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>Implemented by Duchess NL and Borderless Trade and Investments. Sponsored by Providus Bank.</p>
           <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>media@t2tprogramme.org</p>
         </div>
       </div>
@@ -699,58 +650,233 @@ const Landing = ({ setPage }) => {
 const FF = ({num,label,hint,children,hasError}) => (
   <div>
     <div style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:hint?4:10 }}>
-      <span style={{ background: hasError ? "var(--red)" : "var(--forest)", color:"var(--mint)", width:22, height:22, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.65rem", fontWeight:700, flexShrink:0, marginTop:1, transition:"background 0.2s" }}>{num}</span>
-      <label style={{ fontWeight:600, fontSize:"0.93rem", color: hasError ? "var(--red)" : "var(--text)", lineHeight:1.4 }}>{label}{hasError && <span style={{ fontFamily:"Outfit", fontWeight:400, fontSize:"0.78rem", marginLeft:8, color:"var(--red)" }}>· This field is required</span>}</label>
+      <span style={{ background:hasError?"var(--red)":"var(--forest)", color:"var(--mint)", width:22, height:22, borderRadius:6, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.65rem", fontWeight:700, flexShrink:0, marginTop:1 }}>{num}</span>
+      <label style={{ fontWeight:600, fontSize:"0.93rem", color:hasError?"var(--red)":"var(--text)", lineHeight:1.4 }}>{label}</label>
     </div>
-    {hint&&<p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:10, paddingLeft:32 }}>{hint}</p>}
+    {hint&&<p style={{ fontSize:"0.78rem", color:hasError?"var(--red)":"var(--text3)", marginBottom:10, paddingLeft:32 }}>{hint}</p>}
     {children}
   </div>
 );
-const TI = ({value,onChange,placeholder,hasError}) => <input value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{ width:"100%", background: hasError ? "#FEF0EF" : "white", border:`1.5px solid ${hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 14px", color:"var(--text)", fontSize:"0.9rem" }} />;
-const SI = ({value,onChange,options,hasError}) => <select value={value||""} onChange={e=>onChange(e.target.value)} style={{ width:"100%", background: hasError ? "#FEF0EF" : "white", border:`1.5px solid ${hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 14px", color:value?"var(--text)":"var(--text3)", fontSize:"0.9rem", cursor:"pointer" }}><option value="">Select an option</option>{options.map(o=><option key={o} value={o}>{o}</option>)}</select>;
-const Rad = ({value,onChange,options,hasError}) => <div style={{ display:"flex", flexDirection:"column", gap:8, borderRadius:8, outline: hasError ? "2px solid var(--red)" : "none", outlineOffset:4 }}>{options.map(o=><label key={o} onClick={()=>onChange(o)} style={{ display:"flex", alignItems:"center", gap:12, background:value===o?"var(--mint2)":"white", border:`1.5px solid ${value===o?"var(--sage)":"var(--border)"}`, borderRadius:8, padding:"11px 16px", cursor:"pointer", transition:"all 0.15s" }}><div style={{ width:18, height:18, borderRadius:"50%", border:`2px solid ${value===o?"var(--forest)":"var(--border)"}`, background:value===o?"var(--forest)":"white", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>{value===o&&<div style={{ width:6, height:6, borderRadius:"50%", background:"white" }} />}</div><span style={{ fontSize:"0.875rem", color:value===o?"var(--forest)":"var(--text2)", fontWeight:value===o?500:400 }}>{o}</span><input type="radio" checked={value===o} onChange={()=>onChange(o)} style={{ display:"none" }} /></label>)}</div>;
-const Chk = ({value=[],onChange,options,hasError}) => { const tog=o=>onChange(value.includes(o)?value.filter(v=>v!==o):[...value,o]); return <div style={{ display:"flex", flexDirection:"column", gap:8, borderRadius:8, outline: hasError ? "2px solid var(--red)" : "none", outlineOffset:4 }}>{options.map(o=><label key={o} onClick={()=>tog(o)} style={{ display:"flex", alignItems:"center", gap:12, background:value.includes(o)?"var(--mint2)":"white", border:`1.5px solid ${value.includes(o)?"var(--sage)":"var(--border)"}`, borderRadius:8, padding:"11px 16px", cursor:"pointer", transition:"all 0.15s" }}><div style={{ width:18, height:18, borderRadius:5, border:`2px solid ${value.includes(o)?"var(--forest)":"var(--border)"}`, background:value.includes(o)?"var(--forest)":"white", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", color:"white" }}>{value.includes(o)&&"✓"}</div><span style={{ fontSize:"0.875rem", color:value.includes(o)?"var(--forest)":"var(--text2)", fontWeight:value.includes(o)?500:400 }}>{o}</span></label>)}</div>; };
-const TA = ({value,onChange,placeholder,rows=3,hasError}) => <textarea value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={rows} style={{ width:"100%", background: hasError ? "#FEF0EF" : "white", border:`1.5px solid ${hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 14px", color:"var(--text)", fontSize:"0.9rem", resize:"vertical" }} />;
+const TI = ({value,onChange,placeholder,hasError}) => <input value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} style={{ width:"100%", background:hasError?"#FEF0EF":"white", border:`1.5px solid ${hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 14px", color:"var(--text)", fontSize:"0.9rem" }} />;
+const SI = ({value,onChange,options,hasError}) => <select value={value||""} onChange={e=>onChange(e.target.value)} style={{ width:"100%", background:hasError?"#FEF0EF":"white", border:`1.5px solid ${hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 14px", color:value?"var(--text)":"var(--text3)", fontSize:"0.9rem", cursor:"pointer" }}><option value="">Select an option</option>{options.map(o=><option key={o} value={o}>{o}</option>)}</select>;
+const Rad = ({value,onChange,options,hasError}) => <div style={{ display:"flex", flexDirection:"column", gap:8 }}>{options.map(o=><label key={o} onClick={()=>onChange(o)} style={{ display:"flex", alignItems:"center", gap:12, background:value===o?"var(--mint2)":hasError?"#FEF0EF":"white", border:`1.5px solid ${value===o?"var(--sage)":hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 16px", cursor:"pointer", transition:"all 0.15s" }}><div style={{ width:18, height:18, borderRadius:"50%", border:`2px solid ${value===o?"var(--forest)":hasError?"var(--red)":"var(--border)"}`, background:value===o?"var(--forest)":"white", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>{value===o&&<div style={{ width:6, height:6, borderRadius:"50%", background:"white" }} />}</div><span style={{ fontSize:"0.875rem", color:value===o?"var(--forest)":"var(--text2)", fontWeight:value===o?500:400 }}>{o}</span><input type="radio" checked={value===o} onChange={()=>onChange(o)} style={{ display:"none" }} /></label>)}</div>;
+const Chk = ({value=[],onChange,options,hasError}) => { const tog=o=>onChange(value.includes(o)?value.filter(v=>v!==o):[...value,o]); return <div style={{ display:"flex", flexDirection:"column", gap:8 }}>{options.map(o=><label key={o} onClick={()=>tog(o)} style={{ display:"flex", alignItems:"center", gap:12, background:value.includes(o)?"var(--mint2)":hasError?"#FEF0EF":"white", border:`1.5px solid ${value.includes(o)?"var(--sage)":hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 16px", cursor:"pointer", transition:"all 0.15s" }}><div style={{ width:18, height:18, borderRadius:5, border:`2px solid ${value.includes(o)?"var(--forest)":hasError?"var(--red)":"var(--border)"}`, background:value.includes(o)?"var(--forest)":"white", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", color:"white" }}>{value.includes(o)&&"✓"}</div><span style={{ fontSize:"0.875rem", color:value.includes(o)?"var(--forest)":"var(--text2)", fontWeight:value.includes(o)?500:400 }}>{o}</span></label>)}</div>; };
+const TA = ({value,onChange,placeholder,rows=3,hasError}) => <textarea value={value||""} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={rows} style={{ width:"100%", background:hasError?"#FEF0EF":"white", border:`1.5px solid ${hasError?"var(--red)":"var(--border)"}`, borderRadius:8, padding:"11px 14px", color:"var(--text)", fontSize:"0.9rem", resize:"vertical" }} />;
 
-// ─── VALIDATION HELPERS ───────────────────────────────────────────────────────
-const validatePhase = (phase, d) => {
-  const missing = [];
-  if (phase === 1) {
-    if (!d.businessName?.trim()) missing.push("businessName");
-    if (!d.businessAddress?.trim()) missing.push("businessAddress");
-    if (!d.businessNiche) missing.push("businessNiche");
-    if (!d.businessStructure) missing.push("businessStructure");
-    if (!d.businessAge) missing.push("businessAge");
-    if (!d.role) missing.push("role");
-    if (!d.exportExperience) missing.push("exportExperience");
-    if (!d.targetMarkets?.length) missing.push("targetMarkets");
-    if (!d.contactPhone?.trim()) missing.push("contactPhone");
-    if (!d.contactEmail?.trim()) missing.push("contactEmail");
-    if (!d.contactTime) missing.push("contactTime");
-  }
-  if (phase === 2) {
-    if (!d.productionCapacity) missing.push("productionCapacity");
-    if (!d.scalability) missing.push("scalability");
-    if (!d.qualityStandards?.length) missing.push("qualityStandards");
-    if (!d.monthlyTurnover) missing.push("monthlyTurnover");
-    if (!d.loanHistory) missing.push("loanHistory");
-    if (!d.digitalCapability) missing.push("digitalCapability");
-    if (!d.exportDocsFamiliarity) missing.push("exportDocsFamiliarity");
-    if (!d.documents?.length) missing.push("documents");
-    if (!d.kycConsent) missing.push("kycConsent");
-  }
-  if (phase === 3) {
-    if (!d.exportProducts?.trim()) missing.push("exportProducts");
-    if (!d.shippingCompany) missing.push("shippingCompany");
-    if (!d.exportTimeline) missing.push("exportTimeline");
-    if (!d.challenges?.length) missing.push("challenges");
-    if (!d.supportNeeded?.length) missing.push("supportNeeded");
-    if (!d.workingCapital) missing.push("workingCapital");
-    if (!d.pilotAgreement) missing.push("pilotAgreement");
-    // additionalInfo is optional
-  }
-  return missing;
+// ─── PRODUCT PHOTO UPLOAD ─────────────────────────────────────────────────────
+const ProductPhotoUpload = ({ value = [], onChange, hasError }) => {
+  const [uploading, setUploading] = useState([]);
+  const [dragOver, setDragOver]   = useState(false);
+  const inputRef = useRef(null);
+  const MAX_FILES = 2;
+  const MAX_BYTES = 5 * 1024 * 1024;
+
+  const uploadFile = async (file) => {
+    if (file.size > MAX_BYTES) { alert(`"${file.name}" exceeds the 5 MB limit.`); return null; }
+    if (!["image/jpeg","image/png","image/webp"].includes(file.type)) { alert(`"${file.name}" is not supported. Please use JPG, PNG or WEBP.`); return null; }
+    const ext = file.name.split(".").pop();
+    const filename = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/product-images/${filename}`, {
+      method:"POST",
+      headers:{ "apikey":SUPABASE_ANON, "Authorization":`Bearer ${SUPABASE_ANON}`, "Content-Type":file.type, "x-upsert":"true" },
+      body: file,
+    });
+    if (!res.ok) { console.error("Storage upload error:", await res.text()); alert("Upload failed. Please try again."); return null; }
+    return `${SUPABASE_URL}/storage/v1/object/public/product-images/${filename}`;
+  };
+
+  const handleFiles = async (files) => {
+    const remaining = MAX_FILES - (value||[]).length;
+    if (remaining <= 0) return;
+    const toProcess = Array.from(files).slice(0, remaining);
+    setUploading(toProcess.map(()=>Math.random().toString(36).slice(2)));
+    const urls = await Promise.all(toProcess.map(uploadFile));
+    onChange([...(value||[]), ...urls.filter(Boolean)]);
+    setUploading([]);
+  };
+
+  const remove = (url) => onChange((value||[]).filter(u=>u!==url));
+  const borderColor = hasError?"var(--red)":dragOver?"var(--forest)":"var(--border)";
+  const bgColor     = hasError?"#FEF0EF":dragOver?"var(--mint2)":"white";
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+      {(value||[]).length < MAX_FILES && (
+        <div onClick={()=>inputRef.current?.click()}
+          onDragOver={e=>{e.preventDefault();setDragOver(true);}}
+          onDragLeave={()=>setDragOver(false)}
+          onDrop={e=>{e.preventDefault();setDragOver(false);handleFiles(e.dataTransfer.files);}}
+          style={{ border:`2px dashed ${borderColor}`, background:bgColor, borderRadius:10, padding:"28px 20px", textAlign:"center", cursor:"pointer", transition:"all 0.2s" }}
+        >
+          <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple style={{ display:"none" }} onChange={e=>handleFiles(e.target.files)} />
+          {uploading.length > 0
+            ? <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+                <div style={{ width:28, height:28, border:"3px solid var(--border)", borderTop:"3px solid var(--forest)", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
+                <p style={{ fontSize:"0.82rem", color:"var(--text3)" }}>Uploading {uploading.length} photo{uploading.length>1?"s":""}…</p>
+              </div>
+            : <>
+                <p style={{ fontWeight:600, fontSize:"0.875rem", color:hasError?"var(--red)":"var(--text)", marginBottom:4 }}>
+                  {(value||[]).length===0?"Click or drag to upload product photos":"Add one more photo"}
+                </p>
+                <p style={{ fontSize:"0.75rem", color:"var(--text3)" }}>{MAX_FILES-(value||[]).length} remaining · JPG, PNG or WEBP · max 5 MB each</p>
+              </>
+          }
+        </div>
+      )}
+      {(value||[]).length > 0 && (
+        <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+          {(value||[]).map((url,i)=>(
+            <div key={url} style={{ position:"relative", width:120, height:120, borderRadius:10, overflow:"hidden", border:"1.5px solid var(--border)", flexShrink:0 }}>
+              <img src={url} alt={`Product ${i+1}`} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+              <button onClick={()=>remove(url)} style={{ position:"absolute", top:6, right:6, width:24, height:24, borderRadius:"50%", background:"rgba(0,0,0,0.6)", border:"none", color:"white", fontSize:"0.75rem", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+              <div style={{ position:"absolute", bottom:0, left:0, right:0, background:"rgba(0,0,0,0.45)", padding:"4px 8px" }}>
+                <p style={{ fontSize:"0.62rem", color:"white", fontWeight:500 }}>Product {i+1}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
+
+// ─── PRODUCT CERT UPLOAD ──────────────────────────────────────────────────────
+const ProductCertUpload = ({ value = [], onChange, hasError }) => {
+  const [uploading, setUploading] = useState([]);
+  const [dragOver, setDragOver]   = useState(false);
+  const inputRef = useRef(null);
+  const MAX_FILES = 5;
+  const MAX_BYTES = 10 * 1024 * 1024;
+
+  const uploadFile = async (file) => {
+    if (file.size > MAX_BYTES) { alert(`"${file.name}" exceeds the 10 MB limit.`); return null; }
+    if (!["image/jpeg","image/png","image/webp","application/pdf"].includes(file.type)) { alert(`"${file.name}" is not supported. Please use JPG, PNG, WEBP or PDF.`); return null; }
+    const ext = file.name.split(".").pop();
+    const filename = `certs/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/product-images/${filename}`, {
+      method:"POST",
+      headers:{ "apikey":SUPABASE_ANON, "Authorization":`Bearer ${SUPABASE_ANON}`, "Content-Type":file.type, "x-upsert":"true" },
+      body: file,
+    });
+    if (!res.ok) { console.error("Cert upload error:", await res.text()); alert("Upload failed. Please try again."); return null; }
+    return { url:`${SUPABASE_URL}/storage/v1/object/public/product-images/${filename}`, name:file.name, type:file.type };
+  };
+
+  const handleFiles = async (files) => {
+    const remaining = MAX_FILES - (value||[]).length;
+    if (remaining <= 0) return;
+    const toProcess = Array.from(files).slice(0, remaining);
+    setUploading(toProcess.map(()=>Math.random().toString(36).slice(2)));
+    const results = await Promise.all(toProcess.map(uploadFile));
+    onChange([...(value||[]), ...results.filter(Boolean)]);
+    setUploading([]);
+  };
+
+  const remove = (url) => onChange((value||[]).filter(f=>f.url!==url));
+  const isPdf  = (f)  => f.type==="application/pdf" || f.name?.endsWith(".pdf");
+  const borderColor = hasError?"var(--red)":dragOver?"var(--forest)":"var(--border)";
+  const bgColor     = hasError?"#FEF0EF":dragOver?"var(--mint2)":"white";
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+      {(value||[]).length < MAX_FILES && (
+        <div onClick={()=>inputRef.current?.click()}
+          onDragOver={e=>{e.preventDefault();setDragOver(true);}}
+          onDragLeave={()=>setDragOver(false)}
+          onDrop={e=>{e.preventDefault();setDragOver(false);handleFiles(e.dataTransfer.files);}}
+          style={{ border:`2px dashed ${borderColor}`, background:bgColor, borderRadius:10, padding:"28px 20px", textAlign:"center", cursor:"pointer", transition:"all 0.2s" }}
+        >
+          <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,application/pdf" multiple style={{ display:"none" }} onChange={e=>handleFiles(e.target.files)} />
+          {uploading.length > 0
+            ? <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:10 }}>
+                <div style={{ width:28, height:28, border:"3px solid var(--border)", borderTop:"3px solid var(--forest)", borderRadius:"50%", animation:"spin 0.8s linear infinite" }} />
+                <p style={{ fontSize:"0.82rem", color:"var(--text3)" }}>Uploading {uploading.length} file{uploading.length>1?"s":""}…</p>
+              </div>
+            : <>
+                <p style={{ fontWeight:600, fontSize:"0.875rem", color:hasError?"var(--red)":"var(--text)", marginBottom:4 }}>Click or drag to upload certificates</p>
+                <p style={{ fontSize:"0.75rem", color:"var(--text3)" }}>{MAX_FILES-(value||[]).length} remaining · JPG, PNG, WEBP or PDF · max 10 MB each</p>
+              </>
+          }
+        </div>
+      )}
+      {(value||[]).length > 0 && (
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {(value||[]).map((f,i)=>(
+            <div key={f.url} style={{ display:"flex", alignItems:"center", gap:12, background:"var(--sand2)", border:"1.5px solid var(--border)", borderRadius:8, padding:"10px 14px" }}>
+              <div style={{ width:36, height:36, borderRadius:6, overflow:"hidden", flexShrink:0, background:"var(--mint2)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                {isPdf(f)
+                  ? <span style={{ fontSize:"0.6rem", fontWeight:700, color:"var(--forest)", letterSpacing:"0.04em" }}>PDF</span>
+                  : <img src={f.url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                }
+              </div>
+              <div style={{ flex:1, minWidth:0 }}>
+                <p style={{ fontSize:"0.82rem", fontWeight:600, color:"var(--text)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{f.name}</p>
+                <p style={{ fontSize:"0.7rem", color:"var(--text3)" }}>Certificate {i+1}</p>
+              </div>
+              <a href={f.url} target="_blank" rel="noreferrer" style={{ fontSize:"0.72rem", color:"var(--forest)", fontWeight:600, textDecoration:"none", flexShrink:0 }}>View</a>
+              <button onClick={()=>remove(f.url)} style={{ background:"none", border:"none", color:"var(--text3)", cursor:"pointer", fontSize:"0.85rem", flexShrink:0, padding:"0 4px" }}>✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const EA = ({id, children}) => <div className={id?"field-error-anchor":""} id={`field-${id}`}>{children}</div>;
+
+const Ph1=({d,s,errors})=>(<>
+  <EA id="businessName"><FF num="1" label="Business Name" hasError={errors.includes("businessName")}><TI value={d.businessName} onChange={v=>s("businessName",v)} placeholder="Your registered business name" hasError={errors.includes("businessName")} /></FF></EA>
+  <EA id="businessAddress"><FF num="2" label="Business Address" hasError={errors.includes("businessAddress")}><TI value={d.businessAddress} onChange={v=>s("businessAddress",v)} placeholder="Physical business address" hasError={errors.includes("businessAddress")} /></FF></EA>
+  <EA id="businessNiche"><FF num="3" label="Business Niche" hasError={errors.includes("businessNiche")}><SI value={d.businessNiche} onChange={v=>s("businessNiche",v)} options={["Grains","Spices","Legumes","Functional Powders","Nuts","Seeds","Others"]} hasError={errors.includes("businessNiche")} /></FF></EA>
+  <EA id="businessStructure"><FF num="4" label="Business Structure" hasError={errors.includes("businessStructure")}><Rad value={d.businessStructure} onChange={v=>s("businessStructure",v)} options={["Business Name","Limited Liability","Partnership","None"]} hasError={errors.includes("businessStructure")} /></FF></EA>
+  <EA id="businessAge"><FF num="5" label="How long has your business been operating?" hasError={errors.includes("businessAge")}><Rad value={d.businessAge} onChange={v=>s("businessAge",v)} options={["Less than 6 months","6 to 12 months","1 to 2 years","2+ years"]} hasError={errors.includes("businessAge")} /></FF></EA>
+  <EA id="role"><FF num="6" label="Your role in the business" hasError={errors.includes("role")}><Rad value={d.role} onChange={v=>s("role",v)} options={["Founder / Owner","Co-founder","Manager","Other"]} hasError={errors.includes("role")} /></FF></EA>
+  <EA id="exportExperience"><FF num="7" label="Have you ever sold products or services formally outside Nigeria?" hasError={errors.includes("exportExperience")}><Rad value={d.exportExperience} onChange={v=>s("exportExperience",v)} options={["Yes, currently","Yes, previously","No, but interested","Not sure"]} hasError={errors.includes("exportExperience")} /></FF></EA>
+  <EA id="productPhotos"><FF num="8" label="Upload a picture of your export-ready product(s)" hint="Upload up to 2 product photos (JPG, PNG or WEBP · max 5 MB each)" hasError={errors.includes("productPhotos")}>
+    <ProductPhotoUpload value={d.productPhotos} onChange={v=>s("productPhotos",v)} hasError={errors.includes("productPhotos")} />
+  </FF></EA>
+  <EA id="targetMarkets"><FF num="9" label="Which markets interest you most?" hint="Select all that apply" hasError={errors.includes("targetMarkets")}><Chk value={d.targetMarkets} onChange={v=>s("targetMarkets",v)} options={["ECOWAS countries","USA","Canada","Caribbean","Other African countries","Not sure yet"]} hasError={errors.includes("targetMarkets")} /></FF></EA>
+  <EA id="contactPhone"><FF num="10" label="Best contact details" hasError={errors.includes("contactPhone")||errors.includes("contactEmail")||errors.includes("contactTime")}>
+    <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+      <TI value={d.contactPhone} onChange={v=>s("contactPhone",v)} placeholder="Phone number" hasError={errors.includes("contactPhone")} />
+      <TI value={d.contactEmail} onChange={v=>s("contactEmail",v)} placeholder="Email address" hasError={errors.includes("contactEmail")} />
+      <SI value={d.contactTime} onChange={v=>s("contactTime",v)} options={["Morning (8am to 12pm)","Afternoon (12pm to 4pm)","Evening (4pm to 7pm)"]} hasError={errors.includes("contactTime")} />
+    </div>
+  </FF></EA>
+</>);
+
+const Ph2=({d,s,errors})=>(<>
+  <EA id="productionCapacity"><FF num="11" label="Current monthly production capacity" hasError={errors.includes("productionCapacity")}><Rad value={d.productionCapacity} onChange={v=>s("productionCapacity",v)} options={["0.1kg to 100kg","101kg to 500kg","501kg to 1 metric ton","Above 1 tonne"]} hasError={errors.includes("productionCapacity")} /></FF></EA>
+  <EA id="qualityStandards">
+    <FF num="12a" label="Do your products meet any quality standards?" hint="Select all that apply" hasError={errors.includes("qualityStandards")}>
+      <Chk value={d.qualityStandards} onChange={v=>s("qualityStandards",v)} options={["NAFDAC","SON","ISO","ECOWAS standards","None yet","Not applicable"]} hasError={errors.includes("qualityStandards")} />
+    </FF>
+    <div style={{ marginTop:20 }}>
+      <FF num="12b" label="Kindly upload product certificates" hint="Upload up to 5 certificates · JPG, PNG, WEBP or PDF · max 10 MB each">
+        <ProductCertUpload value={d.productCerts} onChange={v=>s("productCerts",v)} />
+      </FF>
+    </div>
+  </EA>
+  <EA id="scalability"><FF num="13" label="Can you scale production if orders increase by 50%?" hasError={errors.includes("scalability")}><Rad value={d.scalability} onChange={v=>s("scalability",v)} options={["Yes, immediately","Yes, within 1 month","Yes, with investment","No","Not sure"]} hasError={errors.includes("scalability")} /></FF></EA>
+  <EA id="monthlyTurnover"><FF num="14" label="Monthly business turnover" hasError={errors.includes("monthlyTurnover")}><Rad value={d.monthlyTurnover} onChange={v=>s("monthlyTurnover",v)} options={["Below ₦50k","₦50k to ₦200k","₦200k to ₦500k","₦500k to ₦1M","₦1M to ₦5M","₦5M and above"]} hasError={errors.includes("monthlyTurnover")} /></FF></EA>
+  <EA id="loanHistory"><FF num="15" label="Have you ever received a business loan or grant?" hasError={errors.includes("loanHistory")}><Rad value={d.loanHistory} onChange={v=>s("loanHistory",v)} options={["Yes, currently repaying","Yes, fully repaid","No, but applied","Never applied"]} hasError={errors.includes("loanHistory")} /></FF></EA>
+  <EA id="digitalCapability"><FF num="16" label="Internet access and digital capability" hasError={errors.includes("digitalCapability")}><Rad value={d.digitalCapability} onChange={v=>s("digitalCapability",v)} options={["Strong internet, use digital tools daily","Regular internet access","Limited access","Minimal digital skills"]} hasError={errors.includes("digitalCapability")} /></FF></EA>
+  <EA id="exportDocsFamiliarity"><FF num="17" label="Are you familiar with export documentation requirements?" hasError={errors.includes("exportDocsFamiliarity")}><Rad value={d.exportDocsFamiliarity} onChange={v=>s("exportDocsFamiliarity",v)} options={["Yes, experienced","Somewhat familiar","No, but willing to learn","No knowledge"]} hasError={errors.includes("exportDocsFamiliarity")} /></FF></EA>
+  <EA id="documents"><FF num="18" label="Do you have or can you obtain:" hint="Select all that apply" hasError={errors.includes("documents")}><Chk value={d.documents} onChange={v=>s("documents",v)} options={["Tax ID","Company letterhead","Product certifications","Export license","None yet"]} hasError={errors.includes("documents")} /></FF></EA>
+  <EA id="kycConsent"><FF num="19" label="KYC Verification Consent" hint="Full KYC verification is mandatory for participation and access to this programme." hasError={errors.includes("kycConsent")}><Rad value={d.kycConsent} onChange={v=>s("kycConsent",v)} options={["Yes, I will participate","No","I need further information on the KYC process"]} hasError={errors.includes("kycConsent")} /></FF></EA>
+</>);
+
+const Ph3=({d,s,errors})=>(<>
+  <EA id="exportProducts"><FF num="20" label="What products or services do you want to export?" hint="Please be as specific as possible." hasError={errors.includes("exportProducts")}><TA value={d.exportProducts} onChange={v=>s("exportProducts",v)} placeholder="Describe your specific products or services..." hasError={errors.includes("exportProducts")} /></FF></EA>
+  <EA id="shippingCompany"><FF num="21" label="Do you use a shipping company?" hasError={errors.includes("shippingCompany")}><Rad value={d.shippingCompany} onChange={v=>s("shippingCompany",v)} options={["Yes, always","Yes, sometimes","No"]} hasError={errors.includes("shippingCompany")} /></FF></EA>
+  <EA id="exportTimeline"><FF num="22" label="Estimated time needed to prepare for your first export" hasError={errors.includes("exportTimeline")}><Rad value={d.exportTimeline} onChange={v=>s("exportTimeline",v)} options={["Ready now","1 to 3 months","3 to 6 months","6 to 12 months","Over 1 year"]} hasError={errors.includes("exportTimeline")} /></FF></EA>
+  <EA id="challenges"><FF num="23" label="Biggest challenge in accessing international markets" hint="Select your top 2 challenges" hasError={errors.includes("challenges")}><Chk value={d.challenges} onChange={v=>s("challenges",v)} options={["Finding buyers","Understanding regulations","Pricing","Shipping and logistics","Payment collection","Product certification","Other"]} hasError={errors.includes("challenges")} /></FF></EA>
+  <EA id="supportNeeded"><FF num="24" label="What support do you need most from this programme?" hint="Select your top 3 priorities" hasError={errors.includes("supportNeeded")}><Chk value={d.supportNeeded} onChange={v=>s("supportNeeded",v)} options={["Buyer connections","Training","Compliance guidance","Financing","Shipping support","Marketing","Other"]} hasError={errors.includes("supportNeeded")} /></FF></EA>
+  <EA id="workingCapital"><FF num="25" label="Estimated working capital available" hasError={errors.includes("workingCapital")}><Rad value={d.workingCapital} onChange={v=>s("workingCapital",v)} options={["Below ₦100k","₦100k to ₦500k","₦500k to ₦2M","₦2M and above"]} hasError={errors.includes("workingCapital")} /></FF></EA>
+  <EA id="pilotAgreement"><FF num="26" label="Pilot transaction requirement" hint="As a standard requirement, initial engagement will commence with small pilot transactions prior to full-scale deals." hasError={errors.includes("pilotAgreement")}><Rad value={d.pilotAgreement} onChange={v=>s("pilotAgreement",v)} options={["Yes, please provide further details on the pilot transaction requirements","No, I will not proceed under this condition"]} hasError={errors.includes("pilotAgreement")} /></FF></EA>
+  <FF num="27" label="Is there anything else we should know about your business?" hint="Optional"><TA value={d.additionalInfo} onChange={v=>s("additionalInfo",v)} placeholder="Any other relevant information..." rows={4} /></FF>
+</>);
 
 // ─── SME REGISTRATION ─────────────────────────────────────────────────────────
 const Registration = ({ addApp }) => {
@@ -769,11 +895,8 @@ const Registration = ({ addApp }) => {
     if (missing.length > 0) {
       setErrors(missing);
       setShaking(true);
-      setTimeout(() => setShaking(false), 500);
-      setTimeout(() => {
-        const firstEl = document.querySelector(".field-error-anchor");
-        if (firstEl) firstEl.scrollIntoView({ behavior:"smooth", block:"center" });
-      }, 80);
+      setTimeout(()=>setShaking(false), 500);
+      setTimeout(()=>{ const el=document.querySelector(".field-error-anchor"); if(el) el.scrollIntoView({behavior:"smooth",block:"center"}); }, 80);
       return;
     }
     setErrors([]);
@@ -783,12 +906,7 @@ const Registration = ({ addApp }) => {
 
   const submit = async () => {
     const missing = validatePhase(3, d);
-    if (missing.length > 0) {
-      setErrors(missing);
-      setShaking(true);
-      setTimeout(() => setShaking(false), 500);
-      return;
-    }
+    if (missing.length > 0) { setErrors(missing); setShaking(true); setTimeout(()=>setShaking(false),500); return; }
     setSubmitting(true);
     const a = await addApp(d);
     setRef(a.id);
@@ -820,21 +938,16 @@ const Registration = ({ addApp }) => {
         <div style={{ marginBottom:48 }}>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>Phase {phase} of 3 · {phase===1?"Business Basics":phase===2?"Compliance and Readiness":"Export Capacity"}</span>
           <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:600, color:"var(--forest)", marginBottom:8, lineHeight:1.15 }}>{phase===1?"Tell us about your business":phase===2?"Compliance and operational readiness":"Export capability and commitment"}</h1>
-          <p style={{ color:"var(--text3)", fontSize:"0.875rem" }}>{phase===1?"9 questions · approx. 4 to 5 minutes":phase===2?"9 questions · approx. 4 to 5 minutes":"8 questions · approx. 2 to 3 minutes"}</p>
-
-          {/* Validation error banner */}
+          <p style={{ color:"var(--text3)", fontSize:"0.875rem" }}>{phase===1?"10 questions · approx. 5 to 6 minutes":phase===2?"9 questions · approx. 4 to 5 minutes":"8 questions · approx. 2 to 3 minutes"}</p>
           {errors.length > 0 && (
-            <div className={shaking ? "shake" : ""} style={{ marginTop:20, background:"#FEF0EF", border:"1.5px solid var(--red)", borderRadius:10, padding:"14px 18px", display:"flex", alignItems:"flex-start", gap:10 }}>
+            <div className={shaking?"shake":""} style={{ marginTop:20, background:"#FEF0EF", border:"1.5px solid var(--red)", borderRadius:10, padding:"14px 18px", display:"flex", alignItems:"flex-start", gap:10 }}>
               <span style={{ fontSize:"1rem", flexShrink:0 }}>⚠️</span>
               <div>
                 <p style={{ fontSize:"0.85rem", fontWeight:600, color:"var(--red)", marginBottom:3 }}>Please complete all required fields</p>
-                <p style={{ fontSize:"0.78rem", color:"#8B2020", lineHeight:1.5 }}>
-                  {errors.length} field{errors.length > 1 ? "s" : ""} {errors.length > 1 ? "are" : "is"} missing or incomplete. All questions must be answered before continuing.
-                </p>
+                <p style={{ fontSize:"0.78rem", color:"#8B2020", lineHeight:1.5 }}>{errors.length} field{errors.length>1?"s":""} {errors.length>1?"are":"is"} missing or incomplete.</p>
               </div>
             </div>
           )}
-
           <div style={{ marginTop:20 }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
               {["Business Basics","Compliance","Export Capacity"].map((l,i)=>(<span key={l} style={{ fontSize:"0.72rem", fontWeight:i+1<=phase?600:400, color:i+1<=phase?"var(--forest)":"var(--text3)" }}>{l}</span>))}
@@ -861,60 +974,16 @@ const Registration = ({ addApp }) => {
   );
 };
 
-// Helper: wraps a field with an anchor for scrolling to errors
-const EA = ({id, children}) => <div className={id ? "field-error-anchor" : ""} id={`field-${id}`}>{children}</div>;
-
-const Ph1=({d,s,errors})=>(<>
-  <EA id="businessName"><FF num="1" label="Business Name" hasError={errors.includes("businessName")}><TI value={d.businessName} onChange={v=>s("businessName",v)} placeholder="Your registered business name" hasError={errors.includes("businessName")} /></FF></EA>
-  <EA id="businessAddress"><FF num="2" label="Business Address" hasError={errors.includes("businessAddress")}><TI value={d.businessAddress} onChange={v=>s("businessAddress",v)} placeholder="Physical business address" hasError={errors.includes("businessAddress")} /></FF></EA>
-  <EA id="businessNiche"><FF num="3" label="Business Niche" hasError={errors.includes("businessNiche")}><SI value={d.businessNiche} onChange={v=>s("businessNiche",v)} options={["Grains","Spices","Legumes","Functional Powders","Nuts","Seeds","Others"]} hasError={errors.includes("businessNiche")} /></FF></EA>
-  <EA id="businessStructure"><FF num="4" label="Business Structure" hasError={errors.includes("businessStructure")}><Rad value={d.businessStructure} onChange={v=>s("businessStructure",v)} options={["Business Name","Limited Liability","Partnership","None"]} hasError={errors.includes("businessStructure")} /></FF></EA>
-  <EA id="businessAge"><FF num="5" label="How long has your business been operating?" hasError={errors.includes("businessAge")}><Rad value={d.businessAge} onChange={v=>s("businessAge",v)} options={["Less than 6 months","6 to 12 months","1 to 2 years","2+ years"]} hasError={errors.includes("businessAge")} /></FF></EA>
-  <EA id="role"><FF num="6" label="Your role in the business" hasError={errors.includes("role")}><Rad value={d.role} onChange={v=>s("role",v)} options={["Founder / Owner","Co-founder","Manager","Other"]} hasError={errors.includes("role")} /></FF></EA>
-  <EA id="exportExperience"><FF num="7" label="Have you ever sold products or services formally outside Nigeria?" hasError={errors.includes("exportExperience")}><Rad value={d.exportExperience} onChange={v=>s("exportExperience",v)} options={["Yes, currently","Yes, previously","No, but interested","Not sure"]} hasError={errors.includes("exportExperience")} /></FF></EA>
-  <EA id="targetMarkets"><FF num="8" label="Which markets interest you most?" hint="Select all that apply" hasError={errors.includes("targetMarkets")}><Chk value={d.targetMarkets} onChange={v=>s("targetMarkets",v)} options={["ECOWAS countries","USA","Canada","Caribbean","Other African countries","Not sure yet"]} hasError={errors.includes("targetMarkets")} /></FF></EA>
-  <EA id="contactPhone"><FF num="9" label="Best contact details" hasError={errors.includes("contactPhone")||errors.includes("contactEmail")||errors.includes("contactTime")}>
-    <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
-      <TI value={d.contactPhone} onChange={v=>s("contactPhone",v)} placeholder="Phone number" hasError={errors.includes("contactPhone")} />
-      <TI value={d.contactEmail} onChange={v=>s("contactEmail",v)} placeholder="Email address" hasError={errors.includes("contactEmail")} />
-      <SI value={d.contactTime} onChange={v=>s("contactTime",v)} options={["Morning (8am to 12pm)","Afternoon (12pm to 4pm)","Evening (4pm to 7pm)"]} hasError={errors.includes("contactTime")} />
-    </div>
-  </FF></EA>
-</>);
-
-const Ph2=({d,s,errors})=>(<>
-  <EA id="productionCapacity"><FF num="10" label="Current monthly production capacity" hasError={errors.includes("productionCapacity")}><Rad value={d.productionCapacity} onChange={v=>s("productionCapacity",v)} options={["0.1kg to 100kg","101kg to 500kg","501kg to 1 metric ton","Above 1 tonne"]} hasError={errors.includes("productionCapacity")} /></FF></EA>
-  <EA id="scalability"><FF num="11" label="Can you scale production if orders increase by 50%?" hasError={errors.includes("scalability")}><Rad value={d.scalability} onChange={v=>s("scalability",v)} options={["Yes, immediately","Yes, within 1 month","Yes, with investment","No","Not sure"]} hasError={errors.includes("scalability")} /></FF></EA>
-  <EA id="qualityStandards"><FF num="12" label="Do your products meet any quality standards?" hint="Select all that apply" hasError={errors.includes("qualityStandards")}><Chk value={d.qualityStandards} onChange={v=>s("qualityStandards",v)} options={["NAFDAC","SON","ISO","ECOWAS standards","None yet","Not applicable"]} hasError={errors.includes("qualityStandards")} /></FF></EA>
-  <EA id="monthlyTurnover"><FF num="13" label="Monthly business turnover" hasError={errors.includes("monthlyTurnover")}><Rad value={d.monthlyTurnover} onChange={v=>s("monthlyTurnover",v)} options={["Below ₦50k","₦50k to ₦200k","₦200k to ₦500k","₦500k to ₦1M","₦1M to ₦5M","₦5M and above"]} hasError={errors.includes("monthlyTurnover")} /></FF></EA>
-  <EA id="loanHistory"><FF num="14" label="Have you ever received a business loan or grant?" hasError={errors.includes("loanHistory")}><Rad value={d.loanHistory} onChange={v=>s("loanHistory",v)} options={["Yes, currently repaying","Yes, fully repaid","No, but applied","Never applied"]} hasError={errors.includes("loanHistory")} /></FF></EA>
-  <EA id="digitalCapability"><FF num="15" label="Internet access and digital capability" hasError={errors.includes("digitalCapability")}><Rad value={d.digitalCapability} onChange={v=>s("digitalCapability",v)} options={["Strong internet, use digital tools daily","Regular internet access","Limited access","Minimal digital skills"]} hasError={errors.includes("digitalCapability")} /></FF></EA>
-  <EA id="exportDocsFamiliarity"><FF num="16" label="Are you familiar with export documentation requirements?" hasError={errors.includes("exportDocsFamiliarity")}><Rad value={d.exportDocsFamiliarity} onChange={v=>s("exportDocsFamiliarity",v)} options={["Yes, experienced","Somewhat familiar","No, but willing to learn","No knowledge"]} hasError={errors.includes("exportDocsFamiliarity")} /></FF></EA>
-  <EA id="documents"><FF num="17" label="Do you have or can you obtain:" hint="Select all that apply" hasError={errors.includes("documents")}><Chk value={d.documents} onChange={v=>s("documents",v)} options={["Tax ID","Company letterhead","Product certifications","Export license","None yet"]} hasError={errors.includes("documents")} /></FF></EA>
-  <EA id="kycConsent"><FF num="18" label="KYC Verification Consent" hint="Full KYC verification is mandatory for participation and access to this programme." hasError={errors.includes("kycConsent")}><Rad value={d.kycConsent} onChange={v=>s("kycConsent",v)} options={["Yes, I will participate","No","I need further information on the KYC process"]} hasError={errors.includes("kycConsent")} /></FF></EA>
-</>);
-
-const Ph3=({d,s,errors})=>(<>
-  <EA id="exportProducts"><FF num="19" label="What products or services do you want to export?" hint="Please be as specific as possible." hasError={errors.includes("exportProducts")}><TA value={d.exportProducts} onChange={v=>s("exportProducts",v)} placeholder="Describe your specific products or services..." hasError={errors.includes("exportProducts")} /></FF></EA>
-  <EA id="shippingCompany"><FF num="20" label="Do you use a shipping company?" hasError={errors.includes("shippingCompany")}><Rad value={d.shippingCompany} onChange={v=>s("shippingCompany",v)} options={["Yes, always","Yes, sometimes","No"]} hasError={errors.includes("shippingCompany")} /></FF></EA>
-  <EA id="exportTimeline"><FF num="21" label="Estimated time needed to prepare for your first export" hasError={errors.includes("exportTimeline")}><Rad value={d.exportTimeline} onChange={v=>s("exportTimeline",v)} options={["Ready now","1 to 3 months","3 to 6 months","6 to 12 months","Over 1 year"]} hasError={errors.includes("exportTimeline")} /></FF></EA>
-  <EA id="challenges"><FF num="22" label="Biggest challenge in accessing international markets" hint="Select your top 2 challenges" hasError={errors.includes("challenges")}><Chk value={d.challenges} onChange={v=>s("challenges",v)} options={["Finding buyers","Understanding regulations","Pricing","Shipping and logistics","Payment collection","Product certification","Other"]} hasError={errors.includes("challenges")} /></FF></EA>
-  <EA id="supportNeeded"><FF num="23" label="What support do you need most from this programme?" hint="Select your top 3 priorities" hasError={errors.includes("supportNeeded")}><Chk value={d.supportNeeded} onChange={v=>s("supportNeeded",v)} options={["Buyer connections","Training","Compliance guidance","Financing","Shipping support","Marketing","Other"]} hasError={errors.includes("supportNeeded")} /></FF></EA>
-  <EA id="workingCapital"><FF num="24" label="Estimated working capital available" hasError={errors.includes("workingCapital")}><Rad value={d.workingCapital} onChange={v=>s("workingCapital",v)} options={["Below ₦100k","₦100k to ₦500k","₦500k to ₦2M","₦2M and above"]} hasError={errors.includes("workingCapital")} /></FF></EA>
-  <EA id="pilotAgreement"><FF num="25" label="Pilot transaction requirement" hint="As a standard requirement, initial engagement will commence with small pilot transactions prior to full-scale deals." hasError={errors.includes("pilotAgreement")}><Rad value={d.pilotAgreement} onChange={v=>s("pilotAgreement",v)} options={["Yes, please provide further details on the pilot transaction requirements","No, I will not proceed under this condition"]} hasError={errors.includes("pilotAgreement")} /></FF></EA>
-  <FF num="26" label="Is there anything else we should know about your business?" hint="Optional"><TA value={d.additionalInfo} onChange={v=>s("additionalInfo",v)} placeholder="Any other relevant information..." rows={4} /></FF>
-</>);
-
 // ─── JOURNALIST PORTAL ────────────────────────────────────────────────────────
 const PressPortal = ({ addSubmission, onExit }) => {
-  const [d, setD]               = useState({});
-  const [done, setDone]         = useState(false);
-  const [refId, setRefId]       = useState("");
+  const [d, setD] = useState({});
+  const [done, setDone] = useState(false);
+  const [refId, setRefId] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const set = (k,v) => setD(p=>({...p,[k]:v}));
 
   const submit = async () => {
-    if (!d.name || !d.outlet || !d.email || !d.storyType || !d.headline || !d.content) return;
+    if (!d.name||!d.outlet||!d.email||!d.storyType||!d.headline||!d.content) return;
     setSubmitting(true);
     const s = await addSubmission(d);
     setRefId(s.id);
@@ -927,16 +996,12 @@ const PressPortal = ({ addSubmission, onExit }) => {
       <div className="fade-up" style={{ background:"white", border:"1px solid var(--border)", borderRadius:20, padding:"60px 48px", maxWidth:520, width:"100%", textAlign:"center", boxShadow:"0 24px 80px rgba(27,61,47,0.1)" }}>
         <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.8rem" }}>📰</div>
         <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Submission Received</h2>
-        <p style={{ color:"var(--text2)", lineHeight:1.7, marginBottom:28, fontWeight:300 }}>
-          Your press submission has been received by the T2T Programme communications team. All submissions are reviewed before publication. You will be contacted at the email address provided if your submission is selected.
-        </p>
+        <p style={{ color:"var(--text2)", lineHeight:1.7, marginBottom:28, fontWeight:300 }}>Your press submission has been received by the T2T Programme communications team. All submissions are reviewed before publication.</p>
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"18px 24px", marginBottom:28 }}>
           <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:6 }}>SUBMISSION REFERENCE</p>
           <p style={{ fontFamily:"Cormorant Garamond", fontSize:"1.5rem", fontWeight:700, color:"var(--forest)" }}>{refId}</p>
         </div>
-        <p style={{ fontSize:"0.82rem", color:"var(--text3)", marginBottom:24 }}>
-          For urgent enquiries contact: <strong>media@t2tprogramme.org</strong>
-        </p>
+        <p style={{ fontSize:"0.82rem", color:"var(--text3)", marginBottom:24 }}>For urgent enquiries contact: <strong>media@t2tprogramme.org</strong></p>
         <button onClick={onExit} style={{ background:"var(--forest)", color:"white", border:"none", padding:"12px 28px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer" }}>Back to Newsroom</button>
       </div>
     </div>
@@ -946,20 +1011,12 @@ const PressPortal = ({ addSubmission, onExit }) => {
     <div style={{ minHeight:"100vh", background:"var(--sand2)", padding:"100px 24px 80px" }}>
       <div style={{ maxWidth:680, margin:"0 auto" }}>
         <div style={{ marginBottom:48 }}>
-          <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>
-            PRESS PORTAL · ACCREDITED JOURNALISTS
-          </span>
-          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:600, color:"var(--forest)", lineHeight:1.1, marginBottom:12 }}>
-            Submit a Story or Press Release
-          </h1>
-          <p style={{ color:"var(--text2)", lineHeight:1.7, fontWeight:300, marginBottom:20 }}>
-            Use this portal to submit press releases, story pitches, or editorial contributions for consideration in the T2T Programme Digital Newsroom. All submissions are reviewed by the communications team before publication.
-          </p>
+          <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>PRESS PORTAL · ACCREDITED JOURNALISTS</span>
+          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:600, color:"var(--forest)", lineHeight:1.1, marginBottom:12 }}>Submit a Story or Press Release</h1>
+          <p style={{ color:"var(--text2)", lineHeight:1.7, fontWeight:300, marginBottom:20 }}>Use this portal to submit press releases, story pitches, or editorial contributions for consideration in the T2T Programme Digital Newsroom.</p>
           <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"14px 18px", display:"flex", alignItems:"flex-start", gap:10 }}>
             <span style={{ fontSize:"1rem", flexShrink:0, marginTop:1 }}>ℹ️</span>
-            <p style={{ fontSize:"0.8rem", color:"var(--text2)", lineHeight:1.6 }}>
-              Submissions do not guarantee publication. The T2T Programme reserves the right to edit, withhold, or decline any submission. Response time is typically 2 to 3 business days.
-            </p>
+            <p style={{ fontSize:"0.8rem", color:"var(--text2)", lineHeight:1.6 }}>Submissions do not guarantee publication. Response time is typically 2 to 3 business days.</p>
           </div>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:28 }}>
@@ -982,11 +1039,11 @@ const PressPortal = ({ addSubmission, onExit }) => {
             <div style={{ display:"flex", flexDirection:"column", gap:18 }}>
               <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Submission Type</label><Rad value={d.storyType} onChange={v=>set("storyType",v)} options={["Press Release","News Story","Feature Article","Opinion / Commentary","Interview Request","Event Coverage"]} /></div>
               <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Headline / Title</label><TI value={d.headline} onChange={v=>set("headline",v)} placeholder="Proposed headline for your submission" /></div>
-              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Summary</label><p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:8 }}>A brief 1 to 2 sentence summary of your story or pitch.</p><TA value={d.summary} onChange={v=>set("summary",v)} placeholder="Briefly describe your story..." rows={2} /></div>
-              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Full Content</label><p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:8 }}>Paste your full press release, article, or story pitch below.</p><TA value={d.content} onChange={v=>set("content",v)} placeholder="Full content of your submission..." rows={10} /></div>
-              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Image URL (Optional)</label><p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:8 }}>Link to a high-resolution image to accompany the story (must be publicly accessible).</p><TI value={d.imageUrl} onChange={v=>set("imageUrl",v)} placeholder="https://..." /></div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Summary</label><p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:8 }}>A brief 1 to 2 sentence summary.</p><TA value={d.summary} onChange={v=>set("summary",v)} placeholder="Briefly describe your story..." rows={2} /></div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Full Content</label><TA value={d.content} onChange={v=>set("content",v)} placeholder="Full content of your submission..." rows={10} /></div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Image URL (Optional)</label><TI value={d.imageUrl} onChange={v=>set("imageUrl",v)} placeholder="https://..." /></div>
               <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Category</label><SI value={d.category} onChange={v=>set("category",v)} options={["PRESS RELEASE","NEWS STORY","PARTNER SPOTLIGHT","PROGRAMME UPDATE","OPINION","MEDIA RESOURCE","EVENT COVERAGE"]} /></div>
-              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Any additional notes for the editorial team? (Optional)</label><TA value={d.notes} onChange={v=>set("notes",v)} placeholder="Embargo dates, corrections, context, special requests..." rows={3} /></div>
+              <div><label style={{ display:"block", fontWeight:600, fontSize:"0.875rem", marginBottom:8 }}>Additional notes for editorial team? (Optional)</label><TA value={d.notes} onChange={v=>set("notes",v)} placeholder="Embargo dates, corrections, context..." rows={3} /></div>
             </div>
           </div>
           <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:12, padding:"20px 24px" }}>
@@ -995,8 +1052,8 @@ const PressPortal = ({ addSubmission, onExit }) => {
         </div>
         <div style={{ marginTop:40, paddingTop:28, borderTop:"1px solid var(--border)", display:"flex", justifyContent:"flex-end", gap:12 }}>
           <button onClick={onExit} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Cancel</button>
-          <button onClick={submit} disabled={submitting} style={{ background:submitting?"var(--sage)":"var(--forest)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:submitting?"not-allowed":"pointer", boxShadow:"0 4px 16px rgba(27,61,47,0.25)", opacity:submitting?0.8:1 }}>
-            {submitting ? "Submitting…" : "Submit for Review"}
+          <button onClick={submit} disabled={submitting} style={{ background:submitting?"var(--sage)":"var(--forest)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:submitting?"not-allowed":"pointer", opacity:submitting?0.8:1 }}>
+            {submitting?"Submitting…":"Submit for Review"}
           </button>
         </div>
       </div>
@@ -1005,20 +1062,20 @@ const PressPortal = ({ addSubmission, onExit }) => {
 };
 
 // ─── NEWSROOM ─────────────────────────────────────────────────────────────────
-const Newsroom = ({ setPage, approvedSubmissions }) => {
+const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
   const m = useMobile();
   const [art, setArt] = useState(null);
 
   const approvedAsArticles = approvedSubmissions.map(s => ({
-    id: s.id, cat: s.category || "PRESS RELEASE",
-    date: new Date(s.submitted_at || s.submittedAt).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}),
-    headline: s.headline, summary: s.summary || s.content?.substring(0,180)+"...",
-    img: s.image_url || s.imageUrl || "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80",
-    source: s.outlet, featured: false, fullContent: s.content,
+    id:s.id, cat:s.category||"PRESS RELEASE",
+    date:new Date(s.submitted_at||s.submittedAt).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}),
+    headline:s.headline, summary:s.summary||s.content?.substring(0,180)+"...",
+    img:s.image_url||s.imageUrl||"https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=900&q=80",
+    source:s.outlet, featured:false, fullContent:s.content,
   }));
 
   const allArticles = [...staticNews, ...approvedAsArticles];
-  const feat = allArticles.find(n=>n.featured) || allArticles[0];
+  const feat = allArticles.find(n=>n.featured)||allArticles[0];
   const rest = allArticles.filter(n=>n.id!==feat.id);
 
   if (art) return (
@@ -1038,13 +1095,13 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
         {art.fullContent
           ? <p style={{ color:"var(--text2)", lineHeight:1.9, fontWeight:300, whiteSpace:"pre-wrap" }}>{art.fullContent}</p>
           : <>
-              <p style={{ color:"var(--text2)", lineHeight:1.9, fontWeight:300 }}>The Training-to-Transaction (T2T) Programme is a landmark collaboration between Providus Bank, the ECOWAS Parliament, and the Global African Business Association (GABA). Designed to bridge the gap between SME readiness and commercial transactions, the programme runs for three months across Lagos and Abuja.</p>
-              <p style={{ color:"var(--text2)", lineHeight:1.9, fontWeight:300, marginTop:16 }}>Selected SMEs gain access to trade finance through Providus Bank, buyer linkage networks, and a pathway into the US, Canada, and Caribbean market pipelines. Up to 50 companies will be selected for direct market access programmes following performance assessment.</p>
+              <p style={{ color:"var(--text2)", lineHeight:1.9, fontWeight:300 }}>The Training-to-Transaction (T2T) Programme is a landmark collaboration between Providus Bank, the ECOWAS Parliament, and GABA. Designed to bridge the gap between SME readiness and commercial transactions, the programme runs for three months across Lagos and Abuja.</p>
+              <p style={{ color:"var(--text2)", lineHeight:1.9, fontWeight:300, marginTop:16 }}>Selected SMEs gain access to trade finance through Providus Bank, buyer linkage networks, and a pathway into the US, Canada, and Caribbean market pipelines.</p>
             </>
         }
         <div style={{ marginTop:56, background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:16, padding:"36px 40px" }}>
           <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.4rem", color:"var(--forest)", marginBottom:20 }}>Media Contacts</h3>
-          <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3, 1fr)", gap:20 }}>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20 }}>
             {[{name:"Media Enquiries",email:"media@t2tprogramme.org",org:"T2T Programme Office"},{name:"Providus Bank Comms",email:"comms@providusbank.com",org:"Providus Bank"},{name:"Programme Updates",email:"updates@duchessnl.com",org:"Duchess NL and BTI"}].map(c=>(
               <div key={c.email}><p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:3 }}>{c.name}</p><p style={{ color:"var(--forest)", fontSize:"0.83rem", marginBottom:2 }}>{c.email}</p><p style={{ color:"var(--text3)", fontSize:"0.78rem" }}>{c.org}</p></div>
             ))}
@@ -1055,23 +1112,22 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
   );
 
   return (
-    <div style={{ minHeight:"100vh", background:"var(--cream)", paddingTop: m?80:100, paddingBottom: m?60:80 }}>
-      <div className="wrap">
-        <div style={{ marginBottom:60, display:"flex", flexDirection:m?"column":"row", justifyContent:"space-between", alignItems:m?"flex-start":"flex-end", paddingBottom:32, borderBottom:"1px solid var(--border)", gap:20 }}>
-          <div>
-            <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:12, display:"inline-block" }}>DIGITAL NEWSROOM</span>
-            <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3.2rem", fontWeight:600, color:"var(--forest)", lineHeight:1 }}>Press and Media</h1>
-            <p style={{ color:"var(--text3)", marginTop:8 }}>Official communications for media professionals, journalists, and stakeholders.</p>
-          </div>
-          <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems: m?"flex-start":"flex-end" }}>
-            <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:12, padding:"16px 20px" }}>
-              <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:4 }}>PRESS CONTACT</p>
-              <p style={{ color:"var(--forest)", fontWeight:600, fontSize:"0.875rem" }}>media@t2tprogramme.org</p>
-            </div>
-            <button onClick={()=>setPage("press-gate")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"10px 20px", borderRadius:8, fontSize:"0.82rem", fontWeight:600, cursor:"pointer", letterSpacing:"0.02em" }}>Submit a Story</button>
-          </div>
+    <div style={{ minHeight:"100vh", background:"var(--cream)", padding:m?"80px 20px 60px":"100px 80px 80px" }}>
+      <div style={{ maxWidth:1100, margin:"0 auto 60px", display:"flex", flexDirection:m?"column":"row", justifyContent:"space-between", alignItems:m?"flex-start":"flex-end", paddingBottom:32, borderBottom:"1px solid var(--border)", gap:20 }}>
+        <div>
+          <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:12, display:"inline-block" }}>DIGITAL NEWSROOM</span>
+          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3.2rem", fontWeight:600, color:"var(--forest)", lineHeight:1 }}>Press and Media</h1>
+          <p style={{ color:"var(--text3)", marginTop:8 }}>Official communications for media professionals, journalists, and stakeholders.</p>
         </div>
-
+        <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems:"flex-end" }}>
+          <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:12, padding:"16px 20px" }}>
+            <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:4 }}>PRESS CONTACT</p>
+            <p style={{ color:"var(--forest)", fontWeight:600, fontSize:"0.875rem" }}>media@t2tprogramme.org</p>
+          </div>
+          <button onClick={onPressClick} style={{ background:"transparent", border:"none", color:"transparent", padding:"10px 20px", borderRadius:8, fontSize:"0.82rem", cursor:"default", userSelect:"none", width:120 }}>&nbsp;</button>
+        </div>
+      </div>
+      <div style={{ maxWidth:1100, margin:"0 auto" }}>
         <div onClick={()=>setArt(feat)} className="card-hover" style={{ display:"grid", gridTemplateColumns:m?"1fr":"1fr 1fr", background:"white", borderRadius:16, border:"1px solid var(--border)", overflow:"hidden", marginBottom:40, cursor:"pointer" }}>
           <div style={{ height:m?220:380, overflow:"hidden" }}>
             <img src={feat.img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.5s ease" }} onMouseEnter={e=>e.target.style.transform="scale(1.04)"} onMouseLeave={e=>e.target.style.transform="scale(1)"} />
@@ -1086,7 +1142,6 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
             <p style={{ color:"var(--text3)", fontSize:"0.78rem" }}>{feat.date}</p>
           </div>
         </div>
-
         {rest.length > 0 && (
           <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:16, marginBottom:60 }}>
             {rest.map(a=>(
@@ -1107,13 +1162,12 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
             ))}
           </div>
         )}
-
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:20, padding:m?"28px 20px":"48px" }}>
           <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.8rem", fontWeight:600, color:"var(--forest)", marginBottom:6 }}>Media Resources</h2>
           <p style={{ color:"var(--text3)", marginBottom:32, fontSize:"0.875rem" }}>Official assets for press use</p>
           <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:12, marginBottom:32 }}>
             {[{icon:"📄",title:"Programme Fact Sheet",type:"PDF · 2 pages"},{icon:"🎨",title:"Partner Logos Pack",type:"ZIP · Brand assets"},{icon:"📑",title:"Programme Overview",type:"PDF · 8 pages"}].map(({icon,title,type})=>(
-              <div key={title} style={{ background:"white", border:"1px solid var(--border)", borderRadius:12, padding:"20px", display:"flex", alignItems:"center", gap:14, cursor:"pointer", transition:"all 0.2s" }} onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 16px rgba(27,61,47,0.08)"} onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
+              <div key={title} style={{ background:"white", border:"1px solid var(--border)", borderRadius:12, padding:"20px", display:"flex", alignItems:"center", gap:14, cursor:"pointer" }} onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 16px rgba(27,61,47,0.08)"} onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
                 <div style={{ fontSize:"1.5rem" }}>{icon}</div>
                 <div><p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:2 }}>{title}</p><p style={{ color:"var(--text3)", fontSize:"0.75rem" }}>{type}</p></div>
               </div>
@@ -1139,15 +1193,15 @@ const Newsroom = ({ setPage, approvedSubmissions }) => {
 
 // ─── ADMIN DASHBOARD ──────────────────────────────────────────────────────────
 const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
-  const [tab, setTab]                 = useState("sme");
-  const [filter, setFilter]           = useState("all");
-  const [sort, setSort]               = useState("score");
-  const [exp, setExp]                 = useState(null);
+  const [tab, setTab]             = useState("sme");
+  const [filter, setFilter]       = useState("all");
+  const [sort, setSort]           = useState("score");
+  const [exp, setExp]             = useState(null);
   const [pressFilter, setPressFilter] = useState("all");
-  const [pressExp, setPressExp]       = useState(null);
+  const [pressExp, setPressExp]   = useState(null);
 
-  const list = apps.filter(a=>filter==="all"||a.status===filter).sort((a,b)=>sort==="score"?b.score-a.score:new Date(b.submitted_at||b.submittedAt)-new Date(a.submitted_at||a.submittedAt));
-  const pressList = submissions.filter(s=>pressFilter==="all"||s.status===pressFilter).sort((a,b)=>new Date(b.submitted_at||b.submittedAt)-new Date(a.submitted_at||a.submittedAt));
+  const list = apps.filter(a=>filter==="all"||a.status===filter).sort((a,b)=>sort==="score"?b.score-a.score:new Date(b.submittedAt)-new Date(a.submittedAt));
+  const pressList = submissions.filter(s=>pressFilter==="all"||s.status===pressFilter).sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
 
   const counts = { total:apps.length, pending:apps.filter(a=>a.status==="pending").length, approved:apps.filter(a=>a.status==="approved").length, rejected:apps.filter(a=>a.status==="rejected").length, avg:apps.length?Math.round(apps.reduce((s,a)=>s+a.score,0)/apps.length):0 };
   const pCounts = { total:submissions.length, pending:submissions.filter(s=>s.status==="pending").length, approved:submissions.filter(s=>s.status==="approved").length, rejected:submissions.filter(s=>s.status==="rejected").length };
@@ -1213,7 +1267,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                   {list.map((a,i)=>(
                     <div key={a.id}>
                       <div onClick={()=>setExp(exp===a.id?null:a.id)} style={{ display:"grid", gridTemplateColumns:"2fr 1.4fr 1fr 1fr 1fr 110px", alignItems:"center", padding:"16px 24px", background:exp===a.id?"var(--mint2)":i%2===0?"white":"var(--cream)", borderBottom:"1px solid var(--border2)", cursor:"pointer" }}>
-                        <div><p style={{ fontWeight:600, fontSize:"0.9rem", color:"var(--forest)" }}>{a.business_name||a.businessName||"Not provided"}</p><p style={{ color:"var(--text3)", fontSize:"0.72rem", marginTop:2 }}>{a.id}</p></div>
+                        <div><p style={{ fontWeight:600, fontSize:"0.9rem", color:"var(--forest)" }}>{a.businessName||a.business_name||"Not provided"}</p><p style={{ color:"var(--text3)", fontSize:"0.72rem", marginTop:2 }}>{a.id}</p></div>
                         <div><p style={{ fontSize:"0.85rem" }}>{a.business_niche||a.businessNiche||"Not specified"}</p><p style={{ color:"var(--text3)", fontSize:"0.72rem" }}>{(a.business_address||a.businessAddress)?(a.business_address||a.businessAddress).split(",")[0]:"Not provided"}</p></div>
                         <p style={{ fontSize:"0.85rem", color:"var(--text2)" }}>{a.monthly_turnover||a.monthlyTurnover||"Not stated"}</p>
                         <ScorePill v={a.score} />
@@ -1224,10 +1278,50 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                         </div>
                       </div>
                       {exp===a.id && (
-                        <div className="fade-up" style={{ padding:"28px 24px 32px", background:"var(--mint2)", borderBottom:"1px solid var(--border)", display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:20 }}>
-                          {[["Business Name",a.business_name||a.businessName],["Address",a.business_address||a.businessAddress],["Niche",a.business_niche||a.businessNiche],["Structure",a.business_structure||a.businessStructure],["Operating Since",a.business_age||a.businessAge],["Role",a.role],["Export Experience",a.export_experience||a.exportExperience],["Target Markets",((a.target_markets||a.targetMarkets)||[]).join(", ")],["Contact Email",a.contact_email||a.contactEmail],["Phone",a.contact_phone||a.contactPhone],["Production Capacity",a.production_capacity||a.productionCapacity],["Monthly Turnover",a.monthly_turnover||a.monthlyTurnover],["Working Capital",a.working_capital||a.workingCapital],["Export Familiarity",a.export_docs_familiarity||a.exportDocsFamiliarity],["Quality Standards",((a.quality_standards||a.qualityStandards)||[]).join(", ")],["KYC Consent",a.kyc_consent||a.kycConsent],["Export Products",a.export_products||a.exportProducts],["Export Timeline",a.export_timeline||a.exportTimeline],["Challenges",((a.challenges)||[]).join(", ")],["Support Needed",((a.support_needed||a.supportNeeded)||[]).join(", ")],["Submitted",new Date(a.submitted_at||a.submittedAt).toLocaleDateString("en-NG",{day:"numeric",month:"long",year:"numeric"})]].filter(([,v])=>v&&v!=="").map(([label,value])=>(
-                            <div key={label}><p style={{ fontSize:"0.65rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:3 }}>{label.toUpperCase()}</p><p style={{ fontSize:"0.85rem", color:"var(--text)", lineHeight:1.5 }}>{value}</p></div>
-                          ))}
+                        <div className="fade-up" style={{ padding:"28px 24px 32px", background:"var(--mint2)", borderBottom:"1px solid var(--border)" }}>
+                          {/* Product Photos */}
+                          {((a.product_photos||a.productPhotos)||[]).length > 0 && (
+                            <div style={{ marginBottom:24, paddingBottom:24, borderBottom:"1px solid var(--border)" }}>
+                              <p style={{ fontSize:"0.65rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:12 }}>PRODUCT PHOTOS</p>
+                              <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
+                                {((a.product_photos||a.productPhotos)||[]).map((url,idx)=>(
+                                  <div key={url} style={{ position:"relative", width:140, height:140, borderRadius:10, overflow:"hidden", border:"2px solid var(--border)", background:"var(--sand2)", flexShrink:0, boxShadow:"0 2px 12px rgba(27,61,47,0.1)" }}>
+                                    <img src={url} alt={"Product "+(idx+1)} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                                    <div style={{ position:"absolute", bottom:0, left:0, right:0, background:"rgba(27,61,47,0.7)", padding:"5px 10px" }}>
+                                      <p style={{ fontSize:"0.65rem", color:"white", fontWeight:600, letterSpacing:"0.06em" }}>{"PRODUCT "+(idx+1)}</p>
+                                    </div>
+                                    <a href={url} target="_blank" rel="noreferrer" style={{ position:"absolute", top:6, right:6, background:"rgba(0,0,0,0.55)", borderRadius:6, padding:"3px 7px", fontSize:"0.6rem", color:"white", textDecoration:"none", fontWeight:600 }}>View</a>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {/* Product Certificates */}
+                          {((a.product_certs||a.productCerts)||[]).length > 0 && (
+                            <div style={{ marginBottom:24, paddingBottom:24, borderBottom:"1px solid var(--border)" }}>
+                              <p style={{ fontSize:"0.65rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:12 }}>PRODUCT CERTIFICATES</p>
+                              <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                                {((a.product_certs||a.productCerts)||[]).map((f,idx)=>(
+                                  <div key={f.url||f} style={{ display:"flex", alignItems:"center", gap:12, background:"white", border:"1.5px solid var(--border)", borderRadius:8, padding:"10px 14px" }}>
+                                    <div style={{ width:36, height:36, borderRadius:6, overflow:"hidden", flexShrink:0, background:"var(--mint2)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                                      {(f.type==="application/pdf"||(f.name||"").endsWith(".pdf"))
+                                        ? <span style={{ fontSize:"0.58rem", fontWeight:700, color:"var(--forest)", letterSpacing:"0.04em" }}>PDF</span>
+                                        : <img src={f.url||f} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                                      }
+                                    </div>
+                                    <p style={{ flex:1, fontSize:"0.82rem", fontWeight:500, color:"var(--text)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{f.name||("Certificate "+(idx+1))}</p>
+                                    <a href={f.url||f} target="_blank" rel="noreferrer" style={{ fontSize:"0.75rem", color:"var(--forest)", fontWeight:600, textDecoration:"none", flexShrink:0 }}>View</a>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {/* All other fields */}
+                          <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:20 }}>
+                            {[["Business Name",a.business_name||a.businessName],["Address",a.business_address||a.businessAddress],["Niche",a.business_niche||a.businessNiche],["Structure",a.business_structure||a.businessStructure],["Operating Since",a.business_age||a.businessAge],["Role",a.role],["Export Experience",a.export_experience||a.exportExperience],["Target Markets",((a.target_markets||a.targetMarkets)||[]).join(", ")],["Contact Email",a.contact_email||a.contactEmail],["Phone",a.contact_phone||a.contactPhone],["Production Capacity",a.production_capacity||a.productionCapacity],["Monthly Turnover",a.monthly_turnover||a.monthlyTurnover],["Working Capital",a.working_capital||a.workingCapital],["Export Familiarity",a.export_docs_familiarity||a.exportDocsFamiliarity],["Quality Standards",((a.quality_standards||a.qualityStandards)||[]).join(", ")],["KYC Consent",a.kyc_consent||a.kycConsent],["Export Products",a.export_products||a.exportProducts],["Export Timeline",a.export_timeline||a.exportTimeline],["Challenges",((a.challenges)||[]).join(", ")],["Support Needed",((a.support_needed||a.supportNeeded)||[]).join(", ")],["Submitted",new Date(a.submitted_at||a.submittedAt).toLocaleDateString("en-NG",{day:"numeric",month:"long",year:"numeric"})]].filter(([,v])=>v&&v!=="").map(([label,value])=>(
+                              <div key={label}><p style={{ fontSize:"0.65rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:3 }}>{label.toUpperCase()}</p><p style={{ fontSize:"0.85rem", color:"var(--text)", lineHeight:1.5 }}>{value}</p></div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1255,7 +1349,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
               ))}
             </div>
             {submissions.length===0
-              ? <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"80px 40px", textAlign:"center" }}><p style={{ fontSize:"3rem", marginBottom:16 }}>📰</p><h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.6rem", color:"var(--forest)", marginBottom:8 }}>No press submissions yet</h3><p style={{ color:"var(--text3)" }}>Journalist submissions will appear here for review.</p></div>
+              ? <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"80px 40px", textAlign:"center" }}><p style={{ fontSize:"3rem", marginBottom:16 }}>📰</p><h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.6rem", color:"var(--forest)", marginBottom:8 }}>No press submissions yet</h3></div>
               : <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
                   <div style={{ display:"grid", gridTemplateColumns:"2.5fr 1.5fr 1fr 1fr 120px", padding:"12px 24px", background:"var(--sand2)", borderBottom:"1px solid var(--border)", fontSize:"0.68rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em" }}>
                     <span>HEADLINE</span><span>JOURNALIST AND OUTLET</span><span>TYPE</span><span>STATUS</span><span>ACTIONS</span>
@@ -1263,15 +1357,9 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
                   {pressList.map((s,i)=>(
                     <div key={s.id}>
                       <div onClick={()=>setPressExp(pressExp===s.id?null:s.id)} style={{ display:"grid", gridTemplateColumns:"2.5fr 1.5fr 1fr 1fr 120px", alignItems:"center", padding:"16px 24px", background:pressExp===s.id?"var(--mint2)":i%2===0?"white":"var(--cream)", borderBottom:"1px solid var(--border2)", cursor:"pointer" }}>
-                        <div>
-                          <p style={{ fontWeight:600, fontSize:"0.88rem", color:"var(--forest)", lineHeight:1.3 }}>{s.headline||"Untitled"}</p>
-                          <p style={{ color:"var(--text3)", fontSize:"0.72rem", marginTop:2 }}>{s.id} · {new Date(s.submitted_at||s.submittedAt).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}</p>
-                        </div>
-                        <div>
-                          <p style={{ fontSize:"0.85rem", fontWeight:500 }}>{s.name||"Unknown"}</p>
-                          <p style={{ color:"var(--text3)", fontSize:"0.75rem" }}>{s.outlet||"No outlet"}</p>
-                        </div>
-                        <span style={{ background:"var(--mint2)", color:"var(--forest3)", padding:"3px 8px", borderRadius:4, fontSize:"0.68rem", fontWeight:600 }}>{s.story_type||s.storyType||"Submission"}</span>
+                        <div><p style={{ fontWeight:600, fontSize:"0.88rem", color:"var(--forest)", lineHeight:1.3 }}>{s.headline||"Untitled"}</p><p style={{ color:"var(--text3)", fontSize:"0.72rem", marginTop:2 }}>{s.id}</p></div>
+                        <div><p style={{ fontSize:"0.85rem", fontWeight:500 }}>{s.name||"Unknown"}</p><p style={{ color:"var(--text3)", fontSize:"0.75rem" }}>{s.outlet||"No outlet"}</p></div>
+                        <span style={{ background:"var(--mint2)", color:"var(--forest3)", padding:"3px 8px", borderRadius:4, fontSize:"0.68rem", fontWeight:600 }}>{s.storyType||s.story_type||"Submission"}</span>
                         <StPill st={s.status} />
                         <div style={{ display:"flex", gap:6 }} onClick={e=>e.stopPropagation()}>
                           <button onClick={()=>upSubStatus(s.id,"approved")} style={{ background:"#E8F5EF", border:"1px solid #1B7A4A40", color:"#1B7A4A", padding:"6px 10px", borderRadius:6, fontSize:"0.75rem", cursor:"pointer", fontWeight:700 }}>Publish</button>
@@ -1309,13 +1397,15 @@ export default function App() {
   const [pressUnlocked, setPressUnlocked] = useState(false);
   const { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError } = useDataStore();
 
-  const logoClicks = useRef(0);
-  const logoTimer  = useRef(null);
+  const logoClicks  = useRef(0);
+  const logoTimer   = useRef(null);
+  const pressClicks = useRef(0);
+  const pressTimer  = useRef(null);
 
   const handleLogoClick = () => {
     logoClicks.current += 1;
     clearTimeout(logoTimer.current);
-    logoTimer.current = setTimeout(() => { logoClicks.current = 0; }, 2000);
+    logoTimer.current = setTimeout(()=>{ logoClicks.current=0; }, 2000);
     if (logoClicks.current >= 5) {
       logoClicks.current = 0;
       setAdminUnlocked(false);
@@ -1325,10 +1415,20 @@ export default function App() {
     }
   };
 
-  const approvedSubmissions = submissions.filter(s => s.status === "approved");
+  const handlePressClick = () => {
+    pressClicks.current += 1;
+    clearTimeout(pressTimer.current);
+    pressTimer.current = setTimeout(()=>{ pressClicks.current=0; }, 2000);
+    if (pressClicks.current >= 5) {
+      pressClicks.current = 0;
+      setPressUnlocked(false);
+      setPage("press-gate");
+    }
+  };
+
+  const approvedSubmissions = submissions.filter(s=>s.status==="approved");
   const showNav = !["admin-gate","dashboard"].includes(page);
 
-  // ── DB error banner (non-blocking) ──
   const DbBanner = () => dbError ? (
     <div style={{ position:"fixed", bottom:20, left:"50%", transform:"translateX(-50%)", zIndex:9999, background:"#FEF0EF", border:"1.5px solid var(--red)", borderRadius:10, padding:"12px 20px", display:"flex", alignItems:"center", gap:10, boxShadow:"0 4px 20px rgba(0,0,0,0.12)", maxWidth:480 }}>
       <span>⚠️</span>
@@ -1336,7 +1436,6 @@ export default function App() {
     </div>
   ) : null;
 
-  // ── Loading screen ──
   if (loading) return (
     <>
       <GlobalStyles />
@@ -1352,35 +1451,20 @@ export default function App() {
       <GlobalStyles />
       <DbBanner />
       {showNav && <Nav page={page} setPage={setPage} onLogoClick={handleLogoClick} />}
-
       {page==="landing"   && <Landing setPage={setPage} />}
       {page==="register"  && <Registration addApp={addApp} />}
-      {page==="newsroom"  && <Newsroom setPage={setPage} approvedSubmissions={approvedSubmissions} />}
-
+      {page==="newsroom"  && <Newsroom setPage={setPage} approvedSubmissions={approvedSubmissions} onPressClick={handlePressClick} />}
       {page==="press-gate" && !pressUnlocked && (
-        <PasswordGate
-          title="Press Portal"
-          subtitle="This portal is for accredited journalists and media professionals. Enter your press credentials to continue."
-          password={PRESS_PASSWORD}
-          buttonLabel="Enter Press Portal"
-          onUnlock={() => { setPressUnlocked(true); setPage("press-portal"); }}
-        />
+        <PasswordGate title="Press Portal" subtitle="This portal is for accredited journalists and media professionals." password={PRESS_PASSWORD} buttonLabel="Enter Press Portal" onUnlock={()=>{ setPressUnlocked(true); setPage("press-portal"); }} />
       )}
       {page==="press-portal" && pressUnlocked && (
-        <PressPortal addSubmission={addSubmission} onExit={() => { setPressUnlocked(false); setPage("newsroom"); }} />
+        <PressPortal addSubmission={addSubmission} onExit={()=>{ setPressUnlocked(false); setPage("newsroom"); }} />
       )}
-
       {page==="admin-gate" && !adminUnlocked && (
-        <PasswordGate
-          title="Admin Access"
-          subtitle="This area is restricted. Enter your admin password to continue."
-          password={ADMIN_PASSWORD}
-          buttonLabel="Enter Dashboard"
-          onUnlock={() => { setAdminUnlocked(true); setPage("dashboard"); }}
-        />
+        <PasswordGate title="Admin Access" subtitle="This area is restricted. Enter your admin password to continue." password={ADMIN_PASSWORD} buttonLabel="Enter Dashboard" onUnlock={()=>{ setAdminUnlocked(true); setPage("dashboard"); }} />
       )}
       {page==="dashboard" && adminUnlocked && (
-        <Dashboard apps={apps} upAppStatus={upAppStatus} submissions={submissions} upSubStatus={upSubStatus} onExit={() => { setAdminUnlocked(false); setPage("landing"); }} />
+        <Dashboard apps={apps} upAppStatus={upAppStatus} submissions={submissions} upSubStatus={upSubStatus} onExit={()=>{ setAdminUnlocked(false); setPage("landing"); }} />
       )}
     </>
   );
