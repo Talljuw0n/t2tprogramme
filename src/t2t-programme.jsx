@@ -70,8 +70,8 @@ const GlobalStyles = () => (
   `}</style>
 );
 
-const ADMIN_PASSWORD = "T2T@Admin2026";
-const PRESS_PASSWORD = "T2TPress2026";
+// Passwords removed from frontend — verified server-side in Edge Function
+// To update: supabase secrets set ADMIN_PASSWORD=... PRESS_PASSWORD=...
 const SUPABASE_URL  = "https://rgtorhxyznizhjjqsfyt.supabase.co";
 const SUPABASE_ANON = "sb_publishable_etlhOo9Wb0Laye683RGJug_iNzG1JJK";
 
@@ -91,6 +91,22 @@ const sb = async (path, opts = {}) => {
   return text ? JSON.parse(text) : [];
 };
 
+
+// Edge Function client — all privileged ops verified server-side
+const adminFn = async (action, password, payload = {}) => {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/admin`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_ANON,
+      "Authorization": `Bearer ${SUPABASE_ANON}`,
+    },
+    body: JSON.stringify({ action, password, payload }),
+  });
+  if (res.status === 401) throw new Error("UNAUTHORIZED");
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  return res.json();
+};
 const EMAILJS_SERVICE  = "service_h050sxm";
 const EMAILJS_PUBKEY   = "_8-ZOysExnIB07wdD";
 const EMAILJS_T_CONFIRM = "template_o9zjxfb";
@@ -118,24 +134,29 @@ const useDataStore = () => {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading]         = useState(true);
   const [dbError, setDbError]         = useState(null);
+  const [adminPwd, setAdminPwd]       = useState(null);
+
+  // Called once admin password is verified — loads dashboard data via Edge Function
+  const loadAdminData = async (password) => {
+    setLoading(true);
+    try {
+      const [a, s] = await Promise.all([
+        adminFn("get_applications", password),
+        adminFn("get_submissions",  password),
+      ]);
+      setApps(Array.isArray(a) ? a : []);
+      setSubmissions(Array.isArray(s) ? s : []);
+      setAdminPwd(password);
+    } catch (e) {
+      console.error("Admin load error:", e);
+      setDbError("Could not load admin data. Check your password or network.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const [a, s] = await Promise.all([
-          sb("applications?select=*&order=submitted_at.desc"),
-          sb("press_submissions?select=*&order=submitted_at.desc"),
-        ]);
-        setApps(a);
-        setSubmissions(s);
-      } catch (e) {
-        console.error("Supabase load error:", e);
-        setDbError("Could not connect to database. Please check your network.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    setLoading(false); // Public view loads nothing — data fetched on admin login
   }, []);
 
   const addApp = async (data) => {
@@ -195,7 +216,7 @@ const useDataStore = () => {
 
   const upAppStatus = async (id, status) => {
     try {
-      await sb(`applications?id=eq.${id}`, { method:"PATCH", body:JSON.stringify({ status }), prefer:"return=minimal" });
+      await adminFn("update_app_status", adminPwd, { id, status });
       setApps(prev => prev.map(a => a.id === id ? { ...a, status } : a));
       const app   = apps.find(a => a.id === id);
       const email = app?.contact_email || app?.contactEmail;
@@ -248,14 +269,14 @@ const useDataStore = () => {
 
   const upSubStatus = async (id, status) => {
     try {
-      await sb(`press_submissions?id=eq.${id}`, { method:"PATCH", body:JSON.stringify({ status }), prefer:"return=minimal" });
+      await adminFn("update_sub_status", adminPwd, { id, status });
       setSubmissions(prev => prev.map(s => s.id === id ? { ...s, status } : s));
     } catch (e) {
       console.error("Supabase press status error:", e);
     }
   };
 
-  return { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError };
+  return { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError, loadAdminData };
 };
 
 const validatePhase = (phase, d) => {
@@ -322,13 +343,24 @@ const staticNews = [
     img:"https://images.unsplash.com/photo-1551836022-4c4c79ecde51?w=900&q=80", source:"T2T Programme Office" },
 ];
 
-const PasswordGate = ({ title, subtitle, password, buttonLabel, onUnlock }) => {
-  const [pw, setPw] = useState("");
-  const [err, setErr] = useState(false);
-  const [show, setShow] = useState(false);
-  const attempt = () => {
-    if (pw === password) { onUnlock(); setErr(false); }
-    else { setErr(true); setPw(""); }
+const PasswordGate = ({ title, subtitle, action, buttonLabel, onUnlock }) => {
+  const [pw, setPw]       = useState("");
+  const [err, setErr]     = useState(false);
+  const [show, setShow]   = useState(false);
+  const [busy, setBusy]   = useState(false);
+  const attempt = async () => {
+    if (!pw.trim()) return;
+    setBusy(true);
+    try {
+      await adminFn(action, pw);
+      onUnlock(pw);
+      setErr(false);
+    } catch (e) {
+      setErr(true);
+      setPw("");
+    } finally {
+      setBusy(false);
+    }
   };
   return (
     <div style={{ minHeight:"100vh", background:"var(--sand2)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
@@ -352,15 +384,15 @@ const PasswordGate = ({ title, subtitle, password, buttonLabel, onUnlock }) => {
           </button>
         </div>
         {err && <p style={{ color:"var(--red)", fontSize:"0.8rem", marginBottom:16, textAlign:"left" }}>Incorrect password. Please try again.</p>}
-        <button onClick={attempt} style={{ width:"100%", background:"var(--forest)", color:"white", border:"none", padding:"13px", borderRadius:10, fontSize:"0.95rem", fontWeight:600, cursor:"pointer", marginTop:err?0:8, boxShadow:"0 4px 16px rgba(27,61,47,0.25)" }}>
-          {buttonLabel}
+        <button onClick={attempt} disabled={busy} style={{ width:"100%", background:"var(--forest)", color:"white", border:"none", padding:"13px", borderRadius:10, fontSize:"0.95rem", fontWeight:600, cursor:busy?"not-allowed":"pointer", marginTop:err?0:8, boxShadow:"0 4px 16px rgba(27,61,47,0.25)", opacity:busy?0.7:1 }}>
+          {busy ? "Verifying…" : buttonLabel}
         </button>
       </div>
     </div>
   );
 };
 
-const T2T_LOGO = null;
+const T2T_LOGO = "/logo.png";
 
 const Nav = ({ page, setPage, onLogoClick }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -461,7 +493,7 @@ const Landing = ({ setPage }) => {
             {/* Left content */}
             <div className="fade-up" style={{ flex:1 }}>
               <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
-                <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
+                <span className="live-dot" /><span>Applications Open · Deadline April 13, 2026</span>
               </div>
               <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
                 Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
@@ -470,7 +502,7 @@ const Landing = ({ setPage }) => {
                 A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
               </p>
               <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:44, opacity:0.85 }}>
-                Lagos and Abuja · Commencing April 13, 2026
+                Lagos and Abuja · Commencing April 20, 2026
               </p>
               <div style={{ display:"flex", flexDirection:"row", gap:12 }}>
                 <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
@@ -486,7 +518,7 @@ const Landing = ({ setPage }) => {
             {/* Right overview card — desktop only */}
             <div style={{ width:280, background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:20, padding:"32px 28px", flexShrink:0 }}>
               <p style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(200,230,218,0.6)", letterSpacing:"0.12em", marginBottom:20 }}>PROGRAMME OVERVIEW</p>
-              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"March 31, 2026"},{label:"Commencement",val:"April 13, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val},i,arr)=>(
+              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"April 13, 2026"},{label:"Commencement",val:"April 20, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val},i,arr)=>(
                 <div key={label} style={{ marginBottom: i<arr.length-1?16:0, paddingBottom: i<arr.length-1?16:0, borderBottom: i<arr.length-1?"1px solid rgba(200,230,218,0.12)":"none" }}>
                   <p style={{ fontSize:"0.68rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
                   <p style={{ fontSize:"0.9rem", fontWeight:600, color:"white" }}>{val}</p>
@@ -500,7 +532,7 @@ const Landing = ({ setPage }) => {
         {m && (
           <div className="fade-up" style={{ display:"flex", flexDirection:"column" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28, alignSelf:"flex-start" }}>
-              <span className="live-dot" /><span>Applications Open · Deadline March 31, 2026</span>
+              <span className="live-dot" /><span>Applications Open · Deadline April 13, 2026</span>
             </div>
             <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3rem", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
               Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
@@ -509,7 +541,7 @@ const Landing = ({ setPage }) => {
               A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
             </p>
             <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:32, opacity:0.85 }}>
-              Lagos and Abuja · Commencing April 13, 2026
+              Lagos and Abuja · Commencing April 20, 2026
             </p>
             {/* Buttons */}
             <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
@@ -519,7 +551,7 @@ const Landing = ({ setPage }) => {
             {/* Overview card — mobile, full width, INSIDE the column */}
             <div style={{ background:"rgba(255,255,255,0.1)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:16, padding:"24px" }}>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-                {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"3 Months"},{label:"Deadline",val:"March 31, 2026"},{label:"Starts",val:"April 13, 2026"}].map(({label,val})=>(
+                {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"3 Months"},{label:"Deadline",val:"April 13, 2026"},{label:"Starts",val:"April 20, 2026"}].map(({label,val})=>(
                   <div key={label}>
                     <p style={{ fontSize:"0.65rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
                     <p style={{ fontSize:"0.875rem", fontWeight:600, color:"white" }}>{val}</p>
@@ -640,9 +672,9 @@ const Landing = ({ setPage }) => {
       <div style={{ position:"absolute", inset:0, opacity:0.1, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.5) 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
       <div className="wrap" style={{ position:"relative", zIndex:1, padding: m?"60px 24px":"100px 80px", textAlign:"center" }}>
         <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"clamp(2.5rem,5vw,4.5rem)", fontWeight:600, color:"white", lineHeight:1.05, marginBottom:16 }}>
-          Applications Close<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:300 }}>March 31, 2026</span>
+          Applications Close<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:300 }}>April 13, 2026</span>
         </h2>
-        <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:44, fontSize: m?"1rem":"1.1rem", fontWeight:300 }}>Programme commences April 13 in Lagos and Abuja.</p>
+        <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:44, fontSize: m?"1rem":"1.1rem", fontWeight:300 }}>Programme commences April 20 in Lagos and Abuja.</p>
         <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"16px 48px", borderRadius:10, fontSize:"1rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
           onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
           onMouseLeave={e=>{e.currentTarget.style.background="white";}}
@@ -668,7 +700,7 @@ const Landing = ({ setPage }) => {
         </div>
         <div style={{ display:"flex", flexDirection: m?"column":"row", justifyContent:"space-between", alignItems: m?"flex-start":"center", gap:12 }}>
           <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>Implemented by Duchess NL and Borderless Trade and Investments. Sponsored by Providus Bank.</p>
-          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>media@t2tprogramme.org</p>
+          <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>applications@t2tprogramme.com</p>
         </div>
       </div>
     </footer>
@@ -1031,7 +1063,7 @@ const PressPortal = ({ addSubmission, onExit }) => {
           <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:6 }}>SUBMISSION REFERENCE</p>
           <p style={{ fontFamily:"Cormorant Garamond", fontSize:"1.5rem", fontWeight:700, color:"var(--forest)" }}>{refId}</p>
         </div>
-        <p style={{ fontSize:"0.82rem", color:"var(--text3)", marginBottom:24 }}>For urgent enquiries contact: <strong>media@t2tprogramme.org</strong></p>
+        <p style={{ fontSize:"0.82rem", color:"var(--text3)", marginBottom:24 }}>For urgent enquiries contact: <strong>applications@t2tprogramme.com</strong></p>
         <button onClick={onExit} style={{ background:"var(--forest)", color:"white", border:"none", padding:"12px 28px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer" }}>Back to Newsroom</button>
       </div>
     </div>
@@ -1132,7 +1164,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
         <div style={{ marginTop:56, background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:16, padding:"36px 40px" }}>
           <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.4rem", color:"var(--forest)", marginBottom:20 }}>Media Contacts</h3>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20 }}>
-            {[{name:"Media Enquiries",email:"media@t2tprogramme.org",org:"T2T Programme Office"},{name:"Providus Bank Comms",email:"comms@providusbank.com",org:"Providus Bank"},{name:"Programme Updates",email:"updates@duchessnl.com",org:"Duchess NL and BTI"}].map(c=>(
+            {[{name:"Media Enquiries",email:"applications@t2tprogramme.com",org:"T2T Programme Office"},{name:"Programme Updates",email:"applications@t2tprogramme.com"}].map(c=>(
               <div key={c.email}><p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:3 }}>{c.name}</p><p style={{ color:"var(--forest)", fontSize:"0.83rem", marginBottom:2 }}>{c.email}</p><p style={{ color:"var(--text3)", fontSize:"0.78rem" }}>{c.org}</p></div>
             ))}
           </div>
@@ -1152,7 +1184,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
         <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems:"flex-end" }}>
           <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:12, padding:"16px 20px" }}>
             <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:4 }}>PRESS CONTACT</p>
-            <p style={{ color:"var(--forest)", fontWeight:600, fontSize:"0.875rem" }}>media@t2tprogramme.org</p>
+            <p style={{ color:"var(--forest)", fontWeight:600, fontSize:"0.875rem" }}>applications@t2tprogramme.com</p>
           </div>
           <button onClick={onPressClick} style={{ background:"transparent", border:"none", color:"transparent", padding:"10px 20px", borderRadius:8, fontSize:"0.82rem", cursor:"default", userSelect:"none", width:120 }}>&nbsp;</button>
         </div>
@@ -1196,7 +1228,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
           <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.8rem", fontWeight:600, color:"var(--forest)", marginBottom:6 }}>Media Resources</h2>
           <p style={{ color:"var(--text3)", marginBottom:32, fontSize:"0.875rem" }}>Official assets for press use</p>
           <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:12, marginBottom:32 }}>
-            {[{icon:"📄",title:"Programme Fact Sheet",type:"PDF · 2 pages"},{icon:"🎨",title:"Partner Logos Pack",type:"ZIP · Brand assets"},{icon:"📑",title:"Programme Overview",type:"PDF · 8 pages"}].map(({icon,title,type})=>(
+            {[{icon:"",title:"Programme Fact Sheet",type:"PDF · 2 pages"},{icon:"",title:"Partner Logos Pack",type:"ZIP · Brand assets"},{icon:"",title:"Programme Overview",type:"PDF · 8 pages"}].map(({icon,title,type})=>(
               <div key={title} style={{ background:"white", border:"1px solid var(--border)", borderRadius:12, padding:"20px", display:"flex", alignItems:"center", gap:14, cursor:"pointer" }} onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 16px rgba(27,61,47,0.08)"} onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
                 <div style={{ fontSize:"1.5rem" }}>{icon}</div>
                 <div><p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:2 }}>{title}</p><p style={{ color:"var(--text3)", fontSize:"0.75rem" }}>{type}</p></div>
@@ -1206,7 +1238,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
           <div style={{ paddingTop:32, borderTop:"1px solid var(--border)" }}>
             <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:16 }}>Press Contacts</h3>
             <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:12 }}>
-              {[{name:"Media Enquiries",email:"media@t2tprogramme.org",org:"T2T Programme Office"},{name:"Providus Bank Comms",email:"comms@providusbank.com",org:"Providus Bank"},{name:"Programme Updates",email:"updates@duchessnl.com",org:"Duchess NL and BTI"}].map(c=>(
+              {[{name:"Media Enquiries",email:"applications@t2tprogramme.com",org:"T2T Programme Office"},{name:"Programme Updates",email:"applications@t2tprogramme.com"}].map(c=>(
                 <div key={c.email} style={{ background:"white", border:"1px solid var(--border)", borderRadius:10, padding:"16px 18px" }}>
                   <p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:3 }}>{c.name}</p>
                   <p style={{ color:"var(--forest)", fontSize:"0.82rem", marginBottom:2 }}>{c.email}</p>
@@ -1422,7 +1454,7 @@ export default function App() {
   const [page, setPage]                   = useState("landing");
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [pressUnlocked, setPressUnlocked] = useState(false);
-  const { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError } = useDataStore();
+  const { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError, loadAdminData } = useDataStore();
 
   const logoClicks  = useRef(0);
   const logoTimer   = useRef(null);
@@ -1482,13 +1514,13 @@ export default function App() {
       {page==="register"  && <Registration addApp={addApp} />}
       {page==="newsroom"  && <Newsroom setPage={setPage} approvedSubmissions={approvedSubmissions} onPressClick={handlePressClick} />}
       {page==="press-gate" && !pressUnlocked && (
-        <PasswordGate title="Press Portal" subtitle="This portal is for accredited journalists and media professionals." password={PRESS_PASSWORD} buttonLabel="Enter Press Portal" onUnlock={()=>{ setPressUnlocked(true); setPage("press-portal"); }} />
+        <PasswordGate title="Press Portal" subtitle="This portal is for accredited journalists and media professionals." action="verify_press" buttonLabel="Enter Press Portal" onUnlock={()=>{ setPressUnlocked(true); setPage("press-portal"); }} />
       )}
       {page==="press-portal" && pressUnlocked && (
         <PressPortal addSubmission={addSubmission} onExit={()=>{ setPressUnlocked(false); setPage("newsroom"); }} />
       )}
       {page==="admin-gate" && !adminUnlocked && (
-        <PasswordGate title="Admin Access" subtitle="This area is restricted. Enter your admin password to continue." password={ADMIN_PASSWORD} buttonLabel="Enter Dashboard" onUnlock={()=>{ setAdminUnlocked(true); setPage("dashboard"); }} />
+        <PasswordGate title="Admin Access" subtitle="This area is restricted. Enter your admin password to continue." action="verify_admin" buttonLabel="Enter Dashboard" onUnlock={(pwd)=>{ setAdminUnlocked(true); loadAdminData(pwd); setPage("dashboard"); }} />
       )}
       {page==="dashboard" && adminUnlocked && (
         <Dashboard apps={apps} upAppStatus={upAppStatus} submissions={submissions} upSubStatus={upSubStatus} onExit={()=>{ setAdminUnlocked(false); setPage("landing"); }} />
