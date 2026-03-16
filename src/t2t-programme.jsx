@@ -193,6 +193,7 @@ const useDataStore = () => {
       working_capital:        data.workingCapital,
       pilot_agreement:        data.pilotAgreement,
       additional_info:        data.additionalInfo,
+      tc_consent:             data.tcConsent || false,
       product_photos:         data.productPhotos || [],
       product_certs:          data.productCerts  || [],
     };
@@ -308,6 +309,7 @@ const validatePhase = (phase, d) => {
   }
   if (phase === 3) {
     if (!d.exportProducts?.trim()) missing.push("exportProducts");
+    if (!d.tcConsent) missing.push("tcConsent");
     if (!d.shippingCompany) missing.push("shippingCompany");
     if (!d.exportTimeline) missing.push("exportTimeline");
     if (!d.challenges?.length) missing.push("challenges");
@@ -329,19 +331,99 @@ const scoreApp = (d) => {
 };
 
 const staticNews = [
-  { id:"s1", cat:"PRESS RELEASE", date:"March 1, 2026", featured:true,
-    headline:"Providus Bank, ECOWAS Parliament and GABA Launch Landmark T2T Programme for African SMEs",
-    summary:"The Training-to-Transaction Programme represents a transformative step in connecting West African SMEs to global markets, backed by structured trade finance and institutional support from three leading organisations.",
-    img:"https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=900&q=80", source:"T2T Programme Office" },
-  { id:"s2", cat:"PROGRAMME UPDATE", date:"February 28, 2026", featured:false,
-    headline:"Applications Now Open: SMEs to Gain Market Access Across USA, Canada and Caribbean",
-    summary:"Selected participants will receive structured guidance on export readiness, trade compliance, buyer access, and trade finance solutions over a three-month intensive programme in Lagos and Abuja.",
-    img:"https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=900&q=80", source:"T2T Programme Office" },
-  { id:"s3", cat:"PARTNER SPOTLIGHT", date:"February 25, 2026", featured:false,
-    headline:"ECOWAS Parliament Endorses T2T as Flagship SME Trade Initiative for 2026",
-    summary:"The ECOWAS Parliament's endorsement signals strong regional commitment to enabling intra-African and global trade for small and medium enterprises across West Africa.",
-    img:"https://images.unsplash.com/photo-1551836022-4c4c79ecde51?w=900&q=80", source:"T2T Programme Office" },
+  { id:"s1", cat:"PRESS RELEASE", date:"March 6, 2026", featured:true,
+    headline:"ECOWAS Parliament Kicks Off Year-Long Commemorative Programme with the Private Sector",
+    summary:"The year-long programme to celebrate 25 years of ECOWAS Parliament has launched in Abuja with authorised partners Duchess NL and Borderless Trade & Investment — the same implementing partners behind the T2T Programme.",
+    img:"https://insidebusiness.ng/wp-content/uploads/OVL08358-scaled.jpg",
+    source:"Green Savannah Diplomatic Cable",
+    externalUrl:"https://greensavannahdiplomaticcable.com/2026/03/ecowas-parliament-kicks-off-year-long-commemorative-programme-with-the-private-sector/" },
+  { id:"s2", cat:"MEDIA COVERAGE", date:"March 5, 2026", featured:false,
+    headline:"ECOWAS Parliament Seeks Stronger Regional Trade Participation",
+    summary:"The ECOWAS Parliament called for stronger participation in regional trade across West Africa, with its Director of Parliamentary Affairs urging that trade and innovation must translate into improved welfare for citizens across the subregion.",
+    img:"https://cdn.punchng.com/wp-content/uploads/2025/05/22153016/The-ECOWAS-Parliament-during-the-sitting-in-Abuja-NAN.jpeg",
+    source:"Punch",
+    externalUrl:"https://punchng.com/ecowas-parliament-seeks-stronger-regional-trade-participation/" },
+  { id:"s3", cat:"MEDIA COVERAGE", date:"March 6, 2026", featured:false,
+    headline:"ECOWAS Parliament Pushes Stronger Public Engagement, Private Sector Role",
+    summary:"The ECOWAS Parliament called for deeper public engagement, stronger youth participation and greater private sector involvement as part of year-long initiatives to commemorate its 25th anniversary.",
+    img:"https://blogger.googleusercontent.com/img/a/AVvXsEhHsd8VqjJR6bd2HfBND-nYRBiU-r8kih6yWxyCub31uUm2xNv3IfapaLGYLh80vSDrFJjR6dw6-zOMmvsC4zyfPcqq-PpbXuqWVp4SSuPpprRUGbW3MRK4QxYP-FYqkb5U9WlmF829572YfMlyKr4jqcdk0wRTrsLxtIYX7zqKxCbHze_ZqcEunsgRP3Nl",
+    source:"CityBlog News",
+    externalUrl:"https://www.cityblognews.com/2026/03/ecowas-parliament-pushes-stronger.html" },
+  { id:"s4", cat:"PARTNER SPOTLIGHT", date:"March 5, 2026", featured:false,
+    headline:"ECOWAS Parliament, Private Sector Unite to Grow Regional Trade",
+    summary:"Victoria Akai (CEO, Duchess Naturals), Kabeer Garba (ECOWAS Parliament), and Olori Boye-Ajayi (Borderless Trade & Investments) came together at a press conference to announce private sector-led initiatives driving regional trade across West Africa.",
+    img:"https://insidebusiness.ng/wp-content/uploads/OVL08358-scaled.jpg",
+    source:"InsideBusiness",
+    externalUrl:"https://insidebusiness.ng/239001/ecowas-parliament-private-sector-unite-to-grow-regional-trade/" },
 ];
+
+
+// ─── TERMS & CONDITIONS MODAL ─────────────────────────────────────────────────
+const TCModal = ({ onClose }) => (
+  <div style={{ position:"fixed", inset:0, zIndex:2000, background:"rgba(0,0,0,0.55)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }} onClick={onClose}>
+    <div onClick={e=>e.stopPropagation()} style={{ background:"white", borderRadius:16, maxWidth:640, width:"100%", maxHeight:"80vh", display:"flex", flexDirection:"column", boxShadow:"0 24px 80px rgba(0,0,0,0.2)" }}>
+      <div style={{ padding:"28px 32px 20px", borderBottom:"1px solid var(--border)", flexShrink:0 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+          <div>
+            <p style={{ fontSize:"0.68rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.1em", marginBottom:6 }}>T2T PROGRAMME</p>
+            <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.6rem", fontWeight:600, color:"var(--forest)", lineHeight:1.1 }}>Terms, Conditions and Data Consent</h2>
+          </div>
+          <button onClick={onClose} style={{ background:"var(--sand2)", border:"1px solid var(--border)", borderRadius:8, width:32, height:32, cursor:"pointer", fontSize:"1rem", color:"var(--text3)", flexShrink:0, marginLeft:16 }}>✕</button>
+        </div>
+      </div>
+      <div style={{ overflowY:"auto", padding:"24px 32px 32px", fontSize:"0.875rem", color:"var(--text2)", lineHeight:1.8 }}>
+
+        <p style={{ fontSize:"0.78rem", color:"var(--text3)", marginBottom:24 }}>Last updated: March 2026 · Training-to-Transaction (T2T) Programme</p>
+
+        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8, marginTop:0 }}>1. About This Programme</h3>
+        <p style={{ marginBottom:20 }}>The Training-to-Transaction (T2T) Programme is a sponsored initiative designed to support African Small and Medium Enterprises (SMEs) in transitioning from business readiness to executing real commercial transactions. The programme is sponsored by Providus Bank as part of the celebration of the ECOWAS Parliament at 25, in collaboration with the Global African Business Association (GABA). It is implemented by Duchess Naturals Limited (DNL) and Borderless Trade & Investments (BTI). The programme aims to equip participating SMEs with the tools, market access, and strategic support needed to secure trade opportunities, close deals, and scale their businesses within regional and international markets. By submitting this application, you confirm that you have read, understood, and agreed to the terms and conditions of the programme.</p>
+
+        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>2. Eligibility</h3>
+        <p style={{ marginBottom:20 }}>The programme is open to registered African SMEs with verifiable operational capacity, business stability, and a readiness for structured trade engagement. Prior export experience is an advantage but is not mandatory. Submission of an application does not guarantee selection in this cohort. All applications will undergo a screening and evaluation process conducted by the implementing partners, Duchess Naturals Limited (DNL) and Borderless Trade & Investments (BTI), in collaboration with Providus Bank. This process is designed to assess each applicant's business readiness, operational capacity, and growth potential in order to determine the most appropriate support stage within the programme. Participation in the programme will be based on the outcome of this evaluation.</p>
+
+        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>3. Data Collection and Use</h3>
+        <p style={{ marginBottom:12 }}>The information you provide in this application will be used solely for the following purposes:</p>
+        <ul style={{ paddingLeft:20, marginBottom:20 }}>
+          <li style={{ marginBottom:8 }}>Screening and evaluating your suitability for the programme</li>
+          <li style={{ marginBottom:8 }}>Contacting you regarding your application status</li>
+          <li style={{ marginBottom:8 }}>Onboarding and administering your participation if selected</li>
+          <li style={{ marginBottom:8 }}>Compliance and KYC verification as required by Providus Bank</li>
+          <li style={{ marginBottom:8 }}>Measuring and reporting programme outcomes and key performance indicators</li>
+        </ul>
+
+        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>4. Third-Party Data Sharing</h3>
+        <p style={{ marginBottom:12 }}>By agreeing to these terms, you consent to your application information being shared with the following programme partners for the purposes described above:</p>
+        <ul style={{ paddingLeft:20, marginBottom:12 }}>
+          <li style={{ marginBottom:6 }}><strong>Providus Bank</strong> — Lead sponsor; trade finance, KYC verification and account services</li>
+          <li style={{ marginBottom:6 }}><strong>ECOWAS Parliament</strong> — Institutional backer; regional trade policy and market access support</li>
+          <li style={{ marginBottom:6 }}><strong>Global African Business Association (GABA)</strong> — Buyer linkage and international market connections</li>
+          <li style={{ marginBottom:6 }}><strong>Duchess Natural Limited (DNL)</strong> — Programme implementation and SME coordination</li>
+          <li style={{ marginBottom:6 }}><strong>Borderless Trade & Investments (BTI)</strong> — Programme implementation and trade facilitation</li>
+        </ul>
+        <p style={{ marginBottom:20 }}>Your data will not be sold, rented, or shared with any organisation outside this programme without your explicit consent. All partners are bound by confidentiality obligations consistent with applicable data protection laws.</p>
+
+        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>5. KYC Verification</h3>
+        <p style={{ marginBottom:20 }}>Full KYC (Know Your Customer) verification is mandatory for all participants accepted into the programme. This is a regulatory requirement under Providus Bank's compliance framework. Failure to complete KYC verification will result in disqualification from the programme regardless of application score.</p>
+
+        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>6. Pilot Transaction Requirement</h3>
+        <p style={{ marginBottom:20 }}>As a standard programme requirement, initial commercial engagement will commence with small pilot transactions prior to full-scale deals. This is designed to validate readiness and build a verifiable transaction record. Applicants who do not agree to this condition will not be eligible for the transaction execution stage of the programme.</p>
+
+        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>7. Programme Commitment</h3>
+        <p style={{ marginBottom:20 }}>Selected participants are expected to commit fully to all programme activities including attendance at training sessions, submission of required compliance documents, and active participation in market access engagements. The programme runs for three months across Lagos and Abuja. Participants who fail to meet attendance and commitment requirements may be removed from the programme.</p>
+
+        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>8. Accuracy of Information</h3>
+        <p style={{ marginBottom:20 }}>By submitting this application you confirm that all information provided is accurate, complete, and truthful. Submission of false or misleading information will result in immediate disqualification and may be reported to relevant authorities where required by law.</p>
+
+        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>9. No Guarantee of Selection</h3>
+        <p style={{ marginBottom:20 }}>Submission of a completed application does not guarantee selection into the programme. All applications will be assessed against the programme's eligibility and scoring criteria. The implementing partners and Providus Bank reserve the right to accept or decline any application at their discretion.</p>
+
+        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>10. Contact</h3>
+        <p style={{ marginBottom:0 }}>For questions regarding these terms or your application, contact the T2T Programme team at <strong>applications@t2tprogramme.com</strong>.</p>
+
+      </div>
+    </div>
+  </div>
+);
 
 const PasswordGate = ({ title, subtitle, action, buttonLabel, onUnlock }) => {
   const [pw, setPw]       = useState("");
@@ -465,7 +547,6 @@ const PARTNER_LOGOS = {
   ecowas:     "/logos/ecowas.png",
   gaba:       "/logos/gaba.png",
   duchess:    "/logos/duchess.png",
-  cmd:        "/logos/CMD.png",
   borderless: "/logos/borderless.png",
 };
 
@@ -476,7 +557,6 @@ const Landing = ({ setPage }) => {
     { key:"ecowas",     name:"ECOWAS Parliament",                    role:"Institutional Backer", abbr:"EP"   },
     { key:"gaba",       name:"Global African Business Assoc.",       role:"GABA",                 abbr:"GABA" },
     { key:"duchess",    name:"Duchess Natural Limited",              role:"Implementing Partner", abbr:"DNL"  },
-    { key:"cmd",        name:"CMD Tourism & Trade Enterprises Ltd",  role:"Implementing Partner", abbr:"CMD"  },
     { key:"borderless", name:"Borderless Trade & Investments",       role:"Implementing Partner", abbr:"BTI"  },
   ];
   return (
@@ -929,6 +1009,28 @@ const Ph2=({d,s,errors})=>(<>
   <EA id="kycConsent"><FF num="19" label="KYC Verification Consent" hint="Full KYC verification is mandatory for participation and access to this programme." hasError={errors.includes("kycConsent")}><Rad value={d.kycConsent} onChange={v=>s("kycConsent",v)} options={["Yes, I will participate","No","I need further information on the KYC process"]} hasError={errors.includes("kycConsent")} /></FF></EA>
 </>);
 
+const TCConsentCheck = ({ value, onChange, hasError }) => {
+  const [showModal, setShowModal] = useState(false);
+  return (
+    <>
+      {showModal && <TCModal onClose={()=>setShowModal(false)} />}
+      <label onClick={()=>onChange(!value)} style={{ display:"flex", alignItems:"flex-start", gap:14, cursor:"pointer" }}>
+        <div style={{ width:20, height:20, borderRadius:5, border:`2px solid ${value?"var(--forest)":hasError?"var(--red)":"var(--border)"}`, background:value?"var(--forest)":"white", flexShrink:0, marginTop:2, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.7rem", color:"white", transition:"all 0.15s" }}>
+          {value && "✓"}
+        </div>
+        <p style={{ fontSize:"0.875rem", color:hasError?"var(--red)":"var(--text2)", lineHeight:1.7 }}>
+          I have read and agree to the{" "}
+          <span onClick={e=>{e.stopPropagation();setShowModal(true);}} style={{ color:"var(--forest)", fontWeight:600, textDecoration:"underline", cursor:"pointer" }}>
+            Terms, Conditions and Data Consent
+          </span>
+          {" "}of the T2T Programme, including the sharing of my application data with programme partners for the purpose of screening, onboarding and programme delivery.
+        </p>
+      </label>
+      {hasError && <p style={{ fontSize:"0.78rem", color:"var(--red)", marginTop:10, paddingLeft:34 }}>You must agree to the terms and conditions before submitting your application.</p>}
+    </>
+  );
+};
+
 const Ph3=({d,s,errors})=>(<>
   <EA id="exportProducts"><FF num="20" label="What products or services do you want to export?" hint="Please be as specific as possible." hasError={errors.includes("exportProducts")}><TA value={d.exportProducts} onChange={v=>s("exportProducts",v)} placeholder="Describe your specific products or services..." hasError={errors.includes("exportProducts")} /></FF></EA>
   <EA id="shippingCompany"><FF num="21" label="Do you use a shipping company?" hasError={errors.includes("shippingCompany")}><Rad value={d.shippingCompany} onChange={v=>s("shippingCompany",v)} options={["Yes, always","Yes, sometimes","No"]} hasError={errors.includes("shippingCompany")} /></FF></EA>
@@ -938,6 +1040,12 @@ const Ph3=({d,s,errors})=>(<>
   <EA id="workingCapital"><FF num="25" label="Estimated working capital available" hasError={errors.includes("workingCapital")}><Rad value={d.workingCapital} onChange={v=>s("workingCapital",v)} options={["Below ₦100k","₦100k to ₦500k","₦500k to ₦2M","₦2M and above"]} hasError={errors.includes("workingCapital")} /></FF></EA>
   <EA id="pilotAgreement"><FF num="26" label="Pilot transaction requirement" hint="As a standard requirement, initial engagement will commence with small pilot transactions prior to full-scale deals." hasError={errors.includes("pilotAgreement")}><Rad value={d.pilotAgreement} onChange={v=>s("pilotAgreement",v)} options={["Yes, please provide further details on the pilot transaction requirements","No, I will not proceed under this condition"]} hasError={errors.includes("pilotAgreement")} /></FF></EA>
   <FF num="27" label="Is there anything else we should know about your business?" hint="Optional"><TA value={d.additionalInfo} onChange={v=>s("additionalInfo",v)} placeholder="Any other relevant information..." rows={4} /></FF>
+  <EA id="tcConsent">
+    <div style={{ background:errors.includes("tcConsent")?"#FEF0EF":"var(--mint2)", border:`1.5px solid ${errors.includes("tcConsent")?"var(--red)":"var(--border)"}`, borderRadius:12, padding:"20px 24px" }}>
+      <p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--forest)", letterSpacing:"0.08em", marginBottom:12 }}>TERMS AND CONDITIONS</p>
+      <TCConsentCheck value={d.tcConsent} onChange={v=>s("tcConsent",v)} hasError={errors.includes("tcConsent")} />
+    </div>
+  </EA>
 </>);
 
 // ─── SME REGISTRATION ─────────────────────────────────────────────────────────
@@ -1140,6 +1248,11 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
   const feat = allArticles.find(n=>n.featured)||allArticles[0];
   const rest = allArticles.filter(n=>n.id!==feat.id);
 
+  const handleArticleClick = (a) => {
+    if (a.externalUrl) { window.open(a.externalUrl, "_blank", "noreferrer"); }
+    else { setArt(a); }
+  };
+
   if (art) return (
     <div style={{ minHeight:"100vh", background:"var(--cream)", padding:m?"80px 20px 60px":"100px 80px 80px", maxWidth:900, margin:"0 auto" }}>
       <button onClick={()=>setArt(null)} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"8px 18px", borderRadius:8, fontSize:"0.8rem", fontWeight:500, cursor:"pointer", marginBottom:40 }}>Back to Newsroom</button>
@@ -1190,7 +1303,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
         </div>
       </div>
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
-        <div onClick={()=>setArt(feat)} className="card-hover" style={{ display:"grid", gridTemplateColumns:m?"1fr":"1fr 1fr", background:"white", borderRadius:16, border:"1px solid var(--border)", overflow:"hidden", marginBottom:40, cursor:"pointer" }}>
+        <div onClick={()=>handleArticleClick(feat)} className="card-hover" style={{ display:"grid", gridTemplateColumns:m?"1fr":"1fr 1fr", background:"white", borderRadius:16, border:"1px solid var(--border)", overflow:"hidden", marginBottom:40, cursor:"pointer" }}>
           <div style={{ height:m?220:380, overflow:"hidden" }}>
             <img src={feat.img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.5s ease" }} onMouseEnter={e=>e.target.style.transform="scale(1.04)"} onMouseLeave={e=>e.target.style.transform="scale(1)"} />
           </div>
@@ -1207,12 +1320,15 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
         {rest.length > 0 && (
           <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:16, marginBottom:60 }}>
             {rest.map(a=>(
-              <div key={a.id} onClick={()=>setArt(a)} className="card-hover" style={{ background:"white", borderRadius:14, border:"1px solid var(--border)", overflow:"hidden", cursor:"pointer" }}>
+              <div key={a.id} onClick={()=>handleArticleClick(a)} className="card-hover" style={{ background:"white", borderRadius:14, border:"1px solid var(--border)", overflow:"hidden", cursor:"pointer" }}>
                 <div style={{ height:200, overflow:"hidden" }}>
                   <img src={a.img} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.4s" }} onMouseEnter={e=>e.target.style.transform="scale(1.05)"} onMouseLeave={e=>e.target.style.transform="scale(1)"} />
                 </div>
                 <div style={{ padding:"22px 22px 24px" }}>
-                  <span style={{ fontSize:"0.65rem", fontWeight:600, letterSpacing:"0.1em", color:"var(--sage)", display:"inline-block", marginBottom:8 }}>{a.cat}</span>
+                  <div style={{ display:"flex", gap:6, alignItems:"center", marginBottom:8 }}>
+                    <span style={{ fontSize:"0.65rem", fontWeight:600, letterSpacing:"0.1em", color:"var(--sage)" }}>{a.cat}</span>
+                    {a.externalUrl && <span style={{ fontSize:"0.6rem", background:"var(--sand2)", border:"1px solid var(--border)", color:"var(--text3)", padding:"1px 6px", borderRadius:4, fontWeight:500 }}>↗ External</span>}
+                  </div>
                   <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.15rem", fontWeight:600, color:"var(--forest)", lineHeight:1.3, marginBottom:8 }}>{a.headline}</h3>
                   <p style={{ fontSize:"0.82rem", color:"var(--text2)", lineHeight:1.6, marginBottom:12 }}>{a.summary?.substring(0,110)}...</p>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -1227,13 +1343,12 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:20, padding:m?"28px 20px":"48px" }}>
           <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.8rem", fontWeight:600, color:"var(--forest)", marginBottom:6 }}>Media Resources</h2>
           <p style={{ color:"var(--text3)", marginBottom:32, fontSize:"0.875rem" }}>Official assets for press use</p>
-          <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:12, marginBottom:32 }}>
-            {[{icon:"",title:"Programme Fact Sheet",type:"PDF · 2 pages"},{icon:"",title:"Partner Logos Pack",type:"ZIP · Brand assets"},{icon:"",title:"Programme Overview",type:"PDF · 8 pages"}].map(({icon,title,type})=>(
-              <div key={title} style={{ background:"white", border:"1px solid var(--border)", borderRadius:12, padding:"20px", display:"flex", alignItems:"center", gap:14, cursor:"pointer" }} onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 16px rgba(27,61,47,0.08)"} onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
-                <div style={{ fontSize:"1.5rem" }}>{icon}</div>
-                <div><p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:2 }}>{title}</p><p style={{ color:"var(--text3)", fontSize:"0.75rem" }}>{type}</p></div>
-              </div>
-            ))}
+          <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:14, padding:"32px 28px", marginBottom:32, display:"flex", flexDirection:m?"column":"row", alignItems:m?"flex-start":"center", justifyContent:"space-between", gap:24 }}>
+            <div>
+              <p style={{ fontWeight:600, fontSize:"1rem", color:"var(--forest)", marginBottom:8 }}>Request Press Assets</p>
+              <p style={{ fontSize:"0.875rem", color:"var(--text2)", lineHeight:1.7, maxWidth:480, fontWeight:300 }}>Programme fact sheets, partner logos, event photos and background briefings are available on request. Email our communications team with your publication name and deadline and we will respond within one business day.</p>
+            </div>
+            <a href="mailto:applications@t2tprogramme.com?subject=Media%20Asset%20Request%20%E2%80%94%20T2T%20Programme" style={{ background:"var(--forest)", color:"white", border:"none", padding:"12px 28px", borderRadius:9, fontSize:"0.875rem", fontWeight:600, cursor:"pointer", textDecoration:"none", whiteSpace:"nowrap", flexShrink:0 }}>Request Assets</a>
           </div>
           <div style={{ paddingTop:32, borderTop:"1px solid var(--border)" }}>
             <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:16 }}>Press Contacts</h3>
