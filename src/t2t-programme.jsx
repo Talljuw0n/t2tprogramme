@@ -219,21 +219,21 @@ const useDataStore = () => {
     try {
       await adminFn("update_app_status", adminPwd, { id, status });
       setApps(prev => prev.map(a => a.id === id ? { ...a, status } : a));
-      const app   = apps.find(a => a.id === id);
-      const email = app?.contact_email || app?.contactEmail;
-      const name  = app?.business_name || app?.businessName || "Applicant";
-      if (email) {
-        const isApproved = status === "approved";
-        await sendEmail(EMAILJS_T_STATUS, {
-          to_email:       email,
-          to_name:        name,
-          applicant_name: name,
-          reference_id:   id,
-          status:         isApproved ? "Approved" : "Unsuccessful",
-          status_message: isApproved
-            ? "Congratulations — your application has been shortlisted. Our team will be in touch shortly with next steps."
-            : "Thank you for applying. After careful review, we are unable to offer you a place in this cohort. We encourage you to apply again in future cycles.",
-        });
+      // Only send email on approval — rejected applicants receive nothing
+      if (status === "approved") {
+        const app   = apps.find(a => a.id === id);
+        const email = app?.contact_email || app?.contactEmail;
+        const name  = app?.business_name || app?.businessName || "Applicant";
+        if (email) {
+          const assessmentLink = `https://t2tprogramme.com?assessment=${id}`;
+          await sendEmail(EMAILJS_T_STATUS, {
+            to_email:        email,
+            to_name:         name,
+            applicant_name:  name,
+            reference_id:    id,
+            assessment_link: assessmentLink,
+          });
+        }
       }
     } catch (e) {
       console.error("Supabase status update error:", e);
@@ -1564,9 +1564,358 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
   );
 };
 
+
+// ─── EXPORT READINESS ASSESSMENT ─────────────────────────────────────────────
+const ASSESSMENT_SECTIONS = [
+  {
+    id: "statutory", label: "Statutory Readiness",
+    desc: "Your business is statutory compliant",
+    questions: [
+      "Is your business registered?",
+      "Is the information about your business up-to-date: e.g. its directors / members, business address, accounting officer and auditor?",
+      "Does your business meet all statutory requirements?",
+      "Are your statutory returns and payments up-to-date?",
+      "Is your business registered as an exporter?",
+      "Is the information about your business (e.g. business name and address) consistent with all the statutory bodies/authorities?",
+      "Is your business compliant with the regulations specific to your type of business, e.g. health and environmental regulations?",
+    ]
+  },
+  {
+    id: "management", label: "Management Readiness",
+    desc: "Your management is committed and geared to plan and implement export ventures",
+    questions: [
+      "Is your business well-established, stable and achieving success in its domestic market?",
+      "Do you have an up-to-date business plan?",
+      "Are you open to new ways of doing business?",
+      "Do you have a realistic idea of what exporting entails and the timelines for results?",
+      "Is exporting part of your business's long-term goals?",
+      "Is senior management committed to exporting?",
+      "Have you conducted an export-focused SWOT analysis?",
+      "Do you have clear, achievable and measurable export objectives?",
+      "Do you have an up-to-date export plan?",
+      "Have accounting, administrative and communications systems been formalized?",
+      "Are you willing to travel and spend significant time developing new markets?",
+      "Do you have sufficient financial resources to pursue other markets and are you willing to invest in developing new markets?",
+      "Can you obtain enough capital or lines of credit to cover the costs for market development and managing cash flow?",
+    ]
+  },
+  {
+    id: "hr", label: "Human Resource Readiness",
+    desc: "Your staff is committed and has the skills necessary to implement export ventures",
+    questions: [
+      "Do you have the capacity to handle the extra demand associated with exporting?",
+      "Will you be able to serve both your existing domestic customers and your new foreign clients?",
+      "If your domestic demand increases, will you still be able to look after your export customers — and vice versa?",
+      "Is there an entrepreneurial spirit within your organization?",
+      "Is exporting recognized by the full staff as a priority of the business and is everyone prepared to work towards this goal?",
+      "Do you and/or someone within the business have international business experience?",
+      "Do you have staff with strong, culturally-sensitive, marketing skills?",
+      "Do you have the necessary research and project management skills?",
+      "Is someone available within the business who can read, write and speak the official foreign language of your target market?",
+      "Is someone available who could be made responsible for planning and implementing the export venture?",
+      "Where these necessary skills are not currently available, are you willing and able to find people with the right skills to help you develop your export business?",
+    ]
+  },
+  {
+    id: "research", label: "Research Readiness",
+    desc: "Your business has the information required to thoughtfully and strategically pursue export ventures",
+    questions: [
+      "Have you narrowed down your target market(s) to a select few based on comprehensive market research?",
+      "Are you aware of the trade agreements or other treaties that are in place with your target market?",
+      "Have you undertaken sector research in your target market?",
+      "Have you conducted a PEST analysis for your target market?",
+      "Are you aware of the market regulations with respect to your product/service in your target market?",
+      "Are you aware of the consumer-driven market standards in your target market for your product/service?",
+      "Do you have information on import tariffs, taxes, non-tariff barriers, government-imposed terms/conditions/restrictions, licensing requirements, product testing/certification requirements, packaging/labelling requirements and other legal requirements governing the entry of your products/service into your target market?",
+      "Are you aware of the cultural standards re. doing business in your target market?",
+      "Do you have access to market intelligence in your target market?",
+      "Do you have sufficient information on your competitors in your target market?",
+      "Do you have sufficient information on your potential customers in your target market?",
+      "Do you have sufficient information on your potential partners in your target market?",
+      "Are you aware of the trends that influence the supply and demand of your product/service in your target market?",
+    ]
+  },
+  {
+    id: "product", label: "Product / Service Readiness",
+    desc: "Your products/services are ready for exporting",
+    questions: [
+      "Have you identified which product/service has the best potential in your target market?",
+      "Are you aware of and compliant to any governmental or legal requirements to exporting in your domestic market (e.g. prohibitions, export proceed repatriation)?",
+      "Does your product/service meet the technical and regulatory requirements of your target market?",
+      "If you are a service provider, will your credentials be recognized in foreign markets?",
+      "Do you have the production capacity to meet the demands of your target market?",
+      "Do your production processes need to be modified to meet the export market requirements?",
+      "Does your product/service meet the consumer-driven voluntary standards expected in your target market?",
+      "Are there climatic, geographic or technological factors affecting the use of your product/service in your target market and have you accounted for these?",
+      "Is your product design and colour aligned with customs and traditions of the target market?",
+      "Does your product meet the labelling and packaging requirements of the target market?",
+      "Can your company satisfy any pre- and post-sale service requirements of the target market?",
+      "Do you know how to protect your intellectual property in the target market?",
+      "Are you aware of your product's/service's position in the domestic market compared to competitive products/services in terms of strengths, weaknesses and uniqueness?",
+      "Are you aware of your product's/service's position in the target market compared to competitive products/services in terms of strengths, weaknesses and uniqueness?",
+      "Would you be willing/able to change key product/service features in order to meet the requirements, customer expectations and improve competitive positioning in your target market?",
+    ]
+  },
+  {
+    id: "marketing", label: "Marketing Readiness",
+    desc: "Your marketing material is ready for exporting and you have developed an export marketing strategy",
+    questions: [
+      "Do you have a marketing strategy in place for your target market?",
+      "Do you know the profiles of the customers who use your product/services in your domestic market?",
+      "Do you know the profiles of the customers who use your product/services in your target market?",
+      "Do you thoroughly understand the needs of your customers in your target market?",
+      "Have you developed a value proposition that reflects the needs and desires of your customers in your target market?",
+      "Do you know your customers preferred marketing channels in your target market?",
+      "Are you currently utilizing these marketing channels in a world-class manner?",
+      "Has your marketing message been shaped for the target market, including any cultural considerations?",
+      "Do you have world-class and perfectly translated marketing materials available in the language of the target market including brochures, business cards and a website?",
+      "Do you have a strategy for promoting export sales through your website?",
+      "Is there someone in the target market who can support and monitor your marketing efforts when you are not there?",
+      "Do you have the financial resources to adjust your marketing and promotional materials for the target market, including professional translations, if required?",
+    ]
+  },
+  {
+    id: "representation", label: "Local Representation",
+    desc: "You are able to establish business relationships to support your export ventures",
+    questions: [
+      "Do you require a local representative for marketing/delivery/distribution/servicing of your product/service?",
+      "Do you know how to set up a strategic alliance?",
+      "Do you know how a strategic alliance would support your export ventures in the target market?",
+      "Do you know where you can find recommendations and information on potential partners?",
+    ]
+  },
+  {
+    id: "transactional", label: "Transactional Readiness",
+    desc: "You are able to close a deal in your target market",
+    questions: [
+      "Do you know how to price your product/service for the target market?",
+      "Do you have a free on board (FOB) or cost, insurance and freight (CIF) price list for your product, or a rate list for your service?",
+      "Have you checked if you can sell or use the trade name associated with your product in your target markets without infringing on existing intellectual property (IP) rights?",
+      "Are you able to be easily paid from your target market?",
+      "Can your product/service be easily delivered to your target market?",
+      "Do you have efficient ways of responding quickly to customer inquiries?",
+      "Can you communicate effectively with buyers in your target market?",
+      "Can you draft and forward formal price quotations (pro-forma invoices) or proposals that reflect appropriate terms of payment and shipment to prospective buyers in your target market?",
+      "Have you established a formal relationship with your banker to assist you in evaluating purchase orders and letters of credit received from a buyer in your target market?",
+      "Have you established a formal relationship with a freight forwarder through which you could obtain quotations for freight forwarding costs, and arrange inspection certificates, fumigation certificates and cargo space?",
+      "Have you established a formal relationship with an accountant who can provide information on the tax implications of exporting?",
+      "Have you established a formal relationship with an attorney who can provide information on the legal implications of exporting?",
+      "Can you obtain credit insurance?",
+      "Can you obtain marine insurance?",
+      "Can you obtain foreign exchange cover?",
+      "Can you obtain an exchange control declaration from your central bank if required?",
+      "Are you aware of dispute resolution and arbitration mechanisms in exports?",
+    ]
+  },
+  {
+    id: "outcomes", label: "Outcomes",
+    desc: "You have thoughtfully assessed the potential outcomes of exporting",
+    questions: [
+      "Have you estimated the present and projected supply and demand trends for your product/service in your export market?",
+      "Have you calculated sales forecasts in your target market based on a realistic analysis of supply and demand trends and market share?",
+      "Have you prepared an analysis of the fixed and variable costs?",
+      "Have you calculated all the costs related to exporting?",
+      "Have you prepared a projected cash flow and income statement for export venture?",
+      "Have you estimated profits from your export venture?",
+    ]
+  },
+];
+
+const SCORE_MAP = { "yes": 3, "somewhat": 2, "no": 0, "na": null };
+
+const scoreSection = (answers, sectionId, questions) => {
+  let total = 0, max = 0;
+  questions.forEach((_, i) => {
+    const val = answers[`${sectionId}_${i}`];
+    const score = SCORE_MAP[val];
+    if (score !== null && score !== undefined && val !== "na") {
+      total += score;
+      max += 3;
+    }
+  });
+  return max === 0 ? 0 : Math.round((total / max) * 100);
+};
+
+const getCategory = (scores) => {
+  const overall = Object.values(scores).reduce((a, b) => a + b, 0) / Object.values(scores).length;
+  if (scores.transactional < 50) return "Beginner";
+  if (overall >= 75 && scores.product >= 70 && scores.marketing >= 70 && scores.transactional >= 75) return "Advanced";
+  if (overall >= 50) return "Intermediate";
+  return "Beginner";
+};
+
+const Assessment = ({ applicationId, onDone }) => {
+  const [answers, setAnswers]       = useState({});
+  const [section, setSection]       = useState(0);
+  const [submitted, setSubmitted]   = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [category, setCategory]     = useState(null);
+  const top = useRef(null);
+  const m = useMobile();
+
+  const current = ASSESSMENT_SECTIONS[section];
+  const totalSections = ASSESSMENT_SECTIONS.length;
+  const pct = Math.round(((section) / totalSections) * 100);
+
+  const allAnswered = current.questions.every((_, i) => answers[`${current.id}_${i}`]);
+
+  const next = () => {
+    if (!allAnswered) return;
+    if (section < totalSections - 1) {
+      setSection(s => s + 1);
+      setTimeout(() => top.current?.scrollIntoView({ behavior: "smooth" }), 80);
+    }
+  };
+
+  const prev = () => {
+    setSection(s => s - 1);
+    setTimeout(() => top.current?.scrollIntoView({ behavior: "smooth" }), 80);
+  };
+
+  const submit = async () => {
+    if (!allAnswered) return;
+    setSubmitting(true);
+    try {
+      const scores = {};
+      ASSESSMENT_SECTIONS.forEach(sec => {
+        scores[sec.id] = scoreSection(answers, sec.id, sec.questions);
+      });
+      const cat = getCategory(scores);
+      const overall = Math.round(Object.values(scores).reduce((a, b) => a + b, 0) / Object.values(scores).length);
+      const id = `ASS-${String(Date.now()).slice(-8)}`;
+      await sb("assessments", {
+        method: "POST",
+        body: JSON.stringify({
+          id,
+          application_id:      applicationId,
+          submitted_at:        new Date().toISOString(),
+          statutory_score:     scores.statutory,
+          management_score:    scores.management,
+          hr_score:            scores.hr,
+          research_score:      scores.research,
+          product_score:       scores.product,
+          marketing_score:     scores.marketing,
+          representation_score:scores.representation,
+          transactional_score: scores.transactional,
+          outcomes_score:      scores.outcomes,
+          total_score:         overall,
+          category:            cat,
+          answers:             answers,
+        }),
+        prefer: "return=minimal"
+      });
+      setCategory(cat);
+      setSubmitted(true);
+    } catch (e) {
+      console.error("Assessment submit error:", e);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) return (
+    <div style={{ minHeight:"100vh", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 100%)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
+      <div className="fade-up" style={{ background:"white", borderRadius:20, padding:"60px 48px", maxWidth:520, width:"100%", textAlign:"center", boxShadow:"0 24px 80px rgba(0,0,0,0.2)" }}>
+        <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.8rem" }}>✓</div>
+        <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Assessment Complete</h2>
+        <p style={{ color:"var(--text2)", lineHeight:1.7, marginBottom:28, fontWeight:300 }}>Thank you for completing the Export Readiness Assessment. The T2T Programme team will review your results and be in touch shortly regarding your participation track.</p>
+        <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"18px 24px", marginBottom:28 }}>
+          <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:6 }}>APPLICATION REFERENCE</p>
+          <p style={{ fontFamily:"Cormorant Garamond", fontSize:"1.4rem", fontWeight:700, color:"var(--forest)" }}>{applicationId}</p>
+        </div>
+        <p style={{ fontSize:"0.82rem", color:"var(--text3)" }}>For enquiries contact <strong>applications@t2tprogramme.com</strong></p>
+      </div>
+    </div>
+  );
+
+  const optionStyle = (key, qIdx) => {
+    const selected = answers[`${current.id}_${qIdx}`] === key;
+    return {
+      display:"flex", alignItems:"center", gap:10, padding:"10px 16px",
+      borderRadius:8, border:`1.5px solid ${selected ? "var(--sage)" : "var(--border)"}`,
+      background: selected ? "var(--mint2)" : "white",
+      cursor:"pointer", transition:"all 0.15s", flex:1, justifyContent:"center",
+    };
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", background:"var(--sand2)", padding: m ? "40px 20px 60px" : "60px 24px 80px" }} ref={top}>
+      {/* Header */}
+      <div style={{ maxWidth:760, margin:"0 auto 40px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:24 }}>
+          {T2T_LOGO && <img src={T2T_LOGO} alt="T2T" style={{ height:36, objectFit:"contain" }} />}
+        </div>
+        <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>
+          Section {section + 1} of {totalSections}
+        </span>
+        <h1 style={{ fontFamily:"Cormorant Garamond", fontSize: m ? "1.8rem" : "2.4rem", fontWeight:600, color:"var(--forest)", marginBottom:6, lineHeight:1.15 }}>
+          Export Readiness Assessment
+        </h1>
+        <p style={{ color:"var(--text3)", fontSize:"0.875rem", marginBottom:20 }}>Application Reference: <strong style={{ color:"var(--forest)" }}>{applicationId}</strong></p>
+        <div style={{ background:"var(--border)", height:4, borderRadius:4, overflow:"hidden" }}>
+          <div style={{ height:"100%", width:`${pct}%`, background:"linear-gradient(90deg, var(--forest), var(--sage))", borderRadius:4, transition:"width 0.5s ease" }} />
+        </div>
+      </div>
+
+      {/* Section */}
+      <div style={{ maxWidth:760, margin:"0 auto" }}>
+        <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding: m ? "24px 20px" : "36px 40px", marginBottom:28 }}>
+          <div style={{ marginBottom:28, paddingBottom:20, borderBottom:"1px solid var(--border2)" }}>
+            <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.5rem", fontWeight:600, color:"var(--forest)", marginBottom:4 }}>{current.label}</h2>
+            <p style={{ fontSize:"0.82rem", color:"var(--text3)", fontStyle:"italic" }}>{current.desc}</p>
+          </div>
+
+          <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
+            {current.questions.map((q, i) => {
+              const key = `${current.id}_${i}`;
+              const val = answers[key];
+              return (
+                <div key={key}>
+                  <p style={{ fontSize:"0.9rem", fontWeight:500, color:"var(--text)", marginBottom:12, lineHeight:1.5 }}>
+                    <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:5, padding:"2px 8px", fontSize:"0.65rem", fontWeight:700, marginRight:10 }}>{i+1}</span>
+                    {q}
+                  </p>
+                  <div style={{ display:"grid", gridTemplateColumns: m ? "1fr 1fr" : "repeat(4, 1fr)", gap:8 }}>
+                    {[["yes","Yes"],["somewhat","Somewhat"],["no","No"],["na","N/A"]].map(([k, label]) => (
+                      <div key={k} onClick={() => setAnswers(prev => ({ ...prev, [key]: k }))} style={optionStyle(k, i)}>
+                        <div style={{ width:16, height:16, borderRadius:"50%", border:`2px solid ${val===k ? "var(--forest)" : "var(--border)"}`, background: val===k ? "var(--forest)" : "white", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                          {val===k && <div style={{ width:5, height:5, borderRadius:"50%", background:"white" }} />}
+                        </div>
+                        <span style={{ fontSize:"0.82rem", fontWeight: val===k ? 600 : 400, color: val===k ? "var(--forest)" : "var(--text2)" }}>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          {section > 0
+            ? <button onClick={prev} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Back</button>
+            : <div />
+          }
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            {!allAnswered && <p style={{ fontSize:"0.75rem", color:"var(--text3)" }}>Please answer all questions to continue</p>}
+            {section < totalSections - 1
+              ? <button onClick={next} disabled={!allAnswered} style={{ background: allAnswered ? "var(--forest)" : "var(--border)", border:"none", color:"white", padding:"13px 32px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor: allAnswered ? "pointer" : "not-allowed", opacity: allAnswered ? 1 : 0.6 }}>Continue</button>
+              : <button onClick={submit} disabled={submitting || !allAnswered} style={{ background: allAnswered ? "var(--green-ok)" : "var(--border)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor: allAnswered && !submitting ? "pointer" : "not-allowed", opacity: allAnswered ? 1 : 0.6 }}>{submitting ? "Submitting…" : "Submit Assessment"}</button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ─── APP ─────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [page, setPage]                   = useState("landing");
+  const urlParams = new URLSearchParams(window.location.search);
+  const assessmentId = urlParams.get("assessment");
+  const [page, setPage]                   = useState(assessmentId ? "assessment" : "landing");
+  const [activeAssessmentId, setActiveAssessmentId] = useState(assessmentId || null);
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [pressUnlocked, setPressUnlocked] = useState(false);
   const { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError, loadAdminData } = useDataStore();
@@ -1601,7 +1950,7 @@ export default function App() {
   };
 
   const approvedSubmissions = submissions.filter(s=>s.status==="approved");
-  const showNav = !["admin-gate","dashboard"].includes(page);
+  const showNav = !["admin-gate","dashboard","assessment"].includes(page);
 
   const DbBanner = () => dbError ? (
     <div style={{ position:"fixed", bottom:20, left:"50%", transform:"translateX(-50%)", zIndex:9999, background:"#FEF0EF", border:"1.5px solid var(--red)", borderRadius:10, padding:"12px 20px", display:"flex", alignItems:"center", gap:10, boxShadow:"0 4px 20px rgba(0,0,0,0.12)", maxWidth:480 }}>
@@ -1639,6 +1988,9 @@ export default function App() {
       )}
       {page==="dashboard" && adminUnlocked && (
         <Dashboard apps={apps} upAppStatus={upAppStatus} submissions={submissions} upSubStatus={upSubStatus} onExit={()=>{ setAdminUnlocked(false); setPage("landing"); }} />
+      )}
+      {page==="assessment" && (
+        <Assessment applicationId={activeAssessmentId} onDone={()=>{ window.history.replaceState({}, "", "/"); setPage("landing"); }} />
       )}
     </>
   );
