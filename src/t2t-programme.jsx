@@ -132,6 +132,7 @@ const sendEmail = async (templateId, params) => {
 const useDataStore = () => {
   const [apps, setApps]               = useState([]);
   const [submissions, setSubmissions] = useState([]);
+  const [assessments, setAssessments] = useState([]);
   const [loading, setLoading]         = useState(true);
   const [dbError, setDbError]         = useState(null);
   const [adminPwd, setAdminPwd]       = useState(null);
@@ -140,12 +141,14 @@ const useDataStore = () => {
   const loadAdminData = async (password) => {
     setLoading(true);
     try {
-      const [a, s] = await Promise.all([
+      const [a, s, ass] = await Promise.all([
         adminFn("get_applications", password),
         adminFn("get_submissions",  password),
+        adminFn("get_assessments",  password),
       ]);
       setApps(Array.isArray(a) ? a : []);
       setSubmissions(Array.isArray(s) ? s : []);
+      setAssessments(Array.isArray(ass) ? ass : []);
       setAdminPwd(password);
     } catch (e) {
       console.error("Admin load error:", e);
@@ -277,7 +280,7 @@ const useDataStore = () => {
     }
   };
 
-  return { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError, loadAdminData };
+  return { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, assessments, loading, dbError, loadAdminData };
 };
 
 const validatePhase = (phase, d) => {
@@ -1369,7 +1372,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
 };
 
 // ─── ADMIN DASHBOARD ──────────────────────────────────────────────────────────
-const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
+const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, assessments, onExit }) => {
   const [tab, setTab]             = useState("sme");
   const [filter, setFilter]       = useState("all");
   const [sort, setSort]           = useState("score");
@@ -1377,6 +1380,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
   const [pressFilter, setPressFilter] = useState("all");
   const [pressExp, setPressExp]   = useState(null);
 
+  const assessmentMap = Object.fromEntries((assessments||[]).map(a => [a.application_id, a]));
   const list = apps.filter(a=>filter==="all"||a.status===filter).sort((a,b)=>sort==="score"?b.score-a.score:new Date(b.submittedAt)-new Date(a.submittedAt));
   const pressList = submissions.filter(s=>pressFilter==="all"||s.status===pressFilter).sort((a,b)=>new Date(b.submittedAt)-new Date(a.submittedAt));
 
@@ -1438,17 +1442,18 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, onExit }) => {
             {apps.length===0
               ? <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"80px 40px", textAlign:"center" }}><p style={{ fontSize:"3rem", marginBottom:16 }}>📋</p><h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.6rem", color:"var(--forest)", marginBottom:8 }}>No applications yet</h3><p style={{ color:"var(--text3)" }}>Applications will appear here as SMEs register.</p></div>
               : <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
-                  <div style={{ display:"grid", gridTemplateColumns:"2fr 1.4fr 1fr 1fr 1fr 110px", padding:"12px 24px", background:"var(--sand2)", borderBottom:"1px solid var(--border)", fontSize:"0.68rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em" }}>
-                    <span>BUSINESS</span><span>NICHE AND LOCATION</span><span>TURNOVER</span><span>SCORE</span><span>STATUS</span><span>ACTIONS</span>
+                  <div style={{ display:"grid", gridTemplateColumns:"2fr 1.4fr 1fr 1fr 1fr 1fr 110px", padding:"12px 24px", background:"var(--sand2)", borderBottom:"1px solid var(--border)", fontSize:"0.68rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em" }}>
+                    <span>BUSINESS</span><span>NICHE AND LOCATION</span><span>TURNOVER</span><span>SCORE</span><span>STATUS</span><span>ASSESSMENT</span><span>ACTIONS</span>
                   </div>
                   {list.map((a,i)=>(
                     <div key={a.id}>
-                      <div onClick={()=>setExp(exp===a.id?null:a.id)} style={{ display:"grid", gridTemplateColumns:"2fr 1.4fr 1fr 1fr 1fr 110px", alignItems:"center", padding:"16px 24px", background:exp===a.id?"var(--mint2)":i%2===0?"white":"var(--cream)", borderBottom:"1px solid var(--border2)", cursor:"pointer" }}>
+                      <div onClick={()=>setExp(exp===a.id?null:a.id)} style={{ display:"grid", gridTemplateColumns:"2fr 1.4fr 1fr 1fr 1fr 1fr 110px", alignItems:"center", padding:"16px 24px", background:exp===a.id?"var(--mint2)":i%2===0?"white":"var(--cream)", borderBottom:"1px solid var(--border2)", cursor:"pointer" }}>
                         <div><p style={{ fontWeight:600, fontSize:"0.9rem", color:"var(--forest)" }}>{a.businessName||a.business_name||"Not provided"}</p><p style={{ color:"var(--text3)", fontSize:"0.72rem", marginTop:2 }}>{a.id}</p></div>
                         <div><p style={{ fontSize:"0.85rem" }}>{a.business_niche||a.businessNiche||"Not specified"}</p><p style={{ color:"var(--text3)", fontSize:"0.72rem" }}>{(a.business_address||a.businessAddress)?(a.business_address||a.businessAddress).split(",")[0]:"Not provided"}</p></div>
                         <p style={{ fontSize:"0.85rem", color:"var(--text2)" }}>{a.monthly_turnover||a.monthlyTurnover||"Not stated"}</p>
                         <ScorePill v={a.score} />
                         <StPill st={a.status} />
+                        {(() => { const ass = assessmentMap[a.id]; if (!ass) return <span style={{ fontSize:"0.75rem", color:"var(--text3)" }}>{a.status==="approved" ? "⏳ Pending" : "—"}</span>; const c = ass.category; const col = c==="Advanced"?"#1B7A4A":c==="Intermediate"?"#B8943F":"#C0392B"; const bg = c==="Advanced"?"#E8F5EF":c==="Intermediate"?"#FDF5E0":"#FDECEA"; return <span style={{ background:bg, color:col, padding:"3px 10px", borderRadius:100, fontSize:"0.72rem", fontWeight:600, border:`1px solid ${col}30` }}>✓ {c}</span>; })()}
                         <div style={{ display:"flex", gap:6 }} onClick={e=>e.stopPropagation()}>
                           <button onClick={()=>upAppStatus(a.id,"approved")} style={{ background:"#E8F5EF", border:"1px solid #1B7A4A40", color:"#1B7A4A", padding:"6px 12px", borderRadius:6, fontSize:"0.78rem", cursor:"pointer", fontWeight:600 }}>✓</button>
                           <button onClick={()=>upAppStatus(a.id,"rejected")} style={{ background:"#FDECEA", border:"1px solid #C0392B40", color:"#C0392B", padding:"6px 12px", borderRadius:6, fontSize:"0.78rem", cursor:"pointer", fontWeight:600 }}>✕</button>
@@ -1918,7 +1923,7 @@ export default function App() {
   const [activeAssessmentId, setActiveAssessmentId] = useState(assessmentId || null);
   const [adminUnlocked, setAdminUnlocked] = useState(false);
   const [pressUnlocked, setPressUnlocked] = useState(false);
-  const { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, loading, dbError, loadAdminData } = useDataStore();
+  const { apps, addApp, upAppStatus, submissions, addSubmission, upSubStatus, assessments, loading, dbError, loadAdminData } = useDataStore();
 
   const logoClicks  = useRef(0);
   const logoTimer   = useRef(null);
@@ -1987,7 +1992,7 @@ export default function App() {
         <PasswordGate title="Admin Access" subtitle="This area is restricted. Enter your admin password to continue." action="verify_admin" buttonLabel="Enter Dashboard" onUnlock={(pwd)=>{ setAdminUnlocked(true); loadAdminData(pwd); setPage("dashboard"); }} />
       )}
       {page==="dashboard" && adminUnlocked && (
-        <Dashboard apps={apps} upAppStatus={upAppStatus} submissions={submissions} upSubStatus={upSubStatus} onExit={()=>{ setAdminUnlocked(false); setPage("landing"); }} />
+        <Dashboard apps={apps} upAppStatus={upAppStatus} submissions={submissions} upSubStatus={upSubStatus} assessments={assessments} onExit={()=>{ setAdminUnlocked(false); setPage("landing"); }} />
       )}
       {page==="assessment" && (
         <Assessment applicationId={activeAssessmentId} onDone={()=>{ window.history.replaceState({}, "", "/"); setPage("landing"); }} />

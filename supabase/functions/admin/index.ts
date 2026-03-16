@@ -90,6 +90,19 @@ Deno.serve(async (req) => {
         );
       }
 
+      // Load all assessments for admin dashboard
+      case "get_assessments": {
+        const { data, error } = await supabase
+          .from("assessments")
+          .select("application_id, category, total_score, submitted_at");
+
+        if (error) throw error;
+        return new Response(
+          JSON.stringify(data),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       // Update application status (approve / reject)
       case "update_app_status": {
         const { id, status } = payload;
