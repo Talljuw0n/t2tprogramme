@@ -26,8 +26,20 @@ Deno.serve(async (req) => {
     const ADMIN_PASSWORD = Deno.env.get("ADMIN_PASSWORD");
     const PRESS_PASSWORD = Deno.env.get("PRESS_PASSWORD");
 
-    // All admin actions require the admin password
-    // The "verify_press" action uses the press password
+    // Debug — remove after testing
+    if (action === "debug") {
+      return new Response(
+        JSON.stringify({
+          admin_set: !!ADMIN_PASSWORD,
+          admin_length: ADMIN_PASSWORD?.length,
+          admin_value: ADMIN_PASSWORD,
+          received_password: password,
+          match: password === ADMIN_PASSWORD,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const requiredPassword = action === "verify_press" ? PRESS_PASSWORD : ADMIN_PASSWORD;
 
     if (!password || password !== requiredPassword) {
