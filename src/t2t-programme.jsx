@@ -647,7 +647,7 @@ const Landing = ({ setPage }) => {
             {/* Right overview card — desktop only */}
             <div style={{ width:280, background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:20, padding:"32px 28px", flexShrink:0 }}>
               <p style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(200,230,218,0.6)", letterSpacing:"0.12em", marginBottom:20 }}>PROGRAMME OVERVIEW</p>
-              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"April 13, 2026"},{label:"Commencement",val:"April 20, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean"}].map(({label,val},i,arr)=>(
+              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"April 13, 2026"},{label:"Commencement",val:"April 20, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean · Africa"}].map(({label,val},i,arr)=>(
                 <div key={label} style={{ marginBottom: i<arr.length-1?16:0, paddingBottom: i<arr.length-1?16:0, borderBottom: i<arr.length-1?"1px solid rgba(200,230,218,0.12)":"none" }}>
                   <p style={{ fontSize:"0.68rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
                   <p style={{ fontSize:"0.9rem", fontWeight:600, color:"white" }}>{val}</p>
@@ -1027,7 +1027,7 @@ const Ph1=({d,s,errors})=>(<>
   <EA id="productPhotos"><FF num="29" label="Upload a picture of your export-ready product(s)" hint="Upload up to 2 product photos (JPG, PNG or WEBP · max 5 MB each)" hasError={errors.includes("productPhotos")}>
     <ProductPhotoUpload value={d.productPhotos} onChange={v=>s("productPhotos",v)} hasError={errors.includes("productPhotos")} />
   </FF></EA>
-  <EA id="targetMarkets"><FF num="30" label="Which markets interest you most?" hint="Select all that apply" hasError={errors.includes("targetMarkets")}><Chk value={d.targetMarkets} onChange={v=>s("targetMarkets",v)} options={["ECOWAS countries","USA","Canada","Caribbean","Other African countries","Not sure yet"]} hasError={errors.includes("targetMarkets")} /></FF></EA>
+  <EA id="targetMarkets"><FF num="30" label="Which markets interest you most?" hint="Select all that apply" hasError={errors.includes("targetMarkets")}><Chk value={d.targetMarkets} onChange={v=>s("targetMarkets",v)} options={["ECOWAS countries","USA","Canada","Caribbean","Africa","Other African countries","Not sure yet"]} hasError={errors.includes("targetMarkets")} /></FF></EA>
   <EA id="contactPhone"><FF num="31" label="Best contact details" hasError={errors.includes("contactPhone")||errors.includes("contactEmail")||errors.includes("contactTime")}>
     <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
       <TI value={d.contactPhone} onChange={v=>s("contactPhone",v)} placeholder="Phone number" hasError={errors.includes("contactPhone")} />
@@ -1041,7 +1041,7 @@ const Ph2=({d,s,errors})=>(<>
   <EA id="productionCapacity"><FF num="32" label="Current monthly production capacity" hasError={errors.includes("productionCapacity")}><Rad value={d.productionCapacity} onChange={v=>s("productionCapacity",v)} options={["0.1kg to 100kg","101kg to 500kg","501kg to 1 metric ton","Above 1 tonne"]} hasError={errors.includes("productionCapacity")} /></FF></EA>
   <EA id="qualityStandards">
     <FF num="33a" label="Do your products meet any quality standards?" hint="Select all that apply" hasError={errors.includes("qualityStandards")}>
-      <Chk value={d.qualityStandards} onChange={v=>s("qualityStandards",v)} options={["NAFDAC","SON","ISO","ECOWAS standards","None yet","Not applicable"]} hasError={errors.includes("qualityStandards")} />
+      <Chk value={d.qualityStandards} onChange={v=>s("qualityStandards",v)} options={["NAFDAC","SON","ISO","ECOWAS standards","FDA","HACCP","None yet","Not applicable"]} hasError={errors.includes("qualityStandards")} />
     </FF>
     <div style={{ marginTop:20 }}>
       <FF num="33b" label="Kindly upload product certificates" hint="Upload up to 5 certificates · JPG, PNG, WEBP or PDF · max 10 MB each">
