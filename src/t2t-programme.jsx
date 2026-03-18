@@ -1136,7 +1136,7 @@ const Ph4=({d,s,errors})=>{
       <Rad value={d.providusAccount} onChange={v=>s("providusAccount",v)} options={["Yes","No — I will open one"]} hasError={errors.includes("providusAccount")} />
       {d.providusAccount === "No — I will open one" && (
         <div style={{ marginTop:12, background:"var(--amber-bg)", border:"1.5px solid var(--amber)", borderRadius:10, padding:"16px 18px", display:"flex", alignItems:"flex-start", gap:12 }}>
-          <span style={{ fontSize:"1.1rem", flexShrink:0 }}>🏦</span>
+          
           <div>
             <p style={{ fontSize:"0.85rem", fontWeight:600, color:"var(--amber)", marginBottom:6 }}>A Providus Bank business account is required</p>
             <p style={{ fontSize:"0.8rem", color:"var(--text2)", marginBottom:10, lineHeight:1.6 }}>Please open your account before the programme commences. You can complete the account opening form online in under 2 minutes.</p>
@@ -1215,7 +1215,7 @@ const Registration = ({ addApp }) => {
   if (done) return (
     <div style={{ minHeight:"100vh", background:"var(--sand2)", display:"flex", alignItems:"center", justifyContent:"center", padding:"100px 24px" }}>
       <div className="fade-up" style={{ background:"white", border:"1px solid var(--border)", borderRadius:20, padding:"60px 48px", maxWidth:500, width:"100%", textAlign:"center", boxShadow:"0 24px 80px rgba(27,61,47,0.1)" }}>
-        <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.8rem" }}>✓</div>
+        <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center" }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
         <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Application Received</h2>
         <p style={{ color:"var(--text2)", lineHeight:1.7, marginBottom:28, fontWeight:300 }}>Your application has been successfully received and will be reviewed as part of the screening and selection process. Shortlisted applicants will be contacted via the details provided.</p>
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"18px 24px", marginBottom:28 }}>
@@ -1233,7 +1233,7 @@ const Registration = ({ addApp }) => {
         {showResume && (
           <div className="fade-up" style={{ background:"var(--amber-bg)", border:"1.5px solid var(--amber)", borderRadius:12, padding:"16px 20px", marginBottom:28, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
             <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-              <span style={{ fontSize:"1.2rem" }}>💾</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               <div>
                 <p style={{ fontWeight:600, fontSize:"0.875rem", color:"var(--amber)" }}>You have a saved application</p>
                 <p style={{ fontSize:"0.78rem", color:"var(--text2)", marginTop:2 }}>Pick up where you left off — your answers have been restored.</p>
@@ -1248,7 +1248,7 @@ const Registration = ({ addApp }) => {
           <p style={{ color:"var(--text3)", fontSize:"0.875rem" }}>{phase===1?"12 questions · approx. 5 to 6 minutes":phase===2?"10 questions · approx. 5 to 6 minutes":phase===3?"9 questions · approx. 4 to 5 minutes":"8 questions · approx. 2 to 3 minutes"}</p>
           {errors.length > 0 && (
             <div className={shaking?"shake":""} style={{ marginTop:20, background:"#FEF0EF", border:"1.5px solid var(--red)", borderRadius:10, padding:"14px 18px", display:"flex", alignItems:"flex-start", gap:10 }}>
-              <span style={{ fontSize:"1rem", flexShrink:0 }}>⚠️</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               <div>
                 <p style={{ fontSize:"0.85rem", fontWeight:600, color:"var(--red)", marginBottom:3 }}>Please complete all required fields</p>
                 <p style={{ fontSize:"0.78rem", color:"#8B2020", lineHeight:1.5 }}>{errors.length} field{errors.length>1?"s":""} {errors.length>1?"are":"is"} missing or incomplete.</p>
@@ -1302,7 +1302,7 @@ const PressPortal = ({ addSubmission, onExit }) => {
   if (done) return (
     <div style={{ minHeight:"100vh", background:"var(--sand2)", display:"flex", alignItems:"center", justifyContent:"center", padding:"100px 24px" }}>
       <div className="fade-up" style={{ background:"white", border:"1px solid var(--border)", borderRadius:20, padding:"60px 48px", maxWidth:520, width:"100%", textAlign:"center", boxShadow:"0 24px 80px rgba(27,61,47,0.1)" }}>
-        <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.8rem" }}>📰</div>
+        <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center" }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
         <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Submission Received</h2>
         <p style={{ color:"var(--text2)", lineHeight:1.7, marginBottom:28, fontWeight:300 }}>Your press submission has been received by the T2T Programme communications team. All submissions are reviewed before publication.</p>
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"18px 24px", marginBottom:28 }}>
@@ -1323,7 +1323,7 @@ const PressPortal = ({ addSubmission, onExit }) => {
           <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:600, color:"var(--forest)", lineHeight:1.1, marginBottom:12 }}>Submit a Story or Press Release</h1>
           <p style={{ color:"var(--text2)", lineHeight:1.7, fontWeight:300, marginBottom:20 }}>Use this portal to submit press releases, story pitches, or editorial contributions for consideration in the T2T Programme Digital Newsroom.</p>
           <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"14px 18px", display:"flex", alignItems:"flex-start", gap:10 }}>
-            <span style={{ fontSize:"1rem", flexShrink:0, marginTop:1 }}>ℹ️</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <p style={{ fontSize:"0.8rem", color:"var(--text2)", lineHeight:1.6 }}>Submissions do not guarantee publication. Response time is typically 2 to 3 business days.</p>
           </div>
         </div>
@@ -1575,7 +1575,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, assessments, o
               </select>
             </div>
             {apps.length===0
-              ? <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"80px 40px", textAlign:"center" }}><p style={{ fontSize:"3rem", marginBottom:16 }}></p><h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.6rem", color:"var(--forest)", marginBottom:8 }}>No applications yet</h3><p style={{ color:"var(--text3)" }}>Applications will appear here as SMEs register.</p></div>
+              ? <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"80px 40px", textAlign:"center" }}><p style={{ fontSize:"3rem", marginBottom:16 }}>📋</p><h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.6rem", color:"var(--forest)", marginBottom:8 }}>No applications yet</h3><p style={{ color:"var(--text3)" }}>Applications will appear here as SMEs register.</p></div>
               : <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
                   <div style={{ display:"grid", gridTemplateColumns:"2fr 1.4fr 1fr 1fr 1fr 1fr 110px", padding:"12px 24px", background:"var(--sand2)", borderBottom:"1px solid var(--border)", fontSize:"0.68rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em" }}>
                     <span>BUSINESS</span><span>NICHE AND LOCATION</span><span>TURNOVER</span><span>SCORE</span><span>STATUS</span><span>ASSESSMENT</span><span>ACTIONS</span>
@@ -1973,7 +1973,7 @@ const Assessment = ({ applicationId, onDone }) => {
   if (submitted) return (
     <div style={{ minHeight:"100vh", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 100%)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
       <div className="fade-up" style={{ background:"white", borderRadius:20, padding:"60px 48px", maxWidth:520, width:"100%", textAlign:"center", boxShadow:"0 24px 80px rgba(0,0,0,0.2)" }}>
-        <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.8rem" }}>✓</div>
+        <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center" }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
         <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Assessment Complete</h2>
         <p style={{ color:"var(--text2)", lineHeight:1.7, marginBottom:28, fontWeight:300 }}>Thank you for completing the Export Readiness Assessment. The T2T Programme team will review your results and be in touch shortly regarding your participation track.</p>
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"18px 24px", marginBottom:28 }}>
@@ -2001,7 +2001,7 @@ const Assessment = ({ applicationId, onDone }) => {
         <div style={{ maxWidth:760, margin:"0 auto", paddingTop: m?"24px":"40px" }}>
           <div className="fade-up" style={{ background:"var(--amber-bg)", border:"1.5px solid var(--amber)", borderRadius:12, padding:"16px 20px", marginBottom:0, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
             <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-              <span style={{ fontSize:"1.2rem" }}></span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               <div>
                 <p style={{ fontWeight:600, fontSize:"0.875rem", color:"var(--amber)" }}>Your progress has been saved</p>
                 <p style={{ fontSize:"0.78rem", color:"var(--text2)", marginTop:2 }}>You are on Section {section + 1} of {ASSESSMENT_SECTIONS.length} — continue from where you left off.</p>
@@ -2125,7 +2125,7 @@ export default function App() {
 
   const DbBanner = () => dbError ? (
     <div style={{ position:"fixed", bottom:20, left:"50%", transform:"translateX(-50%)", zIndex:9999, background:"#FEF0EF", border:"1.5px solid var(--red)", borderRadius:10, padding:"12px 20px", display:"flex", alignItems:"center", gap:10, boxShadow:"0 4px 20px rgba(0,0,0,0.12)", maxWidth:480 }}>
-      <span>⚠️</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       <p style={{ fontSize:"0.82rem", color:"var(--red)", fontWeight:500 }}>{dbError}</p>
     </div>
   ) : null;
