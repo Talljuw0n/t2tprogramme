@@ -365,6 +365,7 @@ const validatePhase = (phase, d) => {
     if (!d.pilotAgreement) missing.push("pilotAgreement");
     if (!d.tcConsent) missing.push("tcConsent");
   }
+  // tcConsent only validated on final phase (4)
   return missing;
 };
 
@@ -1088,6 +1089,12 @@ const Ph3=({d,s,errors})=>(<>
   <EA id="workingCapital"><FF num="25" label="Estimated working capital available" hasError={errors.includes("workingCapital")}><Rad value={d.workingCapital} onChange={v=>s("workingCapital",v)} options={["Below ₦100k","₦100k to ₦500k","₦500k to ₦2M","₦2M and above"]} hasError={errors.includes("workingCapital")} /></FF></EA>
   <EA id="pilotAgreement"><FF num="26" label="Pilot transaction requirement" hint="As a standard requirement, initial engagement will commence with small pilot transactions prior to full-scale deals." hasError={errors.includes("pilotAgreement")}><Rad value={d.pilotAgreement} onChange={v=>s("pilotAgreement",v)} options={["Yes, please provide further details on the pilot transaction requirements","No, I will not proceed under this condition"]} hasError={errors.includes("pilotAgreement")} /></FF></EA>
   <FF num="27" label="Is there anything else we should know about your business?" hint="Optional"><TA value={d.additionalInfo} onChange={v=>s("additionalInfo",v)} placeholder="Any other relevant information..." rows={4} /></FF>
+  <EA id="tcConsent">
+    <div style={{ background:errors.includes("tcConsent")?"#FEF0EF":"var(--mint2)", border:`1.5px solid ${errors.includes("tcConsent")?"var(--red)":"var(--border)"}`, borderRadius:12, padding:"20px 24px" }}>
+      <p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--forest)", letterSpacing:"0.08em", marginBottom:12 }}>TERMS AND CONDITIONS</p>
+      <TCConsentCheck value={d.tcConsent} onChange={v=>s("tcConsent",v)} hasError={errors.includes("tcConsent")} />
+    </div>
+  </EA>
 </>);
 
 
@@ -1138,12 +1145,6 @@ const Ph4=({d,s,errors})=>{
         </div>
       )}
     </FF>
-  </EA>
-  <EA id="tcConsent">
-    <div style={{ background:errors.includes("tcConsent")?"#FEF0EF":"var(--mint2)", border:`1.5px solid ${errors.includes("tcConsent")?"var(--red)":"var(--border)"}`, borderRadius:12, padding:"20px 24px" }}>
-      <p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--forest)", letterSpacing:"0.08em", marginBottom:12 }}>TERMS AND CONDITIONS</p>
-      <TCConsentCheck value={d.tcConsent} onChange={v=>s("tcConsent",v)} hasError={errors.includes("tcConsent")} />
-    </div>
   </EA>
 </>);};
 
@@ -1574,7 +1575,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, assessments, o
               </select>
             </div>
             {apps.length===0
-              ? <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"80px 40px", textAlign:"center" }}><p style={{ fontSize:"3rem", marginBottom:16 }}>📋</p><h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.6rem", color:"var(--forest)", marginBottom:8 }}>No applications yet</h3><p style={{ color:"var(--text3)" }}>Applications will appear here as SMEs register.</p></div>
+              ? <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"80px 40px", textAlign:"center" }}><p style={{ fontSize:"3rem", marginBottom:16 }}></p><h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.6rem", color:"var(--forest)", marginBottom:8 }}>No applications yet</h3><p style={{ color:"var(--text3)" }}>Applications will appear here as SMEs register.</p></div>
               : <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
                   <div style={{ display:"grid", gridTemplateColumns:"2fr 1.4fr 1fr 1fr 1fr 1fr 110px", padding:"12px 24px", background:"var(--sand2)", borderBottom:"1px solid var(--border)", fontSize:"0.68rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em" }}>
                     <span>BUSINESS</span><span>NICHE AND LOCATION</span><span>TURNOVER</span><span>SCORE</span><span>STATUS</span><span>ASSESSMENT</span><span>ACTIONS</span>
@@ -2000,7 +2001,7 @@ const Assessment = ({ applicationId, onDone }) => {
         <div style={{ maxWidth:760, margin:"0 auto", paddingTop: m?"24px":"40px" }}>
           <div className="fade-up" style={{ background:"var(--amber-bg)", border:"1.5px solid var(--amber)", borderRadius:12, padding:"16px 20px", marginBottom:0, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
             <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-              <span style={{ fontSize:"1.2rem" }}>💾</span>
+              <span style={{ fontSize:"1.2rem" }}></span>
               <div>
                 <p style={{ fontWeight:600, fontSize:"0.875rem", color:"var(--amber)" }}>Your progress has been saved</p>
                 <p style={{ fontSize:"0.78rem", color:"var(--text2)", marginTop:2 }}>You are on Section {section + 1} of {ASSESSMENT_SECTIONS.length} — continue from where you left off.</p>
