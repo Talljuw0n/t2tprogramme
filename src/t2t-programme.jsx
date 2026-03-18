@@ -199,6 +199,27 @@ const useDataStore = () => {
       tc_consent:             data.tcConsent || false,
       product_photos:         data.productPhotos || [],
       product_certs:          data.productCerts  || [],
+      title:                  data.title,
+      first_name:             data.firstName,
+      last_name:              data.lastName,
+      gender:                 data.gender,
+      date_of_birth:          data.dateOfBirth,
+      nationality:            data.nationality,
+      state_of_residence:     data.stateOfResidence,
+      staff_count:            data.staffCount,
+      initial_capital:        data.initialCapital,
+      capital_source:         data.capitalSource,
+      total_investment:       data.totalInvestment,
+      last_year_turnover:     data.lastYearTurnover,
+      annual_profit:          data.annualProfit,
+      nature_of_business:     data.natureOfBusiness,
+      innovation:             data.innovation,
+      programme_benefit:      data.programmeBenefit,
+      product_differentiator: data.productDifferentiator,
+      top_competitors:        data.topCompetitors,
+      revenue_model:          data.revenueModel,
+      training_location:      data.trainingLocation,
+      providus_account:       data.providusAccount,
     };
 
     try {
@@ -312,13 +333,36 @@ const validatePhase = (phase, d) => {
   }
   if (phase === 3) {
     if (!d.exportProducts?.trim()) missing.push("exportProducts");
-    if (!d.tcConsent) missing.push("tcConsent");
     if (!d.shippingCompany) missing.push("shippingCompany");
     if (!d.exportTimeline) missing.push("exportTimeline");
     if (!d.challenges?.length) missing.push("challenges");
     if (!d.supportNeeded?.length) missing.push("supportNeeded");
     if (!d.workingCapital) missing.push("workingCapital");
     if (!d.pilotAgreement) missing.push("pilotAgreement");
+  }
+  if (phase === 4) {
+    if (!d.title) missing.push("title");
+    if (!d.firstName?.trim()) missing.push("firstName");
+    if (!d.lastName?.trim()) missing.push("lastName");
+    if (!d.gender) missing.push("gender");
+    if (!d.dateOfBirth?.trim()) missing.push("dateOfBirth");
+    if (!d.nationality?.trim()) missing.push("nationality");
+    if (!d.stateOfResidence?.trim()) missing.push("stateOfResidence");
+    if (!d.staffCount) missing.push("staffCount");
+    if (!d.initialCapital?.trim()) missing.push("initialCapital");
+    if (!d.capitalSource?.trim()) missing.push("capitalSource");
+    if (!d.totalInvestment?.trim()) missing.push("totalInvestment");
+    if (!d.lastYearTurnover?.trim()) missing.push("lastYearTurnover");
+    if (!d.annualProfit?.trim()) missing.push("annualProfit");
+    if (!d.natureOfBusiness?.trim()) missing.push("natureOfBusiness");
+    if (!d.innovation?.trim()) missing.push("innovation");
+    if (!d.programmeBenefit?.trim()) missing.push("programmeBenefit");
+    if (!d.productDifferentiator?.trim()) missing.push("productDifferentiator");
+    if (!d.topCompetitors?.trim()) missing.push("topCompetitors");
+    if (!d.revenueModel?.trim()) missing.push("revenueModel");
+    if (!d.trainingLocation) missing.push("trainingLocation");
+    if (!d.providusAccount) missing.push("providusAccount");
+    if (!d.tcConsent) missing.push("tcConsent");
   }
   return missing;
 };
@@ -1043,13 +1087,64 @@ const Ph3=({d,s,errors})=>(<>
   <EA id="workingCapital"><FF num="25" label="Estimated working capital available" hasError={errors.includes("workingCapital")}><Rad value={d.workingCapital} onChange={v=>s("workingCapital",v)} options={["Below ₦100k","₦100k to ₦500k","₦500k to ₦2M","₦2M and above"]} hasError={errors.includes("workingCapital")} /></FF></EA>
   <EA id="pilotAgreement"><FF num="26" label="Pilot transaction requirement" hint="As a standard requirement, initial engagement will commence with small pilot transactions prior to full-scale deals." hasError={errors.includes("pilotAgreement")}><Rad value={d.pilotAgreement} onChange={v=>s("pilotAgreement",v)} options={["Yes, please provide further details on the pilot transaction requirements","No, I will not proceed under this condition"]} hasError={errors.includes("pilotAgreement")} /></FF></EA>
   <FF num="27" label="Is there anything else we should know about your business?" hint="Optional"><TA value={d.additionalInfo} onChange={v=>s("additionalInfo",v)} placeholder="Any other relevant information..." rows={4} /></FF>
+</>);
+
+
+const Ph4=({d,s,errors})=>{
+  const ng_states = ["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","FCT - Abuja","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara"];
+  return (<>
+  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16 }}>
+    <EA id="title"><FF num="28" label="Title" hasError={errors.includes("title")}><SI value={d.title} onChange={v=>s("title",v)} options={["Mr","Mrs","Miss","Ms","Dr","Prof","Chief","Alhaji","Alhaja"]} hasError={errors.includes("title")} /></FF></EA>
+    <EA id="firstName"><FF num="29" label="First Name" hasError={errors.includes("firstName")}><TI value={d.firstName} onChange={v=>s("firstName",v)} placeholder="First name" hasError={errors.includes("firstName")} /></FF></EA>
+    <EA id="lastName"><FF num="30" label="Last Name" hasError={errors.includes("lastName")}><TI value={d.lastName} onChange={v=>s("lastName",v)} placeholder="Last name" hasError={errors.includes("lastName")} /></FF></EA>
+  </div>
+  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+    <EA id="gender"><FF num="31" label="Gender" hasError={errors.includes("gender")}><Rad value={d.gender} onChange={v=>s("gender",v)} options={["Male","Female","Prefer not to say"]} hasError={errors.includes("gender")} /></FF></EA>
+    <EA id="dateOfBirth"><FF num="32" label="Date of Birth" hasError={errors.includes("dateOfBirth")}><TI value={d.dateOfBirth} onChange={v=>s("dateOfBirth",v)} placeholder="DD/MM/YYYY" hasError={errors.includes("dateOfBirth")} /></FF></EA>
+  </div>
+  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+    <EA id="nationality"><FF num="33" label="Nationality" hasError={errors.includes("nationality")}><TI value={d.nationality} onChange={v=>s("nationality",v)} placeholder="e.g. Nigerian" hasError={errors.includes("nationality")} /></FF></EA>
+    <EA id="stateOfResidence"><FF num="34" label="State of Residence" hasError={errors.includes("stateOfResidence")}><SI value={d.stateOfResidence} onChange={v=>s("stateOfResidence",v)} options={ng_states} hasError={errors.includes("stateOfResidence")} /></FF></EA>
+  </div>
+  <EA id="staffCount"><FF num="35" label="How many staff do you have?" hasError={errors.includes("staffCount")}><Rad value={d.staffCount} onChange={v=>s("staffCount",v)} options={["1 (Solo)","2 to 5","6 to 10","11 to 20","21 to 50","51 and above"]} hasError={errors.includes("staffCount")} /></FF></EA>
+  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+    <EA id="initialCapital"><FF num="36" label="Initial Capital" hasError={errors.includes("initialCapital")}><TI value={d.initialCapital} onChange={v=>s("initialCapital",v)} placeholder="e.g. ₦500,000" hasError={errors.includes("initialCapital")} /></FF></EA>
+    <EA id="capitalSource"><FF num="37" label="Source of Initial Capital" hasError={errors.includes("capitalSource")}><TI value={d.capitalSource} onChange={v=>s("capitalSource",v)} placeholder="e.g. Personal savings, loan" hasError={errors.includes("capitalSource")} /></FF></EA>
+  </div>
+  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:16 }}>
+    <EA id="totalInvestment"><FF num="38" label="Total Investment in Business" hasError={errors.includes("totalInvestment")}><TI value={d.totalInvestment} onChange={v=>s("totalInvestment",v)} placeholder="e.g. ₦2,000,000" hasError={errors.includes("totalInvestment")} /></FF></EA>
+    <EA id="lastYearTurnover"><FF num="39" label="Last Year Turnover" hasError={errors.includes("lastYearTurnover")}><TI value={d.lastYearTurnover} onChange={v=>s("lastYearTurnover",v)} placeholder="e.g. ₦5,000,000" hasError={errors.includes("lastYearTurnover")} /></FF></EA>
+    <EA id="annualProfit"><FF num="40" label="Annual Profit (Last Year)" hasError={errors.includes("annualProfit")}><TI value={d.annualProfit} onChange={v=>s("annualProfit",v)} placeholder="e.g. ₦1,500,000" hasError={errors.includes("annualProfit")} /></FF></EA>
+  </div>
+  <EA id="natureOfBusiness"><FF num="41" label="Nature of Business" hint="Describe your business in detail, including your market potential and size. Maximum 250 words." hasError={errors.includes("natureOfBusiness")}><TA value={d.natureOfBusiness} onChange={v=>s("natureOfBusiness",v)} placeholder="Describe your business, products/services, market size and potential..." rows={5} hasError={errors.includes("natureOfBusiness")} /></FF></EA>
+  <EA id="innovation"><FF num="42" label="What innovation are you bringing into your sector?" hasError={errors.includes("innovation")}><TA value={d.innovation} onChange={v=>s("innovation",v)} placeholder="Describe what makes your approach innovative..." rows={3} hasError={errors.includes("innovation")} /></FF></EA>
+  <EA id="programmeBenefit"><FF num="43" label="How do you think this programme would benefit you and your business?" hasError={errors.includes("programmeBenefit")}><TA value={d.programmeBenefit} onChange={v=>s("programmeBenefit",v)} placeholder="Explain how the T2T Programme would help your business..." rows={3} hasError={errors.includes("programmeBenefit")} /></FF></EA>
+  <EA id="productDifferentiator"><FF num="44" label="What makes your product or service different from your competitors?" hasError={errors.includes("productDifferentiator")}><TA value={d.productDifferentiator} onChange={v=>s("productDifferentiator",v)} placeholder="Describe your competitive advantage..." rows={3} hasError={errors.includes("productDifferentiator")} /></FF></EA>
+  <EA id="topCompetitors"><FF num="45" label="Mention your top five competitors" hasError={errors.includes("topCompetitors")}><TA value={d.topCompetitors} onChange={v=>s("topCompetitors",v)} placeholder="List your top 5 competitors..." rows={3} hasError={errors.includes("topCompetitors")} /></FF></EA>
+  <EA id="revenueModel"><FF num="46" label="Describe your business revenue model" hasError={errors.includes("revenueModel")}><TA value={d.revenueModel} onChange={v=>s("revenueModel",v)} placeholder="How does your business make money..." rows={3} hasError={errors.includes("revenueModel")} /></FF></EA>
+  <EA id="trainingLocation"><FF num="47" label="Which location will you attend the training?" hasError={errors.includes("trainingLocation")}><Rad value={d.trainingLocation} onChange={v=>s("trainingLocation",v)} options={["Lagos","Abuja"]} hasError={errors.includes("trainingLocation")} /></FF></EA>
+  <EA id="providusAccount">
+    <FF num="48" label="Do you have a Providus Bank business account?" hint="Having a Providus Bank account is a mandatory requirement to participate in this programme." hasError={errors.includes("providusAccount")}>
+      <Rad value={d.providusAccount} onChange={v=>s("providusAccount",v)} options={["Yes","No — I will open one"]} hasError={errors.includes("providusAccount")} />
+      {d.providusAccount === "No — I will open one" && (
+        <div style={{ marginTop:12, background:"var(--amber-bg)", border:"1.5px solid var(--amber)", borderRadius:10, padding:"16px 18px", display:"flex", alignItems:"flex-start", gap:12 }}>
+          <span style={{ fontSize:"1.1rem", flexShrink:0 }}>🏦</span>
+          <div>
+            <p style={{ fontSize:"0.85rem", fontWeight:600, color:"var(--amber)", marginBottom:6 }}>A Providus Bank business account is required</p>
+            <p style={{ fontSize:"0.8rem", color:"var(--text2)", marginBottom:10, lineHeight:1.6 }}>Please open your account before the programme commences. You can complete the account opening form online in under 2 minutes.</p>
+            <a href="https://oap.providusbank.com/accountopening/" target="_blank" rel="noreferrer" style={{ background:"var(--amber)", color:"white", padding:"8px 18px", borderRadius:7, fontSize:"0.8rem", fontWeight:600, textDecoration:"none", display:"inline-block" }}>Open Providus Account →</a>
+          </div>
+        </div>
+      )}
+    </FF>
+  </EA>
   <EA id="tcConsent">
     <div style={{ background:errors.includes("tcConsent")?"#FEF0EF":"var(--mint2)", border:`1.5px solid ${errors.includes("tcConsent")?"var(--red)":"var(--border)"}`, borderRadius:12, padding:"20px 24px" }}>
       <p style={{ fontSize:"0.72rem", fontWeight:700, color:"var(--forest)", letterSpacing:"0.08em", marginBottom:12 }}>TERMS AND CONDITIONS</p>
       <TCConsentCheck value={d.tcConsent} onChange={v=>s("tcConsent",v)} hasError={errors.includes("tcConsent")} />
     </div>
   </EA>
-</>);
+</>);};
 
 // ─── SME REGISTRATION ─────────────────────────────────────────────────────────
 const Registration = ({ addApp }) => {
@@ -1078,7 +1173,7 @@ const Registration = ({ addApp }) => {
   };
 
   const submit = async () => {
-    const missing = validatePhase(3, d);
+    const missing = validatePhase(4, d);
     if (missing.length > 0) { setErrors(missing); setShaking(true); setTimeout(()=>setShaking(false),500); return; }
     setSubmitting(true);
     const a = await addApp(d);
@@ -1088,7 +1183,7 @@ const Registration = ({ addApp }) => {
     setTimeout(()=>top.current?.scrollIntoView({behavior:"smooth"}),80);
   };
 
-  const pct = phase===1?33:phase===2?66:100;
+  const pct = phase===1?25:phase===2?50:phase===3?75:100;
 
   if (done) return (
     <div style={{ minHeight:"100vh", background:"var(--sand2)", display:"flex", alignItems:"center", justifyContent:"center", padding:"100px 24px" }}>
@@ -1109,9 +1204,9 @@ const Registration = ({ addApp }) => {
     <div style={{ background:"var(--sand2)", minHeight:"100vh", padding:"100px 24px 80px" }} ref={top}>
       <div style={{ maxWidth:680, margin:"0 auto" }}>
         <div style={{ marginBottom:48 }}>
-          <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>Phase {phase} of 3 · {phase===1?"Business Basics":phase===2?"Compliance and Readiness":"Export Capacity"}</span>
-          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:600, color:"var(--forest)", marginBottom:8, lineHeight:1.15 }}>{phase===1?"Tell us about your business":phase===2?"Compliance and operational readiness":"Export capability and commitment"}</h1>
-          <p style={{ color:"var(--text3)", fontSize:"0.875rem" }}>{phase===1?"10 questions · approx. 5 to 6 minutes":phase===2?"9 questions · approx. 4 to 5 minutes":"8 questions · approx. 2 to 3 minutes"}</p>
+          <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>Phase {phase} of 4 · {phase===1?"Business Basics":phase===2?"Compliance and Readiness":phase===3?"Export Capacity":"Business Profile and Banking"}</span>
+          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:600, color:"var(--forest)", marginBottom:8, lineHeight:1.15 }}>{phase===1?"Tell us about your business":phase===2?"Compliance and operational readiness":phase===3?"Export capability and commitment":"Your profile and banking details"}</h1>
+          <p style={{ color:"var(--text3)", fontSize:"0.875rem" }}>{phase===1?"10 questions · approx. 5 to 6 minutes":phase===2?"9 questions · approx. 4 to 5 minutes":phase===3?"8 questions · approx. 2 to 3 minutes":"12 questions · approx. 5 to 6 minutes"}</p>
           {errors.length > 0 && (
             <div className={shaking?"shake":""} style={{ marginTop:20, background:"#FEF0EF", border:"1.5px solid var(--red)", borderRadius:10, padding:"14px 18px", display:"flex", alignItems:"flex-start", gap:10 }}>
               <span style={{ fontSize:"1rem", flexShrink:0 }}>⚠️</span>
@@ -1123,7 +1218,7 @@ const Registration = ({ addApp }) => {
           )}
           <div style={{ marginTop:20 }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-              {["Business Basics","Compliance","Export Capacity"].map((l,i)=>(<span key={l} style={{ fontSize:"0.72rem", fontWeight:i+1<=phase?600:400, color:i+1<=phase?"var(--forest)":"var(--text3)" }}>{l}</span>))}
+              {["Business Basics","Compliance","Export Capacity","Profile & Banking"].map((l,i)=>(<span key={l} style={{ fontSize:"0.65rem", fontWeight:i+1<=phase?600:400, color:i+1<=phase?"var(--forest)":"var(--text3)" }}>{l}</span>))}
             </div>
             <div style={{ background:"var(--border)", height:4, borderRadius:4, overflow:"hidden" }}>
               <div style={{ height:"100%", width:`${pct}%`, background:"linear-gradient(90deg, var(--forest), var(--sage))", borderRadius:4, transition:"width 0.6s cubic-bezier(0.16,1,0.3,1)" }} />
@@ -1134,10 +1229,11 @@ const Registration = ({ addApp }) => {
           {phase===1&&<Ph1 d={d} s={set} errors={errors} />}
           {phase===2&&<Ph2 d={d} s={set} errors={errors} />}
           {phase===3&&<Ph3 d={d} s={set} errors={errors} />}
+          {phase===4&&<Ph4 d={d} s={set} errors={errors} />}
         </div>
         <div style={{ display:"flex", justifyContent:"space-between", marginTop:48, paddingTop:28, borderTop:"1px solid var(--border)" }}>
           {phase>1?<button onClick={()=>{setPhase(p=>p-1);setErrors([]);}} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Back</button>:<div/>}
-          {phase<3
+          {phase<4
             ?<button onClick={tryNext} style={{ background:"var(--forest)", border:"none", color:"white", padding:"13px 32px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer" }}>Continue</button>
             :<button onClick={submit} disabled={submitting} style={{ background:submitting?"var(--sage)":"var(--green-ok)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:submitting?"not-allowed":"pointer", boxShadow:"0 4px 16px rgba(27,122,74,0.3)", opacity:submitting?0.8:1 }}>{submitting?"Submitting…":"Submit Application"}</button>
           }
@@ -1497,7 +1593,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, assessments, o
                             </div>
                           )}
                           <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:20 }}>
-                            {[["Business Name",a.business_name||a.businessName],["Address",a.business_address||a.businessAddress],["Niche",a.business_niche||a.businessNiche],["Structure",a.business_structure||a.businessStructure],["Operating Since",a.business_age||a.businessAge],["Role",a.role],["Export Experience",a.export_experience||a.exportExperience],["Target Markets",((a.target_markets||a.targetMarkets)||[]).join(", ")],["Contact Email",a.contact_email||a.contactEmail],["Phone",a.contact_phone||a.contactPhone],["Production Capacity",a.production_capacity||a.productionCapacity],["Monthly Turnover",a.monthly_turnover||a.monthlyTurnover],["Working Capital",a.working_capital||a.workingCapital],["Export Familiarity",a.export_docs_familiarity||a.exportDocsFamiliarity],["Quality Standards",((a.quality_standards||a.qualityStandards)||[]).join(", ")],["KYC Consent",a.kyc_consent||a.kycConsent],["Export Products",a.export_products||a.exportProducts],["Export Timeline",a.export_timeline||a.exportTimeline],["Challenges",((a.challenges)||[]).join(", ")],["Support Needed",((a.support_needed||a.supportNeeded)||[]).join(", ")],["Submitted",new Date(a.submitted_at||a.submittedAt).toLocaleDateString("en-NG",{day:"numeric",month:"long",year:"numeric"})]].filter(([,v])=>v&&v!=="").map(([label,value])=>(
+                            {[["Business Name",a.business_name||a.businessName],["Address",a.business_address||a.businessAddress],["Niche",a.business_niche||a.businessNiche],["Structure",a.business_structure||a.businessStructure],["Operating Since",a.business_age||a.businessAge],["Role",a.role],["Export Experience",a.export_experience||a.exportExperience],["Target Markets",((a.target_markets||a.targetMarkets)||[]).join(", ")],["Contact Email",a.contact_email||a.contactEmail],["Phone",a.contact_phone||a.contactPhone],["Production Capacity",a.production_capacity||a.productionCapacity],["Monthly Turnover",a.monthly_turnover||a.monthlyTurnover],["Working Capital",a.working_capital||a.workingCapital],["Export Familiarity",a.export_docs_familiarity||a.exportDocsFamiliarity],["Quality Standards",((a.quality_standards||a.qualityStandards)||[]).join(", ")],["KYC Consent",a.kyc_consent||a.kycConsent],["Export Products",a.export_products||a.exportProducts],["Export Timeline",a.export_timeline||a.exportTimeline],["Challenges",((a.challenges)||[]).join(", ")],["Support Needed",((a.support_needed||a.supportNeeded)||[]).join(", ")],["Training Location",a.training_location||a.trainingLocation],["Providus Account",a.providus_account||a.providusAccount],["Full Name",[(a.title||""),(a.first_name||a.firstName||""),(a.last_name||a.lastName||"")].filter(Boolean).join(" ")||null],["Gender",a.gender],["Date of Birth",a.date_of_birth||a.dateOfBirth],["Nationality",a.nationality],["State of Residence",a.state_of_residence||a.stateOfResidence],["Staff Count",a.staff_count||a.staffCount],["Initial Capital",a.initial_capital||a.initialCapital],["Capital Source",a.capital_source||a.capitalSource],["Total Investment",a.total_investment||a.totalInvestment],["Last Year Turnover",a.last_year_turnover||a.lastYearTurnover],["Annual Profit",a.annual_profit||a.annualProfit],["Nature of Business",a.nature_of_business||a.natureOfBusiness],["Innovation",a.innovation],["Programme Benefit",a.programme_benefit||a.programmeBenefit],["Product Differentiator",a.product_differentiator||a.productDifferentiator],["Top Competitors",a.top_competitors||a.topCompetitors],["Revenue Model",a.revenue_model||a.revenueModel],["Submitted",new Date(a.submitted_at||a.submittedAt).toLocaleDateString("en-NG",{day:"numeric",month:"long",year:"numeric"})]].filter(([,v])=>v&&v!=="").map(([label,value])=>(
                               <div key={label}><p style={{ fontSize:"0.65rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em", marginBottom:3 }}>{label.toUpperCase()}</p><p style={{ fontSize:"0.85rem", color:"var(--text)", lineHeight:1.5 }}>{value}</p></div>
                             ))}
                           </div>
