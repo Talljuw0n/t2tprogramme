@@ -226,10 +226,11 @@ const useDataStore = () => {
       await sb("applications", { method:"POST", body:JSON.stringify(row), prefer:"return=minimal" });
       setApps(prev => [{ ...row, submittedAt:row.submitted_at, businessName:data.businessName, contactEmail:data.contactEmail }, ...prev]);
       if (data.contactEmail) {
+        const fullName = [data.title, data.firstName, data.lastName].filter(Boolean).join(" ") || data.businessName || "Applicant";
         await sendEmail(EMAILJS_T_CONFIRM, {
           to_email:       data.contactEmail,
-          to_name:        data.businessName || "Applicant",
-          applicant_name: data.businessName || "Applicant",
+          to_name:        fullName,
+          applicant_name: fullName,
           reference_id:   id,
         });
       }
@@ -247,7 +248,7 @@ const useDataStore = () => {
       if (status === "approved") {
         const app   = apps.find(a => a.id === id);
         const email = app?.contact_email || app?.contactEmail;
-        const name  = app?.business_name || app?.businessName || "Applicant";
+        const name  = [app?.title, app?.first_name||app?.firstName, app?.last_name||app?.lastName].filter(Boolean).join(" ") || app?.business_name || app?.businessName || "Applicant";
         if (email) {
           const assessmentLink = `https://t2tprogramme.com?assessment=${id}`;
           await sendEmail(EMAILJS_T_STATUS, {
@@ -307,40 +308,6 @@ const useDataStore = () => {
 const validatePhase = (phase, d) => {
   const missing = [];
   if (phase === 1) {
-    if (!d.businessName?.trim()) missing.push("businessName");
-    if (!d.businessAddress?.trim()) missing.push("businessAddress");
-    if (!d.businessNiche) missing.push("businessNiche");
-    if (!d.businessStructure) missing.push("businessStructure");
-    if (!d.businessAge) missing.push("businessAge");
-    if (!d.role) missing.push("role");
-    if (!d.exportExperience) missing.push("exportExperience");
-    if (!d.productPhotos?.length) missing.push("productPhotos");
-    if (!d.targetMarkets?.length) missing.push("targetMarkets");
-    if (!d.contactPhone?.trim()) missing.push("contactPhone");
-    if (!d.contactEmail?.trim()) missing.push("contactEmail");
-    if (!d.contactTime) missing.push("contactTime");
-  }
-  if (phase === 2) {
-    if (!d.productionCapacity) missing.push("productionCapacity");
-    if (!d.qualityStandards?.length) missing.push("qualityStandards");
-    if (!d.scalability) missing.push("scalability");
-    if (!d.monthlyTurnover) missing.push("monthlyTurnover");
-    if (!d.loanHistory) missing.push("loanHistory");
-    if (!d.digitalCapability) missing.push("digitalCapability");
-    if (!d.exportDocsFamiliarity) missing.push("exportDocsFamiliarity");
-    if (!d.documents?.length) missing.push("documents");
-    if (!d.kycConsent) missing.push("kycConsent");
-  }
-  if (phase === 3) {
-    if (!d.exportProducts?.trim()) missing.push("exportProducts");
-    if (!d.shippingCompany) missing.push("shippingCompany");
-    if (!d.exportTimeline) missing.push("exportTimeline");
-    if (!d.challenges?.length) missing.push("challenges");
-    if (!d.supportNeeded?.length) missing.push("supportNeeded");
-    if (!d.workingCapital) missing.push("workingCapital");
-    if (!d.pilotAgreement) missing.push("pilotAgreement");
-  }
-  if (phase === 4) {
     if (!d.title) missing.push("title");
     if (!d.firstName?.trim()) missing.push("firstName");
     if (!d.lastName?.trim()) missing.push("lastName");
@@ -362,6 +329,40 @@ const validatePhase = (phase, d) => {
     if (!d.revenueModel?.trim()) missing.push("revenueModel");
     if (!d.trainingLocation) missing.push("trainingLocation");
     if (!d.providusAccount) missing.push("providusAccount");
+  }
+  if (phase === 2) {
+    if (!d.businessName?.trim()) missing.push("businessName");
+    if (!d.businessAddress?.trim()) missing.push("businessAddress");
+    if (!d.businessNiche) missing.push("businessNiche");
+    if (!d.businessStructure) missing.push("businessStructure");
+    if (!d.businessAge) missing.push("businessAge");
+    if (!d.role) missing.push("role");
+    if (!d.exportExperience) missing.push("exportExperience");
+    if (!d.productPhotos?.length) missing.push("productPhotos");
+    if (!d.targetMarkets?.length) missing.push("targetMarkets");
+    if (!d.contactPhone?.trim()) missing.push("contactPhone");
+    if (!d.contactEmail?.trim()) missing.push("contactEmail");
+    if (!d.contactTime) missing.push("contactTime");
+  }
+  if (phase === 3) {
+    if (!d.productionCapacity) missing.push("productionCapacity");
+    if (!d.qualityStandards?.length) missing.push("qualityStandards");
+    if (!d.scalability) missing.push("scalability");
+    if (!d.monthlyTurnover) missing.push("monthlyTurnover");
+    if (!d.loanHistory) missing.push("loanHistory");
+    if (!d.digitalCapability) missing.push("digitalCapability");
+    if (!d.exportDocsFamiliarity) missing.push("exportDocsFamiliarity");
+    if (!d.documents?.length) missing.push("documents");
+    if (!d.kycConsent) missing.push("kycConsent");
+  }
+  if (phase === 4) {
+    if (!d.exportProducts?.trim()) missing.push("exportProducts");
+    if (!d.shippingCompany) missing.push("shippingCompany");
+    if (!d.exportTimeline) missing.push("exportTimeline");
+    if (!d.challenges?.length) missing.push("challenges");
+    if (!d.supportNeeded?.length) missing.push("supportNeeded");
+    if (!d.workingCapital) missing.push("workingCapital");
+    if (!d.pilotAgreement) missing.push("pilotAgreement");
     if (!d.tcConsent) missing.push("tcConsent");
   }
   return missing;
@@ -1204,9 +1205,9 @@ const Registration = ({ addApp }) => {
     <div style={{ background:"var(--sand2)", minHeight:"100vh", padding:"100px 24px 80px" }} ref={top}>
       <div style={{ maxWidth:680, margin:"0 auto" }}>
         <div style={{ marginBottom:48 }}>
-          <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>Phase {phase} of 4 · {phase===1?"Business Basics":phase===2?"Compliance and Readiness":phase===3?"Export Capacity":"Business Profile and Banking"}</span>
-          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:600, color:"var(--forest)", marginBottom:8, lineHeight:1.15 }}>{phase===1?"Tell us about your business":phase===2?"Compliance and operational readiness":phase===3?"Export capability and commitment":"Your profile and banking details"}</h1>
-          <p style={{ color:"var(--text3)", fontSize:"0.875rem" }}>{phase===1?"10 questions · approx. 5 to 6 minutes":phase===2?"9 questions · approx. 4 to 5 minutes":phase===3?"8 questions · approx. 2 to 3 minutes":"12 questions · approx. 5 to 6 minutes"}</p>
+          <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>Phase {phase} of 4 · {phase===1?"Business Profile and Banking":phase===2?"Business Basics":phase===3?"Compliance and Readiness":"Export Capacity"}</span>
+          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:600, color:"var(--forest)", marginBottom:8, lineHeight:1.15 }}>{phase===1?"Your profile and banking details":phase===2?"Tell us about your business":phase===3?"Compliance and operational readiness":"Export capability and commitment"}</h1>
+          <p style={{ color:"var(--text3)", fontSize:"0.875rem" }}>{phase===1?"12 questions · approx. 5 to 6 minutes":phase===2?"10 questions · approx. 5 to 6 minutes":phase===3?"9 questions · approx. 4 to 5 minutes":"8 questions · approx. 2 to 3 minutes"}</p>
           {errors.length > 0 && (
             <div className={shaking?"shake":""} style={{ marginTop:20, background:"#FEF0EF", border:"1.5px solid var(--red)", borderRadius:10, padding:"14px 18px", display:"flex", alignItems:"flex-start", gap:10 }}>
               <span style={{ fontSize:"1rem", flexShrink:0 }}>⚠️</span>
@@ -1218,7 +1219,7 @@ const Registration = ({ addApp }) => {
           )}
           <div style={{ marginTop:20 }}>
             <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-              {["Business Basics","Compliance","Export Capacity","Profile & Banking"].map((l,i)=>(<span key={l} style={{ fontSize:"0.65rem", fontWeight:i+1<=phase?600:400, color:i+1<=phase?"var(--forest)":"var(--text3)" }}>{l}</span>))}
+              {["Profile & Banking","Business Basics","Compliance","Export Capacity"].map((l,i)=>(<span key={l} style={{ fontSize:"0.65rem", fontWeight:i+1<=phase?600:400, color:i+1<=phase?"var(--forest)":"var(--text3)" }}>{l}</span>))}
             </div>
             <div style={{ background:"var(--border)", height:4, borderRadius:4, overflow:"hidden" }}>
               <div style={{ height:"100%", width:`${pct}%`, background:"linear-gradient(90deg, var(--forest), var(--sage))", borderRadius:4, transition:"width 0.6s cubic-bezier(0.16,1,0.3,1)" }} />
@@ -1226,10 +1227,10 @@ const Registration = ({ addApp }) => {
           </div>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:28 }}>
-          {phase===1&&<Ph1 d={d} s={set} errors={errors} />}
-          {phase===2&&<Ph2 d={d} s={set} errors={errors} />}
-          {phase===3&&<Ph3 d={d} s={set} errors={errors} />}
-          {phase===4&&<Ph4 d={d} s={set} errors={errors} />}
+          {phase===1&&<Ph4 d={d} s={set} errors={errors} />}
+          {phase===2&&<Ph1 d={d} s={set} errors={errors} />}
+          {phase===3&&<Ph2 d={d} s={set} errors={errors} />}
+          {phase===4&&<Ph3 d={d} s={set} errors={errors} />}
         </div>
         <div style={{ display:"flex", justifyContent:"space-between", marginTop:48, paddingTop:28, borderTop:"1px solid var(--border)" }}>
           {phase>1?<button onClick={()=>{setPhase(p=>p-1);setErrors([]);}} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Back</button>:<div/>}
