@@ -1148,16 +1148,40 @@ const Ph4=({d,s,errors})=>{
 </>);};
 
 // ─── SME REGISTRATION ─────────────────────────────────────────────────────────
+const REG_SAVE_KEY = "t2t_reg_draft";
+
 const Registration = ({ addApp }) => {
-  const [phase, setPhase]       = useState(1);
-  const [d, setD]               = useState({});
-  const [done, setDone]         = useState(false);
-  const [ref, setRef]           = useState("");
-  const [errors, setErrors]     = useState([]);
-  const [shaking, setShaking]   = useState(false);
+  const savedDraft = (() => { try { const s = localStorage.getItem(REG_SAVE_KEY); return s ? JSON.parse(s) : null; } catch { return null; } })();
+  const [phase, setPhase]           = useState(savedDraft?.phase || 1);
+  const [d, setD]                   = useState(savedDraft?.data || {});
+  const [done, setDone]             = useState(false);
+  const [ref, setRef]               = useState("");
+  const [errors, setErrors]         = useState([]);
+  const [shaking, setShaking]       = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showResume, setShowResume] = useState(!!savedDraft);
   const top = useRef(null);
-  const set = (k,v) => { setD(p=>({...p,[k]:v})); setErrors(prev=>prev.filter(e=>e!==k)); };
+
+  const set = (k,v) => {
+    setD(p => {
+      const next = {...p,[k]:v};
+      try { localStorage.setItem(REG_SAVE_KEY, JSON.stringify({ phase, data: next })); } catch {}
+      return next;
+    });
+    setErrors(prev=>prev.filter(e=>e!==k));
+  };
+
+  const savePhase = (newPhase) => {
+    try { localStorage.setItem(REG_SAVE_KEY, JSON.stringify({ phase: newPhase, data: d })); } catch {}
+    setPhase(newPhase);
+  };
+
+  const clearDraft = () => {
+    try { localStorage.removeItem(REG_SAVE_KEY); } catch {}
+    setD({});
+    setPhase(1);
+    setShowResume(false);
+  };
 
   const tryNext = () => {
     const missing = validatePhase(phase, d);
@@ -1169,7 +1193,7 @@ const Registration = ({ addApp }) => {
       return;
     }
     setErrors([]);
-    setPhase(p=>p+1);
+    savePhase(phase+1);
     setTimeout(()=>top.current?.scrollIntoView({behavior:"smooth"}),80);
   };
 
@@ -1181,6 +1205,7 @@ const Registration = ({ addApp }) => {
     setRef(a.id);
     setDone(true);
     setSubmitting(false);
+    try { localStorage.removeItem(REG_SAVE_KEY); } catch {}
     setTimeout(()=>top.current?.scrollIntoView({behavior:"smooth"}),80);
   };
 
@@ -1204,6 +1229,18 @@ const Registration = ({ addApp }) => {
   return (
     <div style={{ background:"var(--sand2)", minHeight:"100vh", padding:"100px 24px 80px" }} ref={top}>
       <div style={{ maxWidth:680, margin:"0 auto" }}>
+        {showResume && (
+          <div className="fade-up" style={{ background:"var(--amber-bg)", border:"1.5px solid var(--amber)", borderRadius:12, padding:"16px 20px", marginBottom:28, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+              <span style={{ fontSize:"1.2rem" }}>💾</span>
+              <div>
+                <p style={{ fontWeight:600, fontSize:"0.875rem", color:"var(--amber)" }}>You have a saved application</p>
+                <p style={{ fontSize:"0.78rem", color:"var(--text2)", marginTop:2 }}>Pick up where you left off — your answers have been restored.</p>
+              </div>
+            </div>
+            <button onClick={clearDraft} style={{ background:"transparent", border:"1.5px solid var(--amber)", color:"var(--amber)", padding:"7px 16px", borderRadius:8, fontSize:"0.78rem", fontWeight:600, cursor:"pointer", flexShrink:0 }}>Start Fresh</button>
+          </div>
+        )}
         <div style={{ marginBottom:48 }}>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>Phase {phase} of 4 · {phase===1?"Business Profile and Banking":phase===2?"Business Basics":phase===3?"Compliance and Readiness":"Export Capacity"}</span>
           <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(1.8rem,4vw,2.8rem)", fontWeight:600, color:"var(--forest)", marginBottom:8, lineHeight:1.15 }}>{phase===1?"Your profile and banking details":phase===2?"Tell us about your business":phase===3?"Compliance and operational readiness":"Export capability and commitment"}</h1>
@@ -1233,7 +1270,7 @@ const Registration = ({ addApp }) => {
           {phase===4&&<Ph3 d={d} s={set} errors={errors} />}
         </div>
         <div style={{ display:"flex", justifyContent:"space-between", marginTop:48, paddingTop:28, borderTop:"1px solid var(--border)" }}>
-          {phase>1?<button onClick={()=>{setPhase(p=>p-1);setErrors([]);}} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Back</button>:<div/>}
+          {phase>1?<button onClick={()=>{savePhase(phase-1);setErrors([]);}} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"11px 24px", borderRadius:8, fontSize:"0.875rem", fontWeight:500, cursor:"pointer" }}>Back</button>:<div/>}
           {phase<4
             ?<button onClick={tryNext} style={{ background:"var(--forest)", border:"none", color:"white", padding:"13px 32px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer" }}>Continue</button>
             :<button onClick={submit} disabled={submitting} style={{ background:submitting?"var(--sage)":"var(--green-ok)", border:"none", color:"white", padding:"13px 36px", borderRadius:8, fontSize:"0.95rem", fontWeight:600, cursor:submitting?"not-allowed":"pointer", boxShadow:"0 4px 16px rgba(27,122,74,0.3)", opacity:submitting?0.8:1 }}>{submitting?"Submitting…":"Submit Application"}</button>
@@ -1846,12 +1883,16 @@ const getCategory = (scores) => {
   return "Beginner";
 };
 
+const ASS_SAVE_KEY = (id) => `t2t_assessment_${id}`;
+
 const Assessment = ({ applicationId, onDone }) => {
-  const [answers, setAnswers]       = useState({});
-  const [section, setSection]       = useState(0);
+  const savedAss = (() => { try { const s = localStorage.getItem(ASS_SAVE_KEY(applicationId)); return s ? JSON.parse(s) : null; } catch { return null; } })();
+  const [answers, setAnswers]       = useState(savedAss?.answers || {});
+  const [section, setSection]       = useState(savedAss?.section || 0);
   const [submitted, setSubmitted]   = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [category, setCategory]     = useState(null);
+  const [showResume, setShowResume] = useState(!!savedAss);
   const top = useRef(null);
   const m = useMobile();
 
@@ -1861,16 +1902,28 @@ const Assessment = ({ applicationId, onDone }) => {
 
   const allAnswered = current.questions.every((_, i) => answers[`${current.id}_${i}`]);
 
+  const saveAnswer = (key, val) => {
+    setAnswers(prev => {
+      const next = {...prev, [key]: val};
+      try { localStorage.setItem(ASS_SAVE_KEY(applicationId), JSON.stringify({ answers: next, section })); } catch {}
+      return next;
+    });
+  };
+
   const next = () => {
     if (!allAnswered) return;
     if (section < totalSections - 1) {
-      setSection(s => s + 1);
+      const newSection = section + 1;
+      setSection(newSection);
+      try { localStorage.setItem(ASS_SAVE_KEY(applicationId), JSON.stringify({ answers, section: newSection })); } catch {}
       setTimeout(() => top.current?.scrollIntoView({ behavior: "smooth" }), 80);
     }
   };
 
   const prev = () => {
-    setSection(s => s - 1);
+    const newSection = section - 1;
+    setSection(newSection);
+    try { localStorage.setItem(ASS_SAVE_KEY(applicationId), JSON.stringify({ answers, section: newSection })); } catch {}
     setTimeout(() => top.current?.scrollIntoView({ behavior: "smooth" }), 80);
   };
 
@@ -1908,6 +1961,7 @@ const Assessment = ({ applicationId, onDone }) => {
       });
       setCategory(cat);
       setSubmitted(true);
+      try { localStorage.removeItem(ASS_SAVE_KEY(applicationId)); } catch {}
     } catch (e) {
       console.error("Assessment submit error:", e);
     } finally {
@@ -1942,6 +1996,20 @@ const Assessment = ({ applicationId, onDone }) => {
 
   return (
     <div style={{ minHeight:"100vh", background:"var(--sand2)", padding: m ? "40px 20px 60px" : "60px 24px 80px" }} ref={top}>
+      {showResume && (
+        <div style={{ maxWidth:760, margin:"0 auto", paddingTop: m?"24px":"40px" }}>
+          <div className="fade-up" style={{ background:"var(--amber-bg)", border:"1.5px solid var(--amber)", borderRadius:12, padding:"16px 20px", marginBottom:0, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+              <span style={{ fontSize:"1.2rem" }}>💾</span>
+              <div>
+                <p style={{ fontWeight:600, fontSize:"0.875rem", color:"var(--amber)" }}>Your progress has been saved</p>
+                <p style={{ fontSize:"0.78rem", color:"var(--text2)", marginTop:2 }}>You are on Section {section + 1} of {ASSESSMENT_SECTIONS.length} — continue from where you left off.</p>
+              </div>
+            </div>
+            <button onClick={()=>{ setAnswers({}); setSection(0); setShowResume(false); try { localStorage.removeItem(ASS_SAVE_KEY(applicationId)); } catch {} }} style={{ background:"transparent", border:"1.5px solid var(--amber)", color:"var(--amber)", padding:"7px 16px", borderRadius:8, fontSize:"0.78rem", fontWeight:600, cursor:"pointer", flexShrink:0 }}>Start Over</button>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div style={{ maxWidth:760, margin:"0 auto 40px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:16, marginBottom:24 }}>
@@ -1979,7 +2047,7 @@ const Assessment = ({ applicationId, onDone }) => {
                   </p>
                   <div style={{ display:"grid", gridTemplateColumns: m ? "1fr 1fr" : "repeat(4, 1fr)", gap:8 }}>
                     {[["yes","Yes"],["somewhat","Somewhat"],["no","No"],["na","N/A"]].map(([k, label]) => (
-                      <div key={k} onClick={() => setAnswers(prev => ({ ...prev, [key]: k }))} style={optionStyle(k, i)}>
+                      <div key={k} onClick={() => saveAnswer(key, k)} style={optionStyle(k, i)}>
                         <div style={{ width:16, height:16, borderRadius:"50%", border:`2px solid ${val===k ? "var(--forest)" : "var(--border)"}`, background: val===k ? "var(--forest)" : "white", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
                           {val===k && <div style={{ width:5, height:5, borderRadius:"50%", background:"white" }} />}
                         </div>
