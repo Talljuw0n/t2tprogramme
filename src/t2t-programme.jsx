@@ -347,6 +347,8 @@ const validatePhase = (phase, d) => {
   if (phase === 3) {
     if (!d.productionCapacity) missing.push("productionCapacity");
     if (!d.qualityStandards?.length) missing.push("qualityStandards");
+    const certsRequired = d.qualityStandards?.some(s => !["None yet","Not applicable"].includes(s));
+    if (certsRequired && !d.productCerts?.length) missing.push("productCerts");
     if (!d.scalability) missing.push("scalability");
     if (!d.monthlyTurnover) missing.push("monthlyTurnover");
     if (!d.loanHistory) missing.push("loanHistory");
@@ -1044,9 +1046,14 @@ const Ph2=({d,s,errors})=>(<>
       <Chk value={d.qualityStandards} onChange={v=>s("qualityStandards",v)} options={["NAFDAC","SON","ISO","ECOWAS standards","FDA","HACCP","None yet","Not applicable"]} hasError={errors.includes("qualityStandards")} />
     </FF>
     <div style={{ marginTop:20 }}>
-      <FF num="33b" label="Kindly upload product certificates" hint="Upload up to 5 certificates · JPG, PNG, WEBP or PDF · max 10 MB each">
-        <ProductCertUpload value={d.productCerts} onChange={v=>s("productCerts",v)} />
-      </FF>
+      {(() => {
+        const certsRequired = d.qualityStandards?.some(s => !["None yet","Not applicable"].includes(s));
+        return (
+          <FF num="33b" label="Kindly upload product certificates" hint={certsRequired ? "Required — please upload at least one certificate · JPG, PNG, WEBP or PDF · max 10 MB each" : "Optional — upload certificates if available · JPG, PNG, WEBP or PDF · max 10 MB each"} hasError={errors.includes("productCerts")}>
+            <ProductCertUpload value={d.productCerts} onChange={v=>s("productCerts",v)} hasError={errors.includes("productCerts")} />
+          </FF>
+        );
+      })()}
     </div>
   </EA>
   <EA id="scalability"><FF num="34" label="Can you scale production if orders increase by 50%?" hasError={errors.includes("scalability")}><Rad value={d.scalability} onChange={v=>s("scalability",v)} options={["Yes, immediately","Yes, within 1 month","Yes, with investment","No","Not sure"]} hasError={errors.includes("scalability")} /></FF></EA>
