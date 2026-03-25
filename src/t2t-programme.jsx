@@ -862,10 +862,10 @@ const ProductPhotoUpload = ({ value = [], onChange, hasError }) => {
   const [dragOver, setDragOver]   = useState(false);
   const inputRef = useRef(null);
   const MAX_FILES = 2;
-  const MAX_BYTES = 5 * 1024 * 1024;
+  const MAX_BYTES = 2 * 1024 * 1024;
 
   const uploadFile = async (file) => {
-    if (file.size > MAX_BYTES) { alert(`"${file.name}" exceeds the 5 MB limit.`); return null; }
+    if (file.size > MAX_BYTES) { alert(`"${file.name}" exceeds the 2 MB limit.`); return null; }
     if (!["image/jpeg","image/png","image/webp"].includes(file.type)) { alert(`"${file.name}" is not supported. Please use JPG, PNG or WEBP.`); return null; }
     const ext = file.name.split(".").pop();
     const filename = `products/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
@@ -911,7 +911,7 @@ const ProductPhotoUpload = ({ value = [], onChange, hasError }) => {
                 <p style={{ fontWeight:600, fontSize:"0.875rem", color:hasError?"var(--red)":"var(--text)", marginBottom:4 }}>
                   {(value||[]).length===0?"Click or drag to upload product photos":"Add one more photo"}
                 </p>
-                <p style={{ fontSize:"0.75rem", color:"var(--text3)" }}>{MAX_FILES-(value||[]).length} remaining · JPG, PNG or WEBP · max 5 MB each</p>
+                <p style={{ fontSize:"0.75rem", color:"var(--text3)" }}>{MAX_FILES-(value||[]).length} remaining · JPG, PNG or WEBP · max 2 MB each</p>
               </>
           }
         </div>
@@ -939,10 +939,10 @@ const ProductCertUpload = ({ value = [], onChange, hasError }) => {
   const [dragOver, setDragOver]   = useState(false);
   const inputRef = useRef(null);
   const MAX_FILES = 5;
-  const MAX_BYTES = 10 * 1024 * 1024;
+  const MAX_BYTES = 3 * 1024 * 1024;
 
   const uploadFile = async (file) => {
-    if (file.size > MAX_BYTES) { alert(`"${file.name}" exceeds the 10 MB limit.`); return null; }
+    if (file.size > MAX_BYTES) { alert(`"${file.name}" exceeds the 3 MB limit.`); return null; }
     if (!["image/jpeg","image/png","image/webp","application/pdf"].includes(file.type)) { alert(`"${file.name}" is not supported. Please use JPG, PNG, WEBP or PDF.`); return null; }
     const ext = file.name.split(".").pop();
     const filename = `certs/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
@@ -987,7 +987,7 @@ const ProductCertUpload = ({ value = [], onChange, hasError }) => {
               </div>
             : <>
                 <p style={{ fontWeight:600, fontSize:"0.875rem", color:hasError?"var(--red)":"var(--text)", marginBottom:4 }}>Click or drag to upload certificates</p>
-                <p style={{ fontSize:"0.75rem", color:"var(--text3)" }}>{MAX_FILES-(value||[]).length} remaining · JPG, PNG, WEBP or PDF · max 10 MB each</p>
+                <p style={{ fontSize:"0.75rem", color:"var(--text3)" }}>{MAX_FILES-(value||[]).length} remaining · JPG, PNG, WEBP or PDF · max 3 MB each</p>
               </>
           }
         </div>
@@ -1026,7 +1026,7 @@ const Ph1=({d,s,errors})=>(<>
   <EA id="businessAge"><FF num="26" label="How long has your business been operating?" hasError={errors.includes("businessAge")}><Rad value={d.businessAge} onChange={v=>s("businessAge",v)} options={["Less than 6 months","6 to 12 months","1 to 2 years","2+ years"]} hasError={errors.includes("businessAge")} /></FF></EA>
   <EA id="role"><FF num="27" label="Your role in the business" hasError={errors.includes("role")}><Rad value={d.role} onChange={v=>s("role",v)} options={["Founder / Owner","Co-founder","Manager","Other"]} hasError={errors.includes("role")} /></FF></EA>
   <EA id="exportExperience"><FF num="28" label="Have you ever sold products or services formally outside Nigeria?" hasError={errors.includes("exportExperience")}><Rad value={d.exportExperience} onChange={v=>s("exportExperience",v)} options={["Yes, currently","Yes, previously","No, but interested","Not sure"]} hasError={errors.includes("exportExperience")} /></FF></EA>
-  <EA id="productPhotos"><FF num="29" label="Upload a picture of your export-ready product(s)" hint="Upload up to 2 product photos (JPG, PNG or WEBP · max 5 MB each)" hasError={errors.includes("productPhotos")}>
+  <EA id="productPhotos"><FF num="29" label="Upload a picture of your export-ready product(s)" hint="Upload up to 2 product photos (JPG, PNG or WEBP · max 2 MB each)" hasError={errors.includes("productPhotos")}>
     <ProductPhotoUpload value={d.productPhotos} onChange={v=>s("productPhotos",v)} hasError={errors.includes("productPhotos")} />
   </FF></EA>
   <EA id="targetMarkets"><FF num="30" label="Which markets interest you most?" hint="Select all that apply" hasError={errors.includes("targetMarkets")}><Chk value={d.targetMarkets} onChange={v=>s("targetMarkets",v)} options={["ECOWAS countries","USA","Canada","Caribbean","Africa","Other African countries","Not sure yet"]} hasError={errors.includes("targetMarkets")} /></FF></EA>
@@ -1049,7 +1049,7 @@ const Ph2=({d,s,errors})=>(<>
       {(() => {
         const certsRequired = d.qualityStandards?.some(s => !["None yet","Not applicable"].includes(s));
         return (
-          <FF num="33b" label="Kindly upload product certificates" hint={certsRequired ? "Required — please upload at least one certificate · JPG, PNG, WEBP or PDF · max 10 MB each" : "Optional — upload certificates if available · JPG, PNG, WEBP or PDF · max 10 MB each"} hasError={errors.includes("productCerts")}>
+          <FF num="33b" label="Kindly upload product certificates" hint={certsRequired ? "Required — please upload at least one certificate · JPG, PNG, WEBP or PDF · max 3 MB each" : "Optional — upload certificates if available · JPG, PNG, WEBP or PDF · max 3 MB each"} hasError={errors.includes("productCerts")}>
             <ProductCertUpload value={d.productCerts} onChange={v=>s("productCerts",v)} hasError={errors.includes("productCerts")} />
           </FF>
         );
