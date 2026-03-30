@@ -737,7 +737,7 @@ const Landing = ({ setPage }) => {
             <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"13px 32px", borderRadius:9, fontSize:"0.9rem", fontWeight:600, cursor:"pointer", boxShadow:"0 4px 20px rgba(27,61,47,0.25)" }}>Apply to the Programme</button>
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-            {[{num:"3",label:"Month intensive programme"},{num:"2",label:"Delivery cities"},{num:"3",label:"Target global markets"},{num:"50+",label:"SMEs to be selected"}].map(({num,label})=>(
+            {[{num:"3",label:"Month intensive programme"},{num:"2",label:"Delivery cities"},{num:"10+",label:"Target global markets"},{num:"500",label:"SMEs to be selected"}].map(({num,label})=>(
               <div key={label} style={{ background:"var(--sand2)", border:"1px solid var(--border)", borderRadius:12, padding:"24px 20px" }}>
                 <p style={{ fontFamily:"Cormorant Garamond", fontSize:"2.5rem", fontWeight:700, color:"var(--forest)", lineHeight:1 }}>{num}</p>
                 <p style={{ fontSize:"0.78rem", color:"var(--text3)", marginTop:8, lineHeight:1.4 }}>{label}</p>
