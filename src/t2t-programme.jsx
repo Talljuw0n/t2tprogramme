@@ -13,23 +13,23 @@ const useMobile = () => {
 
 const GlobalStyles = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root {
-      --forest:#1B3D2F; --forest2:#234D3B; --forest3:#2E6249;
-      --sage:#4A7C63; --sage-light:#6B9E84;
-      --mint:#C8E6DA; --mint2:#E8F5EF;
-      --sand:#F5EFE0; --sand2:#FDF9F3; --cream:#FFFEF9;
-      --text:#1A2820; --text2:#3D5449; --text3:#6B7F76;
-      --border:#D8E8E0; --border2:#EAF2EC;
-      --white:#FFFFFF; --red:#C0392B; --green-ok:#1B7A4A;
+      --forest:#000066; --forest2:#003399; --forest3:#003399;
+      --sage:#003399; --sage-light:#4D6BB5;
+      --mint:#B8A289; --mint2:#F2EDE8;
+      --sand:#EBECF0; --sand2:#F5F5F8; --cream:#FFFFFF;
+      --text:#000000; --text2:#1A1A1A; --text3:#5C5C6E;
+      --border:#D8D9E0; --border2:#EBECF0;
+      --white:#FFFFFF; --red:#C0392B; --green-ok:#003399;
       --amber:#B8943F; --amber-bg:#FDF5E0;
       --max-w:1440px;
     }
     .wrap { max-width:var(--max-w); margin:0 auto; width:100%; }
     html { scroll-behavior:smooth; }
-    body { font-family:'Outfit',sans-serif; background:var(--cream); color:var(--text); overflow-x:hidden; }
-    h1,h2,h3,h4 { font-family:'Cormorant Garamond',serif; }
+    body { font-family:'Sora',sans-serif; background:var(--cream); color:var(--text); overflow-x:hidden; }
+    h1,h2,h3,h4 { font-family:'Sora',sans-serif; }
     ::-webkit-scrollbar { width:3px; }
     ::-webkit-scrollbar-track { background:var(--sand); }
     ::-webkit-scrollbar-thumb { background:var(--forest); border-radius:2px; }
@@ -43,9 +43,9 @@ const GlobalStyles = () => (
     @keyframes spin { to { transform:rotate(360deg); } }
     .card-hover { transition:transform 0.25s ease,box-shadow 0.25s ease; }
     .card-hover:hover { transform:translateY(-4px);box-shadow:0 20px 60px rgba(27,61,47,0.12); }
-    input,select,textarea { font-family:'Outfit',sans-serif; }
+    input,select,textarea { font-family:'Sora',sans-serif; }
     input:focus,select:focus,textarea:focus { outline:none;border-color:var(--forest) !important;box-shadow:0 0 0 3px rgba(27,61,47,0.08); }
-    button { font-family:'Outfit',sans-serif; }
+    button { font-family:'Sora',sans-serif; }
     @media (max-width: 768px) {
       .hero-section { padding:100px 24px 48px !important; min-height:auto !important; }
       .hero-buttons { flex-direction:column !important; }
@@ -406,6 +406,12 @@ const staticNews = [
     img:"https://insidebusiness.ng/wp-content/uploads/OVL08358-scaled.jpg",
     source:"InsideBusiness",
     externalUrl:"https://insidebusiness.ng/239001/ecowas-parliament-private-sector-unite-to-grow-regional-trade/" },
+   { id:"s0", cat:"PROGRAMME UPDATE", date:"July 11, 2025", featured:true,
+    headline:"We're Live on Providus Bank",
+    summary:"The T2T Programme is officially live on Providus Bank. Follow our journey and stay updated on programme milestones, SME spotlights, and trade insights.",
+    img:"announcement.jpeg",
+    source:"Instagram",
+    externalUrl:"https://www.instagram.com/p/DWgbh3dDJag/?igsh=MWo5b3NzdHI2bG9raw==" },
 ];
 
 
@@ -453,22 +459,22 @@ const TCModal = ({ onClose }) => (
         </ul>
         <p style={{ marginBottom:20 }}>Your data will not be sold, rented, or shared with any organisation outside this programme without your explicit consent. All partners are bound by confidentiality obligations consistent with applicable data protection laws.</p>
 
-        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>5. KYC Verification</h3>
+        <h3 style={{ fontFamily:"Sora", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>5. KYC Verification</h3>
         <p style={{ marginBottom:20 }}>Full KYC (Know Your Customer) verification is mandatory for all participants accepted into the programme. This is a regulatory requirement under Providus Bank's compliance framework. Failure to complete KYC verification will result in disqualification from the programme regardless of application score.</p>
 
-        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>6. Pilot Transaction Requirement</h3>
+        <h3 style={{ fontFamily:"Sora", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>6. Pilot Transaction Requirement</h3>
         <p style={{ marginBottom:20 }}>As a standard programme requirement, initial commercial engagement will commence with small pilot transactions prior to full-scale deals. This is designed to validate readiness and build a verifiable transaction record. Applicants who do not agree to this condition will not be eligible for the transaction execution stage of the programme.</p>
 
-        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>7. Programme Commitment</h3>
+        <h3 style={{ fontFamily:"Sora", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>7. Programme Commitment</h3>
         <p style={{ marginBottom:20 }}>Selected participants are expected to commit fully to all programme activities including attendance at training sessions, submission of required compliance documents, and active participation in market access engagements. The programme runs for three months across Lagos and Abuja. Participants who fail to meet attendance and commitment requirements may be removed from the programme.</p>
 
-        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>8. Accuracy of Information</h3>
+        <h3 style={{ fontFamily:"Sora", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>8. Accuracy of Information</h3>
         <p style={{ marginBottom:20 }}>By submitting this application you confirm that all information provided is accurate, complete, and truthful. Submission of false or misleading information will result in immediate disqualification and may be reported to relevant authorities where required by law.</p>
 
-        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>9. No Guarantee of Selection</h3>
+        <h3 style={{ fontFamily:"Sora", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>9. No Guarantee of Selection</h3>
         <p style={{ marginBottom:20 }}>Submission of a completed application does not guarantee selection into the programme. All applications will be assessed against the programme's eligibility and scoring criteria. The implementing partners and Providus Bank reserve the right to accept or decline any application at their discretion.</p>
 
-        <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>10. Contact</h3>
+        <h3 style={{ fontFamily:"Sora", fontSize:"1.1rem", fontWeight:600, color:"var(--forest)", marginBottom:8 }}>10. Contact</h3>
         <p style={{ marginBottom:0 }}>For questions regarding these terms or your application, contact the T2T Programme team at <strong>applications@t2tprogramme.com</strong>.</p>
 
       </div>
@@ -503,7 +509,7 @@ const PasswordGate = ({ title, subtitle, action, buttonLabel, onUnlock }) => {
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
           </svg>
         </div>
-        <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.8rem", color:"var(--forest)", marginBottom:8 }}>{title}</h2>
+        <h2 style={{ fontFamily:"Sora", fontSize:"1.8rem", color:"var(--forest)", marginBottom:8 }}>{title}</h2>
         <p style={{ color:"var(--text3)", fontSize:"0.875rem", marginBottom:32, fontWeight:300 }}>{subtitle}</p>
         <div style={{ position:"relative", marginBottom:12 }}>
           <input type={show?"text":"password"} value={pw}
@@ -555,7 +561,7 @@ const Nav = ({ page, setPage, onLogoClick }) => {
                     </svg>
                   </div>
                   <div>
-                    <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.1rem", color:"var(--forest)", lineHeight:1 }}>T2T Programme</p>
+                    <p style={{ fontFamily:"Sora", fontWeight:700, fontSize:"1.1rem", color:"var(--forest)", lineHeight:1 }}>T2T Programme</p>
                     <p style={{ fontSize:"0.6rem", color:"var(--text3)", letterSpacing:"0.08em", fontWeight:500 }}>TRAINING TO TRANSACTION</p>
                   </div>
                 </div>
@@ -595,20 +601,28 @@ const Nav = ({ page, setPage, onLogoClick }) => {
 
 const PARTNER_LOGOS = {
   providus:   "/logos/providus.png",
-  ecowas:     "/logos/ecowas.png",
+  ecowaspar:  "/logos/ecowasparliament.png",
   gaba:       "/logos/gaba.png",
+  valcertra:  "/logos/valcertra.png",
   duchess:    "/logos/duchess.png",
   borderless: "/logos/borderless.png",
+  cmd:        "/logos/CMD.png",
+  smedan:     "/logos/smedan.png",
+  ecowas:     "/logos/ecowas.png"
 };
 
 const Landing = ({ setPage }) => {
   const m = useMobile();
   const partners = [
+    { key:"ecowaspar",  name:"ECOWAS Parliament",                    role:"",                     abbr:"EP"   },
+    { key:"ecowas",     name:"ECOWAS",                               role:"",                     abbr:"EP"   },
     { key:"providus",   name:"Providus Bank",                        role:"Lead Sponsor",         abbr:"PB"   },
-    { key:"ecowas",     name:"ECOWAS Parliament",                    role:"Institutional Backer", abbr:"EP"   },
-    { key:"gaba",       name:"Global African Business Assoc.",       role:"GABA",                 abbr:"GABA" },
     { key:"duchess",    name:"Duchess Natural Limited",              role:"Implementing Partner", abbr:"DNL"  },
     { key:"borderless", name:"Borderless Trade & Investments",       role:"Implementing Partner", abbr:"BTI"  },
+    { key:"cmd",        name:"CMD Tourism & Trade Enterprise",       role:"Implementing Partner", abbr:"CMD"  },
+    { key:"gaba",       name:"Global African Business Assoc.",       role:"GABA",                 abbr:"GABA" },
+    { key:"valcertra",  name:"VALCERTRA",                            role:"",                     abbr:""     },
+    { key:"smedan",     name:"SMEDAN",                               role:"Community Partner",    abbr:""     },
   ];
   return (
   <div style={{ overflowX:"hidden" }}>
@@ -626,14 +640,14 @@ const Landing = ({ setPage }) => {
               <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
                 <span className="live-dot" /><span>Applications Open · Deadline April 13, 2026</span>
               </div>
-              <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
+              <h1 style={{ fontFamily:"Sora", fontSize:"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
                 Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
               </h1>
               <p style={{ fontSize:"1.15rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, maxWidth:520, marginBottom:16, fontWeight:300 }}>
                 A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
               </p>
-              <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:44, opacity:0.85 }}>
-                Lagos and Abuja · Commencing April 20, 2026
+              <p style={{ fontFamily:"Sora", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:44, opacity:0.85 }}>
+                Training Commences April 20, 2026
               </p>
               <div style={{ display:"flex", flexDirection:"row", gap:12 }}>
                 <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
@@ -649,7 +663,7 @@ const Landing = ({ setPage }) => {
             {/* Right overview card — desktop only */}
             <div style={{ width:280, background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:20, padding:"32px 28px", flexShrink:0 }}>
               <p style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(200,230,218,0.6)", letterSpacing:"0.12em", marginBottom:20 }}>PROGRAMME OVERVIEW</p>
-              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"3 Months"},{label:"Application Deadline",val:"April 13, 2026"},{label:"Commencement",val:"April 20, 2026"},{label:"Target Markets",val:"USA · Canada · Caribbean · Africa"}].map(({label,val},i,arr)=>(
+              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Application Deadline",val:"April 13, 2026"},{label:"Commencement",val:"April 20, 2026"},{label:"Target Markets",val:"USA · UK · Canada · Caribbean · Africa "}].map(({label,val},i,arr)=>(
                 <div key={label} style={{ marginBottom: i<arr.length-1?16:0, paddingBottom: i<arr.length-1?16:0, borderBottom: i<arr.length-1?"1px solid rgba(200,230,218,0.12)":"none" }}>
                   <p style={{ fontSize:"0.68rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
                   <p style={{ fontSize:"0.9rem", fontWeight:600, color:"white" }}>{val}</p>
@@ -665,14 +679,14 @@ const Landing = ({ setPage }) => {
             <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28, alignSelf:"flex-start" }}>
               <span className="live-dot" /><span>Applications Open · Deadline April 13, 2026</span>
             </div>
-            <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3rem", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
+            <h1 style={{ fontFamily:"Sora", fontSize:"3rem", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
               Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
             </h1>
             <p style={{ fontSize:"1rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, marginBottom:16, fontWeight:300 }}>
               A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
             </p>
-            <p style={{ fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:32, opacity:0.85 }}>
-              Lagos and Abuja · Commencing April 20, 2026
+            <p style={{ fontFamily:"Sora", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:32, opacity:0.85 }}>
+              Training Commences April 20, 2026
             </p>
             {/* Buttons */}
             <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
@@ -732,14 +746,16 @@ const Landing = ({ setPage }) => {
               The T2T Programme is a structured, institutional initiative that walks market-ready African SMEs through a proven pathway into their first international transactions.
             </p>
             <p style={{ color:"var(--text2)", lineHeight:1.9, fontWeight:300, fontSize:"0.95rem", marginBottom:32 }}>
-              Spanning three months across Lagos and Abuja, the programme covers export readiness, trade compliance, buyer linkage, and direct access to trade finance — all designed around real commercial outcomes.
+              Programme Structure & Duration:
+              Training Phase: 5 Days (In-Person + Virtual)
+              Transaction Phase: 3–6 Months (Market Access, Buyer Engagement & Trade Financing Process)
             </p>
             <button onClick={()=>setPage("register")} style={{ background:"var(--forest)", color:"white", border:"none", padding:"13px 32px", borderRadius:9, fontSize:"0.9rem", fontWeight:600, cursor:"pointer", boxShadow:"0 4px 20px rgba(27,61,47,0.25)" }}>Apply to the Programme</button>
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-            {[{num:"3",label:"Month intensive programme"},{num:"2",label:"Delivery cities"},{num:"10+",label:"Target global markets"},{num:"500",label:"SMEs to be selected"}].map(({num,label})=>(
+            {[{num:"5",label:"Days intensive training"},{num:"2",label:"Delivery cities"},{num:"10",label:"Target global markets"},{num:"500",label:"SMEs to be selected"}].map(({num,label})=>(
               <div key={label} style={{ background:"var(--sand2)", border:"1px solid var(--border)", borderRadius:12, padding:"24px 20px" }}>
-                <p style={{ fontFamily:"Cormorant Garamond", fontSize:"2.5rem", fontWeight:700, color:"var(--forest)", lineHeight:1 }}>{num}</p>
+                <p style={{ fontFamily:"Sora", fontSize:"2.5rem", fontWeight:700, color:"var(--forest)", lineHeight:1 }}>{num}</p>
                 <p style={{ fontSize:"0.78rem", color:"var(--text3)", marginTop:8, lineHeight:1.4 }}>{label}</p>
               </div>
             ))}
@@ -753,18 +769,18 @@ const Landing = ({ setPage }) => {
       <div className="wrap" style={{ position:"relative", zIndex:1, padding: m?"0":"0 80px" }}>
         <div style={{ textAlign:"center", marginBottom: m?40:64 }}>
           <span style={{ background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", display:"inline-block", marginBottom:16 }}>HOW IT WORKS</span>
-          <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"3rem", fontWeight:600, color:"white", lineHeight:1.1 }}>Three stages. Real outcomes.</h2>
+          <h2 style={{ fontFamily:"Sora", fontSize: m?"2.2rem":"3rem", fontWeight:600, color:"white", lineHeight:1.1 }}>Three stages. Real outcomes.</h2>
         </div>
         <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3,1fr)", gap: m?20:24 }}>
           {[
-            {num:"01",title:"Business and Export Readiness",desc:"Compliance documentation, NAFDAC and product standards, KYC completion, and operational assessment.",dur:"Lagos: 4 days · Abuja: 2 days"},
-            {num:"02",title:"Market Access and Buyer Linkage",desc:"Buyer connections, ECOWAS region and US-Canada market access, and full trade documentation.",dur:"Lagos: 4 days · Abuja: 2 days"},
-            {num:"03",title:"Transaction Execution",desc:"Trade finance solutions, FX access via Providus Bank, pilot transaction guidance, and first deal closed.",dur:"Lagos: 4 days · Abuja: 2 days"},
+            {num:"01",title:"Business and Export Readiness",desc:"Compliance documentation, NAFDAC and product standards, KYC completion, and operational assessment.",dur:"Lagos · Abuja"},
+            {num:"02",title:"Market Access and Buyer Linkage",desc:"Buyer connections, ECOWAS region and US-Canada market access, and full trade documentation.",dur:"Lagos · Abuja"},
+            {num:"03",title:"Transaction Execution",desc:"Trade finance solutions, FX access via Providus Bank, pilot transaction guidance, and first deal closed.",dur:"Lagos · Abuja"},
           ].map(({num,title,desc,dur})=>(
             <div key={num} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(200,230,218,0.12)", borderRadius:16, overflow:"hidden" }}>
               <div style={{ padding:"28px 24px" }}>
-                <div style={{ width:44, height:44, background:"rgba(200,230,218,0.12)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Cormorant Garamond", fontWeight:700, color:"var(--mint)", fontSize:"1.1rem", marginBottom:16 }}>{num}</div>
-                <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"white", marginBottom:10, lineHeight:1.2 }}>{title}</h3>
+                <div style={{ width:44, height:44, background:"rgba(200,230,218,0.12)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Sora", fontWeight:700, color:"var(--mint)", fontSize:"1.1rem", marginBottom:16 }}>{num}</div>
+                <h3 style={{ fontFamily:"Sora", fontSize:"1.3rem", fontWeight:600, color:"white", marginBottom:10, lineHeight:1.2 }}>{title}</h3>
                 <p style={{ fontSize:"0.85rem", color:"rgba(200,230,218,0.7)", lineHeight:1.7, marginBottom:16 }}>{desc}</p>
                 <span style={{ background:"rgba(200,230,218,0.1)", border:"1px solid rgba(200,230,218,0.2)", color:"var(--mint)", padding:"4px 12px", borderRadius:100, fontSize:"0.7rem", fontWeight:500 }}>{dur}</span>
               </div>
@@ -778,7 +794,7 @@ const Landing = ({ setPage }) => {
       <div className="wrap" style={{ padding: m?"0":"0 80px" }}>
         <div style={{ textAlign:"center", marginBottom: m?40:60 }}>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", display:"inline-block", marginBottom:16 }}>WHO IT IS FOR</span>
-          <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"3rem", fontWeight:600, color:"var(--forest)", lineHeight:1.1 }}>Built for market-ready<br />African SMEs</h2>
+          <h2 style={{ fontFamily:"Sora", fontSize: m?"2.2rem":"3rem", fontWeight:600, color:"var(--forest)", lineHeight:1.1 }}>Built for market-ready<br />African SMEs</h2>
         </div>
         <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3,1fr)", gap: m?20:28 }}>
           {[
@@ -789,23 +805,23 @@ const Landing = ({ setPage }) => {
             <div key={title} style={{ borderRadius:16, overflow:"hidden", background:"white", border:"1px solid var(--border)", boxShadow:"0 2px 20px rgba(27,61,47,0.06)" }}>
               <div style={{ padding:"28px 24px" }}>
                 <div style={{ width:52, height:52, background:"var(--mint2)", borderRadius:14, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.6rem", marginBottom:16 }}>{icon}</div>
-                <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:10 }}>{title}</h3>
+                <h3 style={{ fontFamily:"Sora", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:10 }}>{title}</h3>
                 <p style={{ fontSize:"0.875rem", color:"var(--text2)", lineHeight:1.7 }}>{desc}</p>
               </div>
             </div>
           ))}
         </div>
-        <p style={{ textAlign:"center", marginTop:32, fontFamily:"Cormorant Garamond", fontStyle:"italic", fontSize:"1rem", color:"var(--text3)" }}>Prior export experience is an advantage but is not mandatory.</p>
+        <p style={{ textAlign:"center", marginTop:32, fontFamily:"Sora", fontStyle:"italic", fontSize:"1rem", color:"var(--text3)" }}>Prior export experience is an advantage but is not mandatory.</p>
       </div>
     </section>
 
     <section style={{ position:"relative", overflow:"hidden", background:"linear-gradient(135deg, var(--forest) 0%, #1a3d2e 100%)" }}>
       <div style={{ position:"absolute", inset:0, opacity:0.1, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.5) 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
       <div className="wrap" style={{ position:"relative", zIndex:1, padding: m?"60px 24px":"100px 80px", textAlign:"center" }}>
-        <h2 style={{ fontFamily:"Cormorant Garamond", fontSize: m?"2.2rem":"clamp(2.5rem,5vw,4.5rem)", fontWeight:600, color:"white", lineHeight:1.05, marginBottom:16 }}>
+        <h2 style={{ fontFamily:"Sora", fontSize: m?"2.2rem":"clamp(2.5rem,5vw,4.5rem)", fontWeight:600, color:"white", lineHeight:1.05, marginBottom:16 }}>
           Applications Close<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:300 }}>April 13, 2026</span>
         </h2>
-        <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:44, fontSize: m?"1rem":"1.1rem", fontWeight:300 }}>Programme commences April 20 in Lagos and Abuja.</p>
+        <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:44, fontSize: m?"1rem":"1.1rem", fontWeight:300 }}>Traning commences April 20th</p>
         <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"16px 48px", borderRadius:10, fontSize:"1rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
           onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
           onMouseLeave={e=>{e.currentTarget.style.background="white";}}
@@ -819,7 +835,7 @@ const Landing = ({ setPage }) => {
           <div>
             {T2T_LOGO
               ? <img src={T2T_LOGO} alt="T2T Programme" style={{ height:36, width:"auto", objectFit:"contain", marginBottom:8, filter:"brightness(0) invert(1)" }} />
-              : <p style={{ fontFamily:"Cormorant Garamond", fontWeight:700, fontSize:"1.3rem", color:"white", marginBottom:4 }}>T2T Programme</p>
+              : <p style={{ fontFamily:"Sora", fontWeight:700, fontSize:"1.3rem", color:"white", marginBottom:4 }}>T2T Programme</p>
             }
             <p style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.3)" }}>Training to Transaction · 2026</p>
           </div>
@@ -1223,11 +1239,11 @@ const Registration = ({ addApp }) => {
     <div style={{ minHeight:"100vh", background:"var(--sand2)", display:"flex", alignItems:"center", justifyContent:"center", padding:"100px 24px" }}>
       <div className="fade-up" style={{ background:"white", border:"1px solid var(--border)", borderRadius:20, padding:"60px 48px", maxWidth:500, width:"100%", textAlign:"center", boxShadow:"0 24px 80px rgba(27,61,47,0.1)" }}>
         <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center" }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Application Received</h2>
+        <h2 style={{ fontFamily:"Sora", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Application Received</h2>
         <p style={{ color:"var(--text2)", lineHeight:1.7, marginBottom:28, fontWeight:300 }}>Your application has been successfully received and will be reviewed as part of the screening and selection process. Shortlisted applicants will be contacted via the details provided.</p>
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"18px 24px", marginBottom:28 }}>
           <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:6 }}>YOUR REFERENCE ID</p>
-          <p style={{ fontFamily:"Cormorant Garamond", fontSize:"1.5rem", fontWeight:700, color:"var(--forest)" }}>{ref}</p>
+          <p style={{ fontFamily:"Sora", fontSize:"1.5rem", fontWeight:700, color:"var(--forest)" }}>{ref}</p>
         </div>
         <p style={{ fontSize:"0.82rem", color:"var(--text3)" }}>Please ensure your email and phone remain accessible. We look forward to working with you.</p>
       </div>
@@ -1310,11 +1326,11 @@ const PressPortal = ({ addSubmission, onExit }) => {
     <div style={{ minHeight:"100vh", background:"var(--sand2)", display:"flex", alignItems:"center", justifyContent:"center", padding:"100px 24px" }}>
       <div className="fade-up" style={{ background:"white", border:"1px solid var(--border)", borderRadius:20, padding:"60px 48px", maxWidth:520, width:"100%", textAlign:"center", boxShadow:"0 24px 80px rgba(27,61,47,0.1)" }}>
         <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center" }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
-        <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Submission Received</h2>
+        <h2 style={{ fontFamily:"Sora", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Submission Received</h2>
         <p style={{ color:"var(--text2)", lineHeight:1.7, marginBottom:28, fontWeight:300 }}>Your press submission has been received by the T2T Programme communications team. All submissions are reviewed before publication.</p>
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"18px 24px", marginBottom:28 }}>
           <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:6 }}>SUBMISSION REFERENCE</p>
-          <p style={{ fontFamily:"Cormorant Garamond", fontSize:"1.5rem", fontWeight:700, color:"var(--forest)" }}>{refId}</p>
+          <p style={{ fontFamily:"Sora", fontSize:"1.5rem", fontWeight:700, color:"var(--forest)" }}>{refId}</p>
         </div>
         <p style={{ fontSize:"0.82rem", color:"var(--text3)", marginBottom:24 }}>For urgent enquiries contact: <strong>applications@t2tprogramme.com</strong></p>
         <button onClick={onExit} style={{ background:"var(--forest)", color:"white", border:"none", padding:"12px 28px", borderRadius:8, fontSize:"0.875rem", fontWeight:600, cursor:"pointer" }}>Back to Newsroom</button>
@@ -1327,7 +1343,7 @@ const PressPortal = ({ addSubmission, onExit }) => {
       <div style={{ maxWidth:680, margin:"0 auto" }}>
         <div style={{ marginBottom:48 }}>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>PRESS PORTAL · ACCREDITED JOURNALISTS</span>
-          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:600, color:"var(--forest)", lineHeight:1.1, marginBottom:12 }}>Submit a Story or Press Release</h1>
+          <h1 style={{ fontFamily:"Sora", fontSize:"clamp(2rem,4vw,3rem)", fontWeight:600, color:"var(--forest)", lineHeight:1.1, marginBottom:12 }}>Submit a Story or Press Release</h1>
           <p style={{ color:"var(--text2)", lineHeight:1.7, fontWeight:300, marginBottom:20 }}>Use this portal to submit press releases, story pitches, or editorial contributions for consideration in the T2T Programme Digital Newsroom.</p>
           <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"14px 18px", display:"flex", alignItems:"flex-start", gap:10 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0,marginTop:2}}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -1403,7 +1419,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
       <button onClick={()=>setArt(null)} style={{ background:"transparent", border:"1.5px solid var(--border)", color:"var(--text2)", padding:"8px 18px", borderRadius:8, fontSize:"0.8rem", fontWeight:500, cursor:"pointer", marginBottom:40 }}>Back to Newsroom</button>
       <div className="fade-up">
         <span style={{ background:"var(--forest)", color:"var(--mint)", padding:"3px 12px", borderRadius:4, fontSize:"0.68rem", fontWeight:600, letterSpacing:"0.1em" }}>{art.cat}</span>
-        <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"2.6rem", fontWeight:600, color:"var(--forest)", marginTop:16, marginBottom:10, lineHeight:1.2 }}>{art.headline}</h1>
+        <h1 style={{ fontFamily:"Sora", fontSize:"2.6rem", fontWeight:600, color:"var(--forest)", marginTop:16, marginBottom:10, lineHeight:1.2 }}>{art.headline}</h1>
         <div style={{ display:"flex", gap:16, marginBottom:32, alignItems:"center" }}>
           <p style={{ color:"var(--text3)", fontSize:"0.85rem" }}>{art.date}</p>
           {art.source && <span style={{ background:"var(--mint2)", color:"var(--forest3)", padding:"2px 10px", borderRadius:100, fontSize:"0.72rem", fontWeight:500 }}>{art.source}</span>}
@@ -1420,7 +1436,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
             </>
         }
         <div style={{ marginTop:56, background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:16, padding:"36px 40px" }}>
-          <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.4rem", color:"var(--forest)", marginBottom:20 }}>Media Contacts</h3>
+          <h3 style={{ fontFamily:"Sora", fontSize:"1.4rem", color:"var(--forest)", marginBottom:20 }}>Media Contacts</h3>
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3, 1fr)", gap:20 }}>
             {[{name:"Media Enquiries",email:"applications@t2tprogramme.com",org:"T2T Programme Office"},{name:"Programme Updates",email:"applications@t2tprogramme.com"}].map(c=>(
               <div key={c.email}><p style={{ fontWeight:600, fontSize:"0.875rem", marginBottom:3 }}>{c.name}</p><p style={{ color:"var(--forest)", fontSize:"0.83rem", marginBottom:2 }}>{c.email}</p><p style={{ color:"var(--text3)", fontSize:"0.78rem" }}>{c.org}</p></div>
@@ -1436,7 +1452,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
       <div style={{ maxWidth:1100, margin:"0 auto 60px", display:"flex", flexDirection:m?"column":"row", justifyContent:"space-between", alignItems:m?"flex-start":"flex-end", paddingBottom:32, borderBottom:"1px solid var(--border)", gap:20 }}>
         <div>
           <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:6, padding:"4px 12px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:12, display:"inline-block" }}>DIGITAL NEWSROOM</span>
-          <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"3.2rem", fontWeight:600, color:"var(--forest)", lineHeight:1 }}>Press and Media</h1>
+          <h1 style={{ fontFamily:"Sora", fontSize:"3.2rem", fontWeight:600, color:"var(--forest)", lineHeight:1 }}>Press and Media</h1>
           <p style={{ color:"var(--text3)", marginTop:8 }}>Official communications for media professionals, journalists, and stakeholders.</p>
         </div>
         <div style={{ display:"flex", flexDirection:"column", gap:12, alignItems:"flex-end" }}>
@@ -1457,7 +1473,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
               <span style={{ background:"var(--forest)", color:"var(--mint)", padding:"3px 12px", borderRadius:4, fontSize:"0.68rem", fontWeight:600, letterSpacing:"0.08em" }}>FEATURED</span>
               <span style={{ background:"var(--mint2)", color:"var(--forest3)", padding:"3px 12px", borderRadius:4, fontSize:"0.68rem", fontWeight:600, letterSpacing:"0.08em" }}>{feat.cat}</span>
             </div>
-            <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.7rem", fontWeight:600, color:"var(--forest)", lineHeight:1.2, marginBottom:14 }}>{feat.headline}</h2>
+            <h2 style={{ fontFamily:"Sora", fontSize:"1.7rem", fontWeight:600, color:"var(--forest)", lineHeight:1.2, marginBottom:14 }}>{feat.headline}</h2>
             <p style={{ color:"var(--text2)", lineHeight:1.7, fontSize:"0.875rem", marginBottom:20, fontWeight:300 }}>{feat.summary}</p>
             <p style={{ color:"var(--text3)", fontSize:"0.78rem" }}>{feat.date}</p>
           </div>
@@ -1474,7 +1490,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
                     <span style={{ fontSize:"0.65rem", fontWeight:600, letterSpacing:"0.1em", color:"var(--sage)" }}>{a.cat}</span>
                     {a.externalUrl && <span style={{ fontSize:"0.6rem", background:"var(--sand2)", border:"1px solid var(--border)", color:"var(--text3)", padding:"1px 6px", borderRadius:4, fontWeight:500 }}>↗ External</span>}
                   </div>
-                  <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.15rem", fontWeight:600, color:"var(--forest)", lineHeight:1.3, marginBottom:8 }}>{a.headline}</h3>
+                  <h3 style={{ fontFamily:"Sora", fontSize:"1.15rem", fontWeight:600, color:"var(--forest)", lineHeight:1.3, marginBottom:8 }}>{a.headline}</h3>
                   <p style={{ fontSize:"0.82rem", color:"var(--text2)", lineHeight:1.6, marginBottom:12 }}>{a.summary?.substring(0,110)}...</p>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                     <p style={{ color:"var(--text3)", fontSize:"0.75rem" }}>{a.date}</p>
@@ -1486,7 +1502,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
           </div>
         )}
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:20, padding:m?"28px 20px":"48px" }}>
-          <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.8rem", fontWeight:600, color:"var(--forest)", marginBottom:6 }}>Media Resources</h2>
+          <h2 style={{ fontFamily:"Sora", fontSize:"1.8rem", fontWeight:600, color:"var(--forest)", marginBottom:6 }}>Media Resources</h2>
           <p style={{ color:"var(--text3)", marginBottom:32, fontSize:"0.875rem" }}>Official assets for press use</p>
           <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:14, padding:"32px 28px", marginBottom:32, display:"flex", flexDirection:m?"column":"row", alignItems:m?"flex-start":"center", justifyContent:"space-between", gap:24 }}>
             <div>
@@ -1496,7 +1512,7 @@ const Newsroom = ({ setPage, approvedSubmissions, onPressClick }) => {
             <a href="mailto:applications@t2tprogramme.com?subject=Media%20Asset%20Request%20%E2%80%94%20T2T%20Programme" style={{ background:"var(--forest)", color:"white", border:"none", padding:"12px 28px", borderRadius:9, fontSize:"0.875rem", fontWeight:600, cursor:"pointer", textDecoration:"none", whiteSpace:"nowrap", flexShrink:0 }}>Request Assets</a>
           </div>
           <div style={{ paddingTop:32, borderTop:"1px solid var(--border)" }}>
-            <h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:16 }}>Press Contacts</h3>
+            <h3 style={{ fontFamily:"Sora", fontSize:"1.3rem", fontWeight:600, color:"var(--forest)", marginBottom:16 }}>Press Contacts</h3>
             <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3, 1fr)", gap:12 }}>
               {[{name:"Media Enquiries",email:"applications@t2tprogramme.com",org:"T2T Programme Office"},{name:"Programme Updates",email:"applications@t2tprogramme.com"}].map(c=>(
                 <div key={c.email} style={{ background:"white", border:"1px solid var(--border)", borderRadius:10, padding:"16px 18px" }}>
@@ -1542,7 +1558,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, assessments, o
             </div>
             <div>
               <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:600, letterSpacing:"0.08em" }}>ADMIN DASHBOARD</p>
-              <h1 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.8rem", fontWeight:600, color:"var(--forest)", lineHeight:1 }}>T2T Programme Control Panel</h1>
+              <h1 style={{ fontFamily:"Sora", fontSize:"1.8rem", fontWeight:600, color:"var(--forest)", lineHeight:1 }}>T2T Programme Control Panel</h1>
             </div>
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
@@ -1566,7 +1582,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, assessments, o
               {[{label:"Total Received",val:counts.total,acc:"var(--forest)"},{label:"Pending Review",val:counts.pending,acc:"#B8943F"},{label:"Approved",val:counts.approved,acc:"#1B7A4A"},{label:"Rejected",val:counts.rejected,acc:"#C0392B"},{label:"Average Score",val:`${counts.avg}/100`,acc:"var(--forest)"}].map(({label,val,acc})=>(
                 <div key={label} style={{ background:"white", border:"1px solid var(--border)", borderRadius:12, padding:"20px", borderTop:`3px solid ${acc}` }}>
                   <p style={{ fontSize:"0.72rem", color:"var(--text3)", fontWeight:500, marginBottom:8 }}>{label}</p>
-                  <p style={{ fontFamily:"Cormorant Garamond", fontSize:"1.9rem", fontWeight:700, color:acc }}>{val}</p>
+                  <p style={{ fontFamily:"Sora", fontSize:"1.9rem", fontWeight:700, color:acc }}>{val}</p>
                 </div>
               ))}
             </div>
@@ -1658,7 +1674,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, assessments, o
               {[{label:"Total Submissions",val:pCounts.total,acc:"var(--forest)"},{label:"Awaiting Review",val:pCounts.pending,acc:"#B8943F"},{label:"Published",val:pCounts.approved,acc:"#1B7A4A"},{label:"Declined",val:pCounts.rejected,acc:"#C0392B"}].map(({label,val,acc})=>(
                 <div key={label} style={{ background:"white", border:"1px solid var(--border)", borderRadius:12, padding:"20px", borderTop:`3px solid ${acc}` }}>
                   <p style={{ fontSize:"0.72rem", color:"var(--text3)", fontWeight:500, marginBottom:8 }}>{label}</p>
-                  <p style={{ fontFamily:"Cormorant Garamond", fontSize:"1.9rem", fontWeight:700, color:acc }}>{val}</p>
+                  <p style={{ fontFamily:"Sora", fontSize:"1.9rem", fontWeight:700, color:acc }}>{val}</p>
                 </div>
               ))}
             </div>
@@ -1670,7 +1686,7 @@ const Dashboard = ({ apps, upAppStatus, submissions, upSubStatus, assessments, o
               ))}
             </div>
             {submissions.length===0
-              ? <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"80px 40px", textAlign:"center" }}><p style={{ fontSize:"3rem", marginBottom:16 }}>📰</p><h3 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.6rem", color:"var(--forest)", marginBottom:8 }}>No press submissions yet</h3></div>
+              ? <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding:"80px 40px", textAlign:"center" }}><p style={{ fontSize:"3rem", marginBottom:16 }}>📰</p><h3 style={{ fontFamily:"Sora", fontSize:"1.6rem", color:"var(--forest)", marginBottom:8 }}>No press submissions yet</h3></div>
               : <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, overflow:"hidden" }}>
                   <div style={{ display:"grid", gridTemplateColumns:"2.5fr 1.5fr 1fr 1fr 120px", padding:"12px 24px", background:"var(--sand2)", borderBottom:"1px solid var(--border)", fontSize:"0.68rem", fontWeight:700, color:"var(--text3)", letterSpacing:"0.08em" }}>
                     <span>HEADLINE</span><span>JOURNALIST AND OUTLET</span><span>TYPE</span><span>STATUS</span><span>ACTIONS</span>
@@ -1981,11 +1997,11 @@ const Assessment = ({ applicationId, onDone }) => {
     <div style={{ minHeight:"100vh", background:"linear-gradient(135deg, var(--forest) 0%, #234D3B 100%)", display:"flex", alignItems:"center", justifyContent:"center", padding:24 }}>
       <div className="fade-up" style={{ background:"white", borderRadius:20, padding:"60px 48px", maxWidth:520, width:"100%", textAlign:"center", boxShadow:"0 24px 80px rgba(0,0,0,0.2)" }}>
         <div style={{ width:72, height:72, background:"var(--mint2)", borderRadius:"50%", margin:"0 auto 24px", display:"flex", alignItems:"center", justifyContent:"center" }}><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--forest)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Assessment Complete</h2>
+        <h2 style={{ fontFamily:"Sora", fontSize:"2.2rem", color:"var(--forest)", marginBottom:12 }}>Assessment Complete</h2>
         <p style={{ color:"var(--text2)", lineHeight:1.7, marginBottom:28, fontWeight:300 }}>Thank you for completing the Export Readiness Assessment. The T2T Programme team will review your results and be in touch shortly regarding your participation track.</p>
         <div style={{ background:"var(--mint2)", border:"1px solid var(--border)", borderRadius:10, padding:"18px 24px", marginBottom:28 }}>
           <p style={{ fontSize:"0.7rem", color:"var(--text3)", fontWeight:700, letterSpacing:"0.08em", marginBottom:6 }}>APPLICATION REFERENCE</p>
-          <p style={{ fontFamily:"Cormorant Garamond", fontSize:"1.4rem", fontWeight:700, color:"var(--forest)" }}>{applicationId}</p>
+          <p style={{ fontFamily:"Sora", fontSize:"1.4rem", fontWeight:700, color:"var(--forest)" }}>{applicationId}</p>
         </div>
         <p style={{ fontSize:"0.82rem", color:"var(--text3)" }}>For enquiries contact <strong>applications@t2tprogramme.com</strong></p>
       </div>
@@ -2026,7 +2042,7 @@ const Assessment = ({ applicationId, onDone }) => {
         <span style={{ background:"var(--forest)", color:"var(--mint)", borderRadius:100, padding:"4px 14px", fontSize:"0.72rem", fontWeight:600, letterSpacing:"0.08em", marginBottom:14, display:"inline-block" }}>
           Section {section + 1} of {totalSections}
         </span>
-        <h1 style={{ fontFamily:"Cormorant Garamond", fontSize: m ? "1.8rem" : "2.4rem", fontWeight:600, color:"var(--forest)", marginBottom:6, lineHeight:1.15 }}>
+        <h1 style={{ fontFamily:"Sora", fontSize: m ? "1.8rem" : "2.4rem", fontWeight:600, color:"var(--forest)", marginBottom:6, lineHeight:1.15 }}>
           Export Readiness Assessment
         </h1>
         <p style={{ color:"var(--text3)", fontSize:"0.875rem", marginBottom:20 }}>Application Reference: <strong style={{ color:"var(--forest)" }}>{applicationId}</strong></p>
@@ -2039,7 +2055,7 @@ const Assessment = ({ applicationId, onDone }) => {
       <div style={{ maxWidth:760, margin:"0 auto" }}>
         <div style={{ background:"white", border:"1px solid var(--border)", borderRadius:16, padding: m ? "24px 20px" : "36px 40px", marginBottom:28 }}>
           <div style={{ marginBottom:28, paddingBottom:20, borderBottom:"1px solid var(--border2)" }}>
-            <h2 style={{ fontFamily:"Cormorant Garamond", fontSize:"1.5rem", fontWeight:600, color:"var(--forest)", marginBottom:4 }}>{current.label}</h2>
+            <h2 style={{ fontFamily:"Sora", fontSize:"1.5rem", fontWeight:600, color:"var(--forest)", marginBottom:4 }}>{current.label}</h2>
             <p style={{ fontSize:"0.82rem", color:"var(--text3)", fontStyle:"italic" }}>{current.desc}</p>
           </div>
 
