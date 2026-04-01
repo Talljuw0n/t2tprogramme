@@ -774,7 +774,7 @@ const Landing = ({ setPage }) => {
         <div style={{ display:"grid", gridTemplateColumns: m?"1fr":"repeat(3,1fr)", gap: m?20:24 }}>
           {[
             {num:"01",title:"Business and Export Readiness",desc:"Compliance documentation, NAFDAC and product standards, KYC completion, and operational assessment.",dur:"Lagos · Abuja"},
-            {num:"02",title:"Market Access and Buyer Linkage",desc:"Buyer connections, ECOWAS region and US-UK-Canada market access, and full trade documentation.",dur:"Lagos · Abuja"},
+            {num:"02",title:"Market Access and Buyer Linkage",desc:"Buyer connections, ECOWAS region and US, UK, Canada market access, and full trade documentation.",dur:"Lagos · Abuja"},
             {num:"03",title:"Transaction Execution",desc:"Trade finance solutions, FX access via Providus Bank, pilot transaction guidance, and first deal closed.",dur:"Lagos · Abuja"},
           ].map(({num,title,desc,dur})=>(
             <div key={num} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(200,230,218,0.12)", borderRadius:16, overflow:"hidden" }}>
