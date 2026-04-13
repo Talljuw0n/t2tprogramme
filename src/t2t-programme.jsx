@@ -638,7 +638,7 @@ const Landing = ({ setPage }) => {
             {/* Left content */}
             <div className="fade-up" style={{ flex:1 }}>
               <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28 }}>
-                <span className="live-dot" /><span>Applications Open · Deadline April 13, 2026</span>
+                <span className="live-dot" /><span>Application is Open</span>
               </div>
               <h1 style={{ fontFamily:"Sora", fontSize:"clamp(3.5rem,6vw,6.5rem)", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
                 Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
@@ -663,7 +663,7 @@ const Landing = ({ setPage }) => {
             {/* Right overview card — desktop only */}
             <div style={{ width:280, background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:20, padding:"32px 28px", flexShrink:0 }}>
               <p style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(200,230,218,0.6)", letterSpacing:"0.12em", marginBottom:20 }}>PROGRAMME OVERVIEW</p>
-              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"5 Days"},{label:"Application Deadline",val:"April 13, 2026"},{label:"Commencement",val:"April 20, 2026"},{label:"Target Markets",val:"USA · UK · Canada · Caribbean · Africa "}].map(({label,val},i,arr)=>(
+              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"5 Days"},{label:"Commencement",val:"April 20, 2026"},{label:"Target Markets",val:"USA · UK · Canada · Caribbean · Africa "}].map(({label,val},i,arr)=>(
                 <div key={label} style={{ marginBottom: i<arr.length-1?16:0, paddingBottom: i<arr.length-1?16:0, borderBottom: i<arr.length-1?"1px solid rgba(200,230,218,0.12)":"none" }}>
                   <p style={{ fontSize:"0.68rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
                   <p style={{ fontSize:"0.9rem", fontWeight:600, color:"white" }}>{val}</p>
@@ -677,7 +677,7 @@ const Landing = ({ setPage }) => {
         {m && (
           <div className="fade-up" style={{ display:"flex", flexDirection:"column" }}>
             <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(200,230,218,0.15)", border:"1px solid rgba(200,230,218,0.3)", color:"var(--mint)", borderRadius:100, padding:"6px 16px 6px 12px", fontSize:"0.75rem", fontWeight:500, letterSpacing:"0.04em", marginBottom:28, alignSelf:"flex-start" }}>
-              <span className="live-dot" /><span>Applications Open · Deadline April 13, 2026</span>
+              <span className="live-dot" /><span>Application is Open</span>
             </div>
             <h1 style={{ fontFamily:"Sora", fontSize:"3rem", fontWeight:600, lineHeight:1.0, color:"white", marginBottom:20, letterSpacing:"-0.01em" }}>
               Training<br />to <span style={{ fontStyle:"italic", fontWeight:300, color:"var(--mint)" }}>Transaction.</span>
@@ -696,7 +696,7 @@ const Landing = ({ setPage }) => {
             {/* Overview card — mobile, full width, INSIDE the column */}
             <div style={{ background:"rgba(255,255,255,0.1)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:16, padding:"24px" }}>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-                {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"5 Days"},{label:"Deadline",val:"April 13, 2026"},{label:"Starts",val:"April 20, 2026"}].map(({label,val})=>(
+                {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"5 Days"},{label:"Starts",val:"April 20, 2026"}].map(({label,val})=>(
                   <div key={label}>
                     <p style={{ fontSize:"0.65rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
                     <p style={{ fontSize:"0.875rem", fontWeight:600, color:"white" }}>{val}</p>
@@ -819,7 +819,7 @@ const Landing = ({ setPage }) => {
       <div style={{ position:"absolute", inset:0, opacity:0.1, backgroundImage:"radial-gradient(circle, rgba(200,230,218,0.5) 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
       <div className="wrap" style={{ position:"relative", zIndex:1, padding: m?"60px 24px":"100px 80px", textAlign:"center" }}>
         <h2 style={{ fontFamily:"Sora", fontSize: m?"2.2rem":"clamp(2.5rem,5vw,4.5rem)", fontWeight:600, color:"white", lineHeight:1.05, marginBottom:16 }}>
-          Applications Close<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:300 }}>April 13, 2026</span>
+          Application is Open<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:300 }}></span>
         </h2>
         <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:44, fontSize: m?"1rem":"1.1rem", fontWeight:300 }}>Traning commences April 20th</p>
         <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"16px 48px", borderRadius:10, fontSize:"1rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
