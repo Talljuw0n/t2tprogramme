@@ -646,9 +646,9 @@ const Landing = ({ setPage }) => {
               <p style={{ fontSize:"1.15rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, maxWidth:520, marginBottom:16, fontWeight:300 }}>
                 A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
               </p>
-              <p style={{ fontFamily:"Sora", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:44, opacity:0.85 }}>
+              {/* <p style={{ fontFamily:"Sora", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:44, opacity:0.85 }}>
                 Training Commences April 20, 2026
-              </p>
+              </p> */}
               <div style={{ display:"flex", flexDirection:"row", gap:12 }}>
                 <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
                   onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
@@ -663,7 +663,7 @@ const Landing = ({ setPage }) => {
             {/* Right overview card — desktop only */}
             <div style={{ width:280, background:"rgba(255,255,255,0.08)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:20, padding:"32px 28px", flexShrink:0 }}>
               <p style={{ fontSize:"0.65rem", fontWeight:700, color:"rgba(200,230,218,0.6)", letterSpacing:"0.12em", marginBottom:20 }}>PROGRAMME OVERVIEW</p>
-              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"5 Days"},{label:"Commencement",val:"April 20, 2026"},{label:"Target Markets",val:"USA · UK · Canada · Caribbean · Africa "}].map(({label,val},i,arr)=>(
+              {[{label:"Delivery Cities",val:"Lagos and Abuja"},{label:"Duration",val:"5 Days"},{label:"Target Markets",val:"USA · UK · Canada · Caribbean · Africa "}].map(({label,val},i,arr)=>(
                 <div key={label} style={{ marginBottom: i<arr.length-1?16:0, paddingBottom: i<arr.length-1?16:0, borderBottom: i<arr.length-1?"1px solid rgba(200,230,218,0.12)":"none" }}>
                   <p style={{ fontSize:"0.68rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
                   <p style={{ fontSize:"0.9rem", fontWeight:600, color:"white" }}>{val}</p>
@@ -685,9 +685,9 @@ const Landing = ({ setPage }) => {
             <p style={{ fontSize:"1rem", color:"rgba(255,255,255,0.75)", lineHeight:1.8, marginBottom:16, fontWeight:300 }}>
               A structured programme moving African SMEs from business readiness into real commercial transactions across global markets.
             </p>
-            <p style={{ fontFamily:"Sora", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:32, opacity:0.85 }}>
+            {/* <p style={{ fontFamily:"Sora", fontStyle:"italic", fontSize:"1.05rem", color:"var(--mint)", marginBottom:32, opacity:0.85 }}>
               Training Commences April 20, 2026
-            </p>
+            </p> */}
             {/* Buttons */}
             <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:32 }}>
               <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"15px 36px", borderRadius:10, fontSize:"0.95rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}>Apply to the Programme</button>
@@ -696,7 +696,7 @@ const Landing = ({ setPage }) => {
             {/* Overview card — mobile, full width, INSIDE the column */}
             <div style={{ background:"rgba(255,255,255,0.1)", backdropFilter:"blur(20px)", border:"1px solid rgba(200,230,218,0.2)", borderRadius:16, padding:"24px" }}>
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-                {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"5 Days"},{label:"Starts",val:"April 20, 2026"}].map(({label,val})=>(
+                {[{label:"Cities",val:"Lagos & Abuja"},{label:"Duration",val:"5 Days"}].map(({label,val})=>(
                   <div key={label}>
                     <p style={{ fontSize:"0.65rem", color:"rgba(200,230,218,0.5)", marginBottom:3 }}>{label}</p>
                     <p style={{ fontSize:"0.875rem", fontWeight:600, color:"white" }}>{val}</p>
@@ -821,7 +821,7 @@ const Landing = ({ setPage }) => {
         <h2 style={{ fontFamily:"Sora", fontSize: m?"2.2rem":"clamp(2.5rem,5vw,4.5rem)", fontWeight:600, color:"white", lineHeight:1.05, marginBottom:16 }}>
           Application is Open<br /><span style={{ color:"var(--mint)", fontStyle:"italic", fontWeight:300 }}></span>
         </h2>
-        <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:44, fontSize: m?"1rem":"1.1rem", fontWeight:300 }}>Traning commences April 20th</p>
+        {/* <p style={{ color:"rgba(200,230,218,0.7)", marginBottom:44, fontSize: m?"1rem":"1.1rem", fontWeight:300 }}>Traning commences April 20th</p> */}
         <button onClick={()=>setPage("register")} style={{ background:"white", color:"var(--forest)", border:"none", padding:"16px 48px", borderRadius:10, fontSize:"1rem", fontWeight:700, cursor:"pointer", boxShadow:"0 8px 32px rgba(0,0,0,0.25)", transition:"all 0.2s" }}
           onMouseEnter={e=>{e.currentTarget.style.background="var(--mint)";}}
           onMouseLeave={e=>{e.currentTarget.style.background="white";}}
